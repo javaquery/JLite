@@ -1,0 +1,19 @@
+plugins {
+    id "base"
+}
+
+description = "Java Util Library"
+
+allprojects {
+    group = "io.popcorn"
+}
+
+subprojects {
+    repositories {
+        mavenCentral()
+    }
+
+    configurations.all {
+        resolutionStrategy.cacheChangingModulesFor 0, "minutes"
+    }
+}

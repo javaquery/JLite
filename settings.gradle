@@ -1,0 +1,5 @@
+rootProject.name="popcorn"
+include 'core:util'
+include 'core:spring'
+include 'core:httpclient'
+include 'core:ftpclient'
