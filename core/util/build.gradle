@@ -1,8 +1,8 @@
 plugins {
-    id 'java'
+    id "java-library"
 }
 
-group = 'io.popcorn'
+description = "Utility classes for Java projects"
 version = '1.0.0'
 
 repositories {

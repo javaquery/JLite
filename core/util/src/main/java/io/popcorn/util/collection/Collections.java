@@ -225,7 +225,7 @@ public final class Collections {
    * @param collectionTwo the second collection, must not be null
    * @return {@code true} iff the collections contain the same elements with the same cardinalities.
    * @throws NullPointerException if either collection is null
-   * @since 1.0.3
+   * @since 1.0.0
    */
   public static boolean isCollectionEqual(
       final Collection<?> collectionOne, final Collection<?> collectionTwo) {
@@ -259,7 +259,7 @@ public final class Collections {
    * @param iterable the collection to get the cardinality map for, must not be null
    * @return the populated cardinality map
    * @throws NullPointerException if coll is null
-   * @since 1.0.3
+   * @since 1.0.0
    */
   public static <O> Map<O, Integer> getCardinalityMap(final Iterable<? extends O> iterable) {
     Assert.nonNull(iterable, NullPointerException::new);
@@ -275,7 +275,7 @@ public final class Collections {
    * properties of two collections.
    *
    * @param <O> the element type
-   * @since 1.0.3
+   * @since 1.0.0
    */
   private static class CardinalityHelper<O> {
 

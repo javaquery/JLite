@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author vicky.thakor
- * @since 1.0.3
+ * @since 1.0.0
  */
 public class TestUniqueIdGenerator {
 

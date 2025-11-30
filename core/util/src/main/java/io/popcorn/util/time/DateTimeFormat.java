@@ -2,7 +2,7 @@ package io.popcorn.util.time;
 
 /**
  * @author vicky.thakor
- * @since 1.0.4
+ * @since 1.0.0
  * @see DatePattern
  */
 public interface DateTimeFormat {

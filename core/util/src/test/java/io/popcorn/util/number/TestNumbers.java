@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author javaquery
- * @since 1.2.5
+ * @author vicky.thakor
+ * @since 1.0.0
  */
 public class TestNumbers {
 

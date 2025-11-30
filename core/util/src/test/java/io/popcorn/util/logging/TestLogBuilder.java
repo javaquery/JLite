@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author vicky.thakor
- * @since 1.0.6
+ * @since 1.0.0
  */
 public class TestLogBuilder {
 
