@@ -16,7 +16,7 @@ import java.util.function.Supplier;
  * @author vicky.thakor
  * @since 1.0.0
  */
-public abstract class AbstractService<T, ID> {
+public abstract class AbstractService<T, ID> implements IAbstractService<T, ID>{
 
     protected final JpaRepository<T, ID> repository;
     protected final JpaSpecificationExecutor<T> specificationExecutor;
