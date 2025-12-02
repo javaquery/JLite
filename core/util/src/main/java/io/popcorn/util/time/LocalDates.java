@@ -13,8 +13,7 @@ import java.util.Calendar;
  */
 public final class LocalDates {
 
-    private LocalDates() {
-    }
+    private LocalDates() {}
 
     /**
      * Adds or subtracts the specified amount of time to the given LocalDate. For example, to
@@ -158,7 +157,7 @@ public final class LocalDates {
 
             // Try to parse as ZonedDateTime first (for patterns with timezone info)
             try {
-                ZonedDateTime zonedDateTime =ZonedDateTime. parse(date, formatter.withZone(zoneId));
+                ZonedDateTime zonedDateTime = ZonedDateTime.parse(date, formatter.withZone(zoneId));
                 return zonedDateTime.toLocalDateTime();
             } catch (Exception e) {
                 // If that fails, try parsing as LocalDateTime directly
@@ -261,8 +260,8 @@ public final class LocalDates {
      */
     public static LocalDate fromEpochSeconds(long epochSeconds, ZoneId zoneId) {
         return LocalDateTime.ofEpochSecond(
-                epochSeconds, 0, zoneId.getRules().getOffset(java.time.Instant.ofEpochSecond(epochSeconds)))
-            .toLocalDate();
+                        epochSeconds, 0, zoneId.getRules().getOffset(java.time.Instant.ofEpochSecond(epochSeconds)))
+                .toLocalDate();
     }
 
     /**
@@ -375,7 +374,7 @@ public final class LocalDates {
      * Returns the current LocalDate.
      * @return the current LocalDate
      */
-    public static LocalDate currentLocalDate(){
+    public static LocalDate currentLocalDate() {
         return LocalDate.now();
     }
 
@@ -383,7 +382,7 @@ public final class LocalDates {
      * Returns the current LocalDateTime.
      * @return the current LocalDateTime
      */
-    public static LocalDateTime currentLocalDateTime(){
+    public static LocalDateTime currentLocalDateTime() {
         return LocalDateTime.now();
     }
 }

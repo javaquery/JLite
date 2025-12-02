@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.popcorn.util.logging.Action;
 import io.popcorn.util.logging.ActivityStatus;
 import io.popcorn.util.time.Dates;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +16,7 @@ public class ExecutionContext<T, V> {
 
     private String requestId;
     private T referenceId;
+
     @JsonProperty("user")
     private V userContext;
 
@@ -33,7 +33,7 @@ public class ExecutionContext<T, V> {
         this.meta = new HashMap<>();
     }
 
-    public ExecutionContext(String requestId){
+    public ExecutionContext(String requestId) {
         this.requestId = requestId;
         this.meta = new HashMap<>();
         this.createdAt = Dates.current();
@@ -108,15 +108,15 @@ public class ExecutionContext<T, V> {
         this.meta = meta;
     }
 
-    public Object getMeta(String key, Object defaultValue){
+    public Object getMeta(String key, Object defaultValue) {
         return meta.getOrDefault(key, defaultValue);
     }
 
-    public String optString(String key, String defaultValue){
+    public String optString(String key, String defaultValue) {
         return String.valueOf(getMeta(key, defaultValue));
     }
 
-    public void addMeta(String key, Object value){
+    public void addMeta(String key, Object value) {
         this.meta.put(key, value);
     }
 
@@ -138,13 +138,12 @@ public class ExecutionContext<T, V> {
 
     @Override
     public String toString() {
-        return "ExecutionContext{" +
-                "requestId='" + requestId + '\'' +
-                ", referenceId=" + referenceId +
-                ", action=" + action +
-                ", maxRetries=" + maxRetries +
-                ", retriesAttempted=" + retriesAttempted +
-                ", createdAt=" + createdAt +
-                '}';
+        return "ExecutionContext{" + "requestId='"
+                + requestId + '\'' + ", referenceId="
+                + referenceId + ", action="
+                + action + ", maxRetries="
+                + maxRetries + ", retriesAttempted="
+                + retriesAttempted + ", createdAt="
+                + createdAt + '}';
     }
 }

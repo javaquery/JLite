@@ -1,7 +1,6 @@
 package io.popcorn.util;
 
 import io.popcorn.util.collection.Collections;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
@@ -29,8 +28,8 @@ public class Is {
      * @param obj a reference to be checked against {@code null}
      * @param executableFunction lambda function given executed if the provided reference is {@code null}.
      */
-    public static void isNull(Object obj, ExecutableFunction executableFunction){
-        if(isNull(obj)){
+    public static void isNull(Object obj, ExecutableFunction executableFunction) {
+        if (isNull(obj)) {
             executableFunction.execute();
         }
     }
@@ -52,8 +51,8 @@ public class Is {
      * @param obj a reference to be checked against {@code null}
      * @param executableFunction lambda function given executed if the provided reference is non-{@code null}.
      */
-    public static void nonNull(Object obj, ExecutableFunction executableFunction){
-        if(nonNull(obj)){
+    public static void nonNull(Object obj, ExecutableFunction executableFunction) {
+        if (nonNull(obj)) {
             executableFunction.execute();
         }
     }
@@ -74,7 +73,7 @@ public class Is {
      * @param str a String to be checked against {@code null} or empty
      * @param executableFunction lambda function given executed if the provided String is {@code null} or empty.
      */
-    public static void nullOrEmpty(String str, ExecutableFunction executableFunction){
+    public static void nullOrEmpty(String str, ExecutableFunction executableFunction) {
         Strings.nullOrEmpty(str, executableFunction);
     }
 
@@ -84,7 +83,7 @@ public class Is {
      * @param defaultValue - if the provided String is {@code null} or empty then this value will be returned.
      * @return provided String if non-{@code null} and non-empty otherwise defaultValue
      */
-    public static String nullOrEmpty(String str, String defaultValue){
+    public static String nullOrEmpty(String str, String defaultValue) {
         return Strings.nullOrEmpty(str, defaultValue);
     }
 
@@ -115,7 +114,7 @@ public class Is {
      * @param defaultValue - if the provided String is non-{@code null} and non-empty then this value will be returned.
      * @return provided String if non-{@code null} and non-empty otherwise defaultValue
      */
-    public static String nonNullNonEmpty(String str, String defaultValue){
+    public static String nonNullNonEmpty(String str, String defaultValue) {
         return Strings.nonNullNonEmpty(str, defaultValue);
     }
 
@@ -157,7 +156,7 @@ public class Is {
      * @param collection collection a Collection [List, Set] to be checked against non-{@code null} and non-empty
      * @param executableFunction lambda function given executed if the provided Collection [List, Set] is non-{@code null} and non-empty.
      */
-    public static void nonNullNonEmpty(Collection<?> collection, ExecutableFunction executableFunction){
+    public static void nonNullNonEmpty(Collection<?> collection, ExecutableFunction executableFunction) {
         Collections.nonNullNonEmpty(collection, executableFunction);
     }
 
@@ -178,7 +177,7 @@ public class Is {
      * @param map a Map to be checked against {@code null} or empty
      * @param executableFunction lambda function given executed if the provided Map is {@code null} or empty
      */
-    public static void nullOrEmpty(Map<?, ?> map, ExecutableFunction executableFunction){
+    public static void nullOrEmpty(Map<?, ?> map, ExecutableFunction executableFunction) {
         Collections.nullOrEmpty(map, executableFunction);
     }
 
@@ -199,7 +198,7 @@ public class Is {
      * @param map  a Map to be checked against non-{@code null} and non-empty
      * @param executableFunction lambda function given executed if the provided Map is non-{@code null} and non-empty
      */
-    public static void nonNullNonEmpty(Map<?, ?> map, ExecutableFunction executableFunction){
+    public static void nonNullNonEmpty(Map<?, ?> map, ExecutableFunction executableFunction) {
         Collections.nonNullNonEmpty(map, executableFunction);
     }
 }

@@ -6,5 +6,4 @@ package io.popcorn.util.logging;
  *
  * Implement this interface for {@link LogBuilder} actions.
  */
-public interface Action {
-}
+public interface Action {}

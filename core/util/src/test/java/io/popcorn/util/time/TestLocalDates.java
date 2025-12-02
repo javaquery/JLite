@@ -1,12 +1,11 @@
 package io.popcorn.util.time;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Calendar;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author vicky.thakor
@@ -52,7 +51,8 @@ public class TestLocalDates {
     @Test
     public void test_addInLocalDate_unsupportedType() {
         LocalDate date = LocalDate.of(2021, 1, 19);
-        Assertions.assertThrows(IllegalArgumentException.class, () -> LocalDates.addInLocalDate(date, Calendar.HOUR, 1));
+        Assertions.assertThrows(
+                IllegalArgumentException.class, () -> LocalDates.addInLocalDate(date, Calendar.HOUR, 1));
     }
 
     @Test
@@ -117,7 +117,8 @@ public class TestLocalDates {
     @Test
     public void test_addInLocalDateTime_unsupportedType() {
         LocalDateTime dateTime = LocalDateTime.of(2021, 1, 20, 10, 10, 0);
-        Assertions.assertThrows(IllegalArgumentException.class, () -> LocalDates.addInLocalDateTime(dateTime, Calendar.MILLISECOND, 1));
+        Assertions.assertThrows(
+                IllegalArgumentException.class, () -> LocalDates.addInLocalDateTime(dateTime, Calendar.MILLISECOND, 1));
     }
 
     @Test
@@ -488,4 +489,3 @@ public class TestLocalDates {
         Assertions.assertEquals(expected, result);
     }
 }
-

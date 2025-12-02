@@ -1,7 +1,6 @@
 package io.popcorn.util;
 
 import io.popcorn.util.collection.Collections;
-
 import java.text.Normalizer;
 import java.util.List;
 import java.util.Objects;
@@ -34,8 +33,8 @@ public final class Strings {
      * @param str a String to be checked against {@code null} or empty
      * @param executableFunction lambda function given executed if the provided String is {@code null} or empty.
      */
-    public static void nullOrEmpty(String str, ExecutableFunction executableFunction){
-        if(nullOrEmpty(str)){
+    public static void nullOrEmpty(String str, ExecutableFunction executableFunction) {
+        if (nullOrEmpty(str)) {
             executableFunction.execute();
         }
     }
@@ -46,7 +45,7 @@ public final class Strings {
      * @param defaultValue - if the provided String is {@code null} or empty then this value will be returned.
      * @return provided String if non-{@code null} and non-empty otherwise defaultValue
      */
-    public static String nullOrEmpty(String str, String defaultValue){
+    public static String nullOrEmpty(String str, String defaultValue) {
         return nullOrEmpty(str) ? defaultValue : str;
     }
 
@@ -68,7 +67,7 @@ public final class Strings {
      * @param executableFunction lambda function given executed if the provided String is non-{@code null} and non-empty.
      */
     public static void nonNullNonEmpty(String str, ExecutableFunction executableFunction) {
-        if(nonNullNonEmpty(str)){
+        if (nonNullNonEmpty(str)) {
             executableFunction.execute();
         }
     }
@@ -79,7 +78,7 @@ public final class Strings {
      * @param defaultValue - if the provided String is non-{@code null} and non-empty then this value will be returned.
      * @return provided String if non-{@code null} and non-empty otherwise defaultValue
      */
-    public static String nonNullNonEmpty(String str, String defaultValue){
+    public static String nonNullNonEmpty(String str, String defaultValue) {
         return nonNullNonEmpty(str) ? str : defaultValue;
     }
 
@@ -211,8 +210,8 @@ public final class Strings {
      * @param b String to be compared with {@code a} for equality
      * @param executableFunction lambda function given executed if the provided Strings are equals.
      */
-    public static void equals(String a, String b, ExecutableFunction executableFunction){
-        if(Objects.equals(a, b)){
+    public static void equals(String a, String b, ExecutableFunction executableFunction) {
+        if (Objects.equals(a, b)) {
             executableFunction.execute();
         }
     }
@@ -224,8 +223,8 @@ public final class Strings {
      * @param b String to be compared with {@code a} for non equality
      * @param executableFunction lambda function given executed if the provided Strings are not equals.
      */
-    public static void notEquals(String a, String b, ExecutableFunction executableFunction){
-        if(!Objects.equals(a, b)){
+    public static void notEquals(String a, String b, ExecutableFunction executableFunction) {
+        if (!Objects.equals(a, b)) {
             executableFunction.execute();
         }
     }
@@ -243,9 +242,8 @@ public final class Strings {
      * @return {@code true} if the provided Strings are equalsIgnoreCase otherwise
      *    *     {@code false}
      */
-    public static boolean equalsIgnoreCase(String a, String b){
-        return (a == null && b == null)
-                || (a != null && a.equalsIgnoreCase(b));
+    public static boolean equalsIgnoreCase(String a, String b) {
+        return (a == null && b == null) || (a != null && a.equalsIgnoreCase(b));
     }
 
     /**
@@ -260,8 +258,8 @@ public final class Strings {
      * @param b String to be compared with {@code a} for equality (ignoring case considerations)
      * @param executableFunction lambda function given executed if the provided Strings are equals (ignoring case considerations).
      */
-    public static void equalsIgnoreCase(String a, String b, ExecutableFunction executableFunction){
-        if(equalsIgnoreCase(a, b)){
+    public static void equalsIgnoreCase(String a, String b, ExecutableFunction executableFunction) {
+        if (equalsIgnoreCase(a, b)) {
             executableFunction.execute();
         }
     }
@@ -273,8 +271,8 @@ public final class Strings {
      * @param b String to be compared with {@code a} for non equality (ignoring case considerations)
      * @param executableFunction lambda function given executed if the provided Strings are non equals (ignoring case considerations).
      */
-    public static void notEqualsIgnoreCase(String a, String b, ExecutableFunction executableFunction){
-        if(!equalsIgnoreCase(a, b)){
+    public static void notEqualsIgnoreCase(String a, String b, ExecutableFunction executableFunction) {
+        if (!equalsIgnoreCase(a, b)) {
             executableFunction.execute();
         }
     }

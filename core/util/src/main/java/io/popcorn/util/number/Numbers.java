@@ -19,7 +19,7 @@ public class Numbers {
      * @param decimalPlaces decimal places to round
      * @return rounded number
      */
-    public static Double roundDecimal(Double number, int decimalPlaces){
+    public static Double roundDecimal(Double number, int decimalPlaces) {
         return BigDecimal.valueOf(number)
                 .setScale(decimalPlaces, RoundingMode.HALF_UP)
                 .doubleValue();

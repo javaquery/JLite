@@ -1,12 +1,11 @@
 package io.popcorn.util;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import io.popcorn.util.logging.Action;
 import io.popcorn.util.logging.ActivityStatus;
-import org.junit.jupiter.api.Test;
-
 import java.util.HashMap;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author vicky.thakor
@@ -18,7 +17,7 @@ public class TestExecutionContext {
         ONE
     }
 
-    public class UserContext{
+    public class UserContext {
 
         private Long userId;
 
@@ -39,7 +38,7 @@ public class TestExecutionContext {
     }
 
     @Test
-    public void defaultConstructor(){
+    public void defaultConstructor() {
         ExecutionContext<Object, Object> executionContext = new ExecutionContext<>();
         executionContext.setUserContext(new UserContext(50L, 20L));
         executionContext.setRequestId(UniqueIdGenerator.generate());
@@ -52,7 +51,7 @@ public class TestExecutionContext {
     }
 
     @Test
-    public void constructorWithRequestId(){
+    public void constructorWithRequestId() {
         ExecutionContext<Long, Long> executionContext = new ExecutionContext<>(UniqueIdGenerator.generate());
         assertNotNull(executionContext.getRequestId());
         assertNotNull(executionContext.getMeta());
@@ -60,8 +59,9 @@ public class TestExecutionContext {
     }
 
     @Test
-    public void constructorWithRequestIdReferenceIdAction(){
-        ExecutionContext<Long, Long> executionContext = new ExecutionContext<>(UniqueIdGenerator.generate(), 1L, ExecutionContextAction.ONE);
+    public void constructorWithRequestIdReferenceIdAction() {
+        ExecutionContext<Long, Long> executionContext =
+                new ExecutionContext<>(UniqueIdGenerator.generate(), 1L, ExecutionContextAction.ONE);
         executionContext.setUserContext(50L);
         executionContext.setActivityStatus(ActivityStatus.STARTED);
         assertNotNull(executionContext.getRequestId());
@@ -76,7 +76,7 @@ public class TestExecutionContext {
     }
 
     @Test
-    public void constructorWithReferenceIdAction(){
+    public void constructorWithReferenceIdAction() {
         ExecutionContext<String, Void> executionContext = new ExecutionContext<>("test", ExecutionContextAction.ONE);
         assertNotNull(executionContext.getRequestId());
         assertEquals(ExecutionContextAction.ONE, executionContext.getAction());
@@ -86,7 +86,7 @@ public class TestExecutionContext {
     }
 
     @Test
-    public void constructorWithAction(){
+    public void constructorWithAction() {
         ExecutionContext<String, Void> executionContext = new ExecutionContext<>(ExecutionContextAction.ONE);
         assertNotNull(executionContext.getRequestId());
         assertEquals(ExecutionContextAction.ONE, executionContext.getAction());
@@ -96,7 +96,7 @@ public class TestExecutionContext {
     }
 
     @Test
-    public void constructorWithActionAndMeta(){
+    public void constructorWithActionAndMeta() {
         ExecutionContext<String, Void> executionContext = new ExecutionContext<>(ExecutionContextAction.ONE);
         executionContext.addMeta("key", "value");
         assertNotNull(executionContext.getRequestId());
@@ -112,7 +112,7 @@ public class TestExecutionContext {
     }
 
     @Test
-    public void constructorWithActionAndRetriesAttempted(){
+    public void constructorWithActionAndRetriesAttempted() {
         ExecutionContext<String, Void> executionContext = new ExecutionContext<>(ExecutionContextAction.ONE);
         executionContext.addRetriesAttempted(1);
         assertNotNull(executionContext.getRequestId());
@@ -124,7 +124,7 @@ public class TestExecutionContext {
     }
 
     @Test
-    public void constructorWithReferenceIdActionMaxRetries(){
+    public void constructorWithReferenceIdActionMaxRetries() {
         ExecutionContext<Long, Void> executionContext = new ExecutionContext<>(1L, ExecutionContextAction.ONE, 3);
         assertNotNull(executionContext.getRequestId());
         assertEquals(ExecutionContextAction.ONE, executionContext.getAction());
@@ -135,7 +135,7 @@ public class TestExecutionContext {
     }
 
     @Test
-    public void constructorWithActionMaxRetries(){
+    public void constructorWithActionMaxRetries() {
         ExecutionContext<Long, Void> executionContext = new ExecutionContext<>(ExecutionContextAction.ONE, 3);
         assertNotNull(executionContext.getRequestId());
         assertEquals(ExecutionContextAction.ONE, executionContext.getAction());
@@ -146,7 +146,7 @@ public class TestExecutionContext {
     }
 
     @Test
-    public void metaDataTest(){
+    public void metaDataTest() {
         ExecutionContext<String, Void> executionContext = new ExecutionContext<>();
         executionContext.addMeta("key", "value");
         assertEquals("value", executionContext.getMeta("key", null));

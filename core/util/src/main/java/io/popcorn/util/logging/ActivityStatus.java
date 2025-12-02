@@ -7,6 +7,10 @@ package io.popcorn.util.logging;
  * Represents current activity status
  */
 public enum ActivityStatus {
-	STARTED, PROCESSING, COMPLETED, FAILED, PROCESSING_WITH_ERROR, COMPLETED_WITH_ERROR;
+    STARTED,
+    PROCESSING,
+    COMPLETED,
+    FAILED,
+    PROCESSING_WITH_ERROR,
+    COMPLETED_WITH_ERROR;
 }
-

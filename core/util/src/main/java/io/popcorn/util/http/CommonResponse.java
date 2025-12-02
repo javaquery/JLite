@@ -1,7 +1,6 @@
 package io.popcorn.util.http;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
@@ -28,23 +27,23 @@ public class CommonResponse<T> implements Serializable {
         this.errorMessages = errorMessages;
     }
 
-    public static <T> CommonResponse<T> ok(T payload){
+    public static <T> CommonResponse<T> ok(T payload) {
         return CommonResponse.of(HttpStatusCode.OK, payload);
     }
 
-    public static <T> CommonResponse<T> of(HttpStatusCode statusCode, String message, T payload){
+    public static <T> CommonResponse<T> of(HttpStatusCode statusCode, String message, T payload) {
         return new CommonResponse<>(statusCode.value(), message, payload, Collections.emptyList());
     }
 
-    public static <T> CommonResponse<T> of(HttpStatusCode statusCode, String message){
+    public static <T> CommonResponse<T> of(HttpStatusCode statusCode, String message) {
         return new CommonResponse<>(statusCode.value(), message, null, Collections.emptyList());
     }
 
-    public static <T> CommonResponse<T> of(HttpStatusCode statusCode, T payload){
+    public static <T> CommonResponse<T> of(HttpStatusCode statusCode, T payload) {
         return new CommonResponse<>(statusCode.value(), null, payload, Collections.emptyList());
     }
 
-    public static <T> CommonResponse<T> of(HttpStatusCode statusCode, List<String> errorMessages){
+    public static <T> CommonResponse<T> of(HttpStatusCode statusCode, List<String> errorMessages) {
         return new CommonResponse<>(statusCode.value(), null, null, errorMessages);
     }
 
@@ -68,7 +67,7 @@ public class CommonResponse<T> implements Serializable {
         return page;
     }
 
-    public CommonResponse<T> withPage(Integer page){
+    public CommonResponse<T> withPage(Integer page) {
         this.page = page;
         return this;
     }
@@ -77,7 +76,7 @@ public class CommonResponse<T> implements Serializable {
         return limit;
     }
 
-    public CommonResponse<T> withLimit(Integer limit){
+    public CommonResponse<T> withLimit(Integer limit) {
         this.limit = limit;
         return this;
     }
@@ -86,7 +85,7 @@ public class CommonResponse<T> implements Serializable {
         return total;
     }
 
-    public CommonResponse<T> withTotal(Long total){
+    public CommonResponse<T> withTotal(Long total) {
         this.total = total;
         return this;
     }

@@ -386,13 +386,11 @@ public enum HttpStatusCode {
      */
     NETWORK_AUTHENTICATION_REQUIRED(511, Series.SERVER_ERROR, "Network Authentication Required");
 
-
     private static final HttpStatusCode[] VALUES;
 
     static {
         VALUES = values();
     }
-
 
     private final int value;
 
@@ -405,7 +403,6 @@ public enum HttpStatusCode {
         this.series = series;
         this.reasonPhrase = reasonPhrase;
     }
-
 
     /**
      * Return the integer value of this status code.
@@ -505,7 +502,6 @@ public enum HttpStatusCode {
         return this.value + " " + name();
     }
 
-
     /**
      * Return the {@code HttpStatusCode} enum constant with the specified numeric value.
      * @param statusCode the numeric value of the enum to be returned
@@ -526,7 +522,6 @@ public enum HttpStatusCode {
      * @return the corresponding {@code HttpStatusCode}, or {@code null} if not found
      * @since 5.0
      */
-    
     public static HttpStatusCode resolve(int statusCode) {
         // Use cached VALUES instead of values() to prevent array allocation.
         for (HttpStatusCode status : VALUES) {
@@ -537,13 +532,11 @@ public enum HttpStatusCode {
         return null;
     }
 
-
     /**
      * Enumeration of HTTP status series.
      * <p>Retrievable via {@link HttpStatusCode#series()}.
      */
     public enum Series {
-
         INFORMATIONAL(1),
         SUCCESSFUL(2),
         REDIRECTION(3),

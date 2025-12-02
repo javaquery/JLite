@@ -11,13 +11,13 @@ import org.junit.jupiter.api.Test;
 public class TestCommonResponse {
 
     @Test
-    public void ok(){
+    public void ok() {
         CommonResponse<String> commonResponse = CommonResponse.ok("payload");
         Assertions.assertEquals("payload", commonResponse.getPayload());
     }
 
     @Test
-    public void ofWithStatusCodeMessagePayload(){
+    public void ofWithStatusCodeMessagePayload() {
         CommonResponse<String> commonResponse = CommonResponse.of(HttpStatusCode.CREATED, "message", "payload");
         Assertions.assertEquals(HttpStatusCode.CREATED.value(), commonResponse.getStatusCode());
         Assertions.assertEquals("message", commonResponse.getMessage());
@@ -25,28 +25,30 @@ public class TestCommonResponse {
     }
 
     @Test
-    public void ofWithStatusCodeMessage(){
+    public void ofWithStatusCodeMessage() {
         CommonResponse<String> commonResponse = CommonResponse.of(HttpStatusCode.CREATED, "message");
         Assertions.assertEquals(HttpStatusCode.CREATED.value(), commonResponse.getStatusCode());
         Assertions.assertEquals("message", commonResponse.getMessage());
     }
 
     @Test
-    public void ofWithStatusCodePayload(){
+    public void ofWithStatusCodePayload() {
         CommonResponse<Long> commonResponse = CommonResponse.of(HttpStatusCode.CREATED, 1L);
         Assertions.assertEquals(HttpStatusCode.CREATED.value(), commonResponse.getStatusCode());
         Assertions.assertEquals(1L, commonResponse.getPayload());
     }
 
     @Test
-    public void ofWithStatusCodeErrorMessages(){
-        CommonResponse<Long> commonResponse = CommonResponse.of(HttpStatusCode.BAD_REQUEST, Collections.singletonList("errorMessage"));
+    public void ofWithStatusCodeErrorMessages() {
+        CommonResponse<Long> commonResponse =
+                CommonResponse.of(HttpStatusCode.BAD_REQUEST, Collections.singletonList("errorMessage"));
         Assertions.assertEquals(HttpStatusCode.BAD_REQUEST.value(), commonResponse.getStatusCode());
-        Assertions.assertEquals("errorMessage", commonResponse.getErrorMessages().get(0));
+        Assertions.assertEquals(
+                "errorMessage", commonResponse.getErrorMessages().get(0));
     }
 
     @Test
-    public void okWithPaging(){
+    public void okWithPaging() {
         CommonResponse<Long> commonResponse = CommonResponse.of(HttpStatusCode.CREATED, 1L);
         commonResponse.withPage(1).withLimit(10).withTotal(100L);
         Assertions.assertEquals(HttpStatusCode.CREATED.value(), commonResponse.getStatusCode());

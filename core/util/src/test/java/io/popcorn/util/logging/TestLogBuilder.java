@@ -1,11 +1,10 @@
 package io.popcorn.util.logging;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author vicky.thakor
@@ -13,17 +12,17 @@ import java.util.concurrent.TimeUnit;
  */
 public class TestLogBuilder {
 
-    public enum UtilLogAction implements Action{
+    public enum UtilLogAction implements Action {
         testAction;
     }
 
     @Test
-    public void test_common(){
+    public void test_common() {
         LogBuilder logBuilder = new LogBuilder(UtilLogAction.testAction);
         logBuilder.setExecutionStartTime();
-        try{
+        try {
             TimeUnit.SECONDS.sleep(1L);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         logBuilder.buildMessage("Hello");

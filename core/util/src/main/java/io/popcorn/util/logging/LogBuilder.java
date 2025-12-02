@@ -42,7 +42,7 @@ public final class LogBuilder {
      * @param value the value can be any object
      * @return the log builder
      */
-    public LogBuilder put(String key, Object value){
+    public LogBuilder put(String key, Object value) {
         attributes.put(key, value);
         return this;
     }
@@ -53,7 +53,7 @@ public final class LogBuilder {
      * @param key the key
      * @return the object
      */
-    public Object get(String key){
+    public Object get(String key) {
         return attributes.get(key);
     }
 
@@ -82,8 +82,8 @@ public final class LogBuilder {
      *
      * @param message the message
      */
-    public void buildMessage(Object message){
-        if(Objects.nonNull(message)){
+    public void buildMessage(Object message) {
+        if (Objects.nonNull(message)) {
             messageBuilder.add(message.toString());
             setMessage(messageBuilder.toString());
         }
@@ -95,8 +95,8 @@ public final class LogBuilder {
      * @param key   the key
      * @param value the value
      */
-    public void buildMessage(Object key, Object value){
-        if(Objects.nonNull(key) && Objects.nonNull(value)){
+    public void buildMessage(Object key, Object value) {
+        if (Objects.nonNull(key) && Objects.nonNull(value)) {
             buildMessage(String.format("%s : %s", key, value));
         }
     }
@@ -111,8 +111,8 @@ public final class LogBuilder {
     /**
      * Set execution end time and executionTime (milliseconds) will be added in attributes.
      */
-    public void setExecutionEndTime(){
-        if(executionStartTime != 0){
+    public void setExecutionEndTime() {
+        if (executionStartTime != 0) {
             attributes.put(EXECUTION_TIME, (System.currentTimeMillis() - executionStartTime));
         }
     }
@@ -122,7 +122,7 @@ public final class LogBuilder {
      *
      * @param tag the tag
      */
-    public void addTag(String tag){
+    public void addTag(String tag) {
         tags.add(tag);
         put(TAGS, tags);
     }
