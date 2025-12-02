@@ -1,6 +1,8 @@
 plugins{
     id 'java-library'
     id 'com.diffplug.spotless'
+    id 'maven-publish'
+    id 'signing'
 }
 
 spotless {
@@ -24,8 +26,73 @@ dependencies {
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterEngineVersion}"
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 test {
     useJUnitPlatform()
 }
 
 rootProject.clean.dependsOn tasks.matching { it.name == "clean" }
+
+jar {
+    manifest {
+        attributes(
+                'Built-By': "Vicky Thakor"
+        )
+    }
+}
+
+javadoc {
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = project.name
+            from components.java
+
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = project.name
+                description = project.description
+                url = 'https://github.com/javaquery/popcorn'
+                licenses {
+                    license {
+                        name = 'MIT'
+                        url = 'https://github.com/javaquery/popcorn/blob/main/LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'javaquery'
+                        name = 'Vicky Thakor'
+                        email = 'vicky.thakor@javaquery.com'
+                        timezone = '+05:30'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/javaquery/popcorn.git'
+                    developerConnection = 'scm:git:ssh://github.com/javaquery/popcorn.git'
+                    url = 'https://github.com/javaquery/popcorn'
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}

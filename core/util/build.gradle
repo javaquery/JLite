@@ -1,7 +1,6 @@
 plugins{
     id 'java-conventions'
 }
-
 description = "Utility classes for Java projects"
 
 dependencies {
