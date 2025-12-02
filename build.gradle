@@ -4,5 +4,4 @@ plugins {
 
 allprojects {
     group = "io.popcorn"
-    version = "1.0.0"
 }

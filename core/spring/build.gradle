@@ -3,6 +3,8 @@ plugins{
     id 'spring-conventions'
     id 'publishing-conventions'
 }
+
+version = "1.0.0"
 description = "Utility classes for Spring Boot Projects"
 
 dependencies {
