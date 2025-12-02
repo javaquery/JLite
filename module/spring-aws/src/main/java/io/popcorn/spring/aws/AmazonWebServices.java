@@ -37,7 +37,8 @@ public class AmazonWebServices {
         if (Is.nullOrEmpty(accessKeyId) || Is.nullOrEmpty(secretAccessKey)) {
             return DefaultCredentialsProvider.builder().build();
         } else {
-            AwsBasicCredentials awsCreds = AwsBasicCredentials.builder().accessKeyId(accessKeyId)
+            AwsBasicCredentials awsCreds = AwsBasicCredentials.builder()
+                    .accessKeyId(accessKeyId)
                     .secretAccessKey(secretAccessKey)
                     .providerName(providerName)
                     .accountId(accountId)
