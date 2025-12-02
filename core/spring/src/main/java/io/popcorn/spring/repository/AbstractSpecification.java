@@ -49,7 +49,8 @@ public interface AbstractSpecification<T> {
      * @return the specification
      */
     default Specification<T> notIn(String field, Iterable<?> ids) {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.not(root.get(field).in(ids));
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.not(root.get(field).in(ids));
     }
 
     /**

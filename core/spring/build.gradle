@@ -3,3 +3,7 @@ plugins{
     id 'spring-conventions'
 }
 description = "Utility classes for Spring Boot Projects"
+
+dependencies {
+    implementation project(':core:util')
+}

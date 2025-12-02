@@ -1,14 +1,13 @@
 package io.popcorn.spring.service;
 
 import io.popcorn.spring.data.PageData;
+import java.util.List;
+import java.util.function.Supplier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-
-import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * Abstract service class providing common CRUD operations.
@@ -16,7 +15,7 @@ import java.util.function.Supplier;
  * @author vicky.thakor
  * @since 1.0.0
  */
-public abstract class AbstractService<T, ID> implements IAbstractService<T, ID>{
+public abstract class AbstractService<T, ID> implements IAbstractService<T, ID> {
 
     protected final JpaRepository<T, ID> repository;
     protected final JpaSpecificationExecutor<T> specificationExecutor;
@@ -61,7 +60,7 @@ public abstract class AbstractService<T, ID> implements IAbstractService<T, ID>{
      * @return the found entity or null if not found and no exception supplier is provided
      */
     public T findById(ID id, Supplier<? extends RuntimeException> throwExceptionIfNotFound) {
-        if(throwExceptionIfNotFound == null) {
+        if (throwExceptionIfNotFound == null) {
             return repository.findById(id).orElse(null);
         }
         return repository.findById(id).orElseThrow(throwExceptionIfNotFound);
@@ -123,12 +122,13 @@ public abstract class AbstractService<T, ID> implements IAbstractService<T, ID>{
      * @param pageable the pagination information
      * @return a PageData object containing the paginated results
      */
-    public PageData<T> findAll(Specification<T> specification, Pageable pageable){
-        if(specificationExecutor == null){
+    public PageData<T> findAll(Specification<T> specification, Pageable pageable) {
+        if (specificationExecutor == null) {
             throw new UnsupportedOperationException("Repository does not support Specifications.");
         }
         var page = specificationExecutor.findAll(specification, pageable);
-        return new PageData<>(page.getTotalElements(), page.getTotalPages(), page.getNumber(), page.getSize(), page.getContent());
+        return new PageData<>(
+                page.getTotalElements(), page.getTotalPages(), page.getNumber(), page.getSize(), page.getContent());
     }
 
     /**
@@ -137,9 +137,10 @@ public abstract class AbstractService<T, ID> implements IAbstractService<T, ID>{
      * @param pageable the pagination information
      * @return a PageData object containing the paginated results
      */
-    public PageData<T> findAll(Pageable pageable){
+    public PageData<T> findAll(Pageable pageable) {
         var page = repository.findAll(pageable);
-        return new PageData<>(page.getTotalElements(), page.getTotalPages(), page.getNumber(), page.getSize(), page.getContent());
+        return new PageData<>(
+                page.getTotalElements(), page.getTotalPages(), page.getNumber(), page.getSize(), page.getContent());
     }
 
     /**
