@@ -1,4 +1,4 @@
-rootProject.name="popcorn"
+rootProject.name="JLite"
 include 'core:util'
 include 'core:spring'
 include 'core:httpclient'

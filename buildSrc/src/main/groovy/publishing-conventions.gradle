@@ -26,13 +26,13 @@ publishing {
             pom {
                 name = project.name
                 description = project.description ?: "${project.name} - Java library"
-                url = 'https://github.com/javaquery/popcorn'
+                url = 'https://github.com/javaquery/JLite'
                 inceptionYear = '2024'
 
                 licenses {
                     license {
                         name = 'MIT License'
-                        url = 'https://github.com/javaquery/popcorn/blob/main/LICENSE'
+                        url = 'https://github.com/javaquery/JLite/blob/main/LICENSE'
                         distribution = 'repo'
                     }
                 }
@@ -49,14 +49,14 @@ publishing {
                 }
 
                 scm {
-                    connection = 'scm:git:git://github.com/javaquery/popcorn.git'
-                    developerConnection = 'scm:git:ssh://git@github.com:javaquery/popcorn.git'
-                    url = 'https://github.com/javaquery/popcorn'
+                    connection = 'scm:git:git://github.com/javaquery/JLite.git'
+                    developerConnection = 'scm:git:ssh://git@github.com:javaquery/JLite.git'
+                    url = 'https://github.com/javaquery/JLite'
                 }
 
                 issueManagement {
                     system = 'GitHub Issues'
-                    url = 'https://github.com/javaquery/popcorn/issues'
+                    url = 'https://github.com/javaquery/JLite/issues'
                 }
 
                 // Mark compileOnly dependencies as 'provided'
