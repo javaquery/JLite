@@ -20,6 +20,7 @@ repositories {
 }
 
 dependencies {
+    testImplementation "net.datafaker:datafaker:2.5.3"
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterEngineVersion}"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterEngineVersion}"
 }

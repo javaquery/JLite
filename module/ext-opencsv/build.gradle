@@ -1,0 +1,19 @@
+plugins {
+    id 'java-conventions'
+    id 'publishing-conventions'
+}
+
+version = '1.0.0'
+description = 'OpenCSV extension library'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly 'com.opencsv:opencsv:5.12.0'
+
+    testImplementation 'com.opencsv:opencsv:5.12.0'
+    testImplementation 'org.projectlombok:lombok:1.18.42'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.42'
+}
