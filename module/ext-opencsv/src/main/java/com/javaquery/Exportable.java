@@ -6,6 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Indicates that a field is exportable with a specified key.
  * @author vicky.thakor
  * @since 1.0.0
  */

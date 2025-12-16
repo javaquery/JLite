@@ -11,8 +11,10 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * Writes data to a CSV file with customizable options.
  * @author vicky.thakor
  * @since 1.0.0
+ * @param <T> the type of objects to be written
  */
 public class CsvWriter<T> {
     private List<String> headers;
@@ -25,57 +27,114 @@ public class CsvWriter<T> {
     private String lineEnd = "\n";
     private boolean includeHeader = true;
 
+    /**
+     * Private constructor to enforce the use of the builder pattern.
+     */
     private CsvWriter() {}
 
+    /**
+     * Creates a new CsvWriter instance using the builder pattern.
+     * @param <T> the type of objects to be written
+     * @return a new CsvWriter instance
+     */
     public static <T> CsvWriter<T> builder() {
         return new CsvWriter<>();
     }
 
+    /**
+     * Sets the headers for the CSV file.
+     * @param headers the list of headers
+     * @return the CsvWriter instance
+     */
     public CsvWriter<T> headers(List<String> headers) {
         this.headers = headers;
         return this;
     }
 
+    /**
+     * Sets the keys corresponding to the data fields.
+     * @param keys the list of keys
+     * @return the CsvWriter instance
+     */
     public CsvWriter<T> keys(List<String> keys) {
         this.keys = keys;
         return this;
     }
 
+    /**
+     * Sets the data to be written to the CSV file.
+     * @param data the iterable data
+     * @return the CsvWriter instance
+     */
     public CsvWriter<T> data(Iterable<T> data) {
         this.data = data;
         return this;
     }
 
+    /**
+     * Sets the destination file for the CSV output.
+     * @param destination the destination file
+     * @return the CsvWriter instance
+     */
     public CsvWriter<T> toFile(File destination) {
         this.destination = destination;
         return this;
     }
 
+    /**
+     * Sets the delimiter character for the CSV file.
+     * @param delimiter the delimiter character
+     * @return the CsvWriter instance
+     */
     public CsvWriter<T> delimiter(char delimiter) {
         this.delimiter = delimiter;
         return this;
     }
 
+    /**
+     * Sets the quote character for the CSV file.
+     * @param quotechar the quote character
+     * @return the CsvWriter instance
+     */
     public CsvWriter<T> quoteChar(char quotechar) {
         this.quotechar = quotechar;
         return this;
     }
 
+    /**
+     * Sets the escape character for the CSV file.
+     * @param escapechar the escape character
+     * @return the CsvWriter instance
+     */
     public CsvWriter<T> escapeChar(char escapechar) {
         this.escapechar = escapechar;
         return this;
     }
 
+    /**
+     * Sets the line ending string for the CSV file.
+     * @param lineEnd the line ending string
+     * @return the CsvWriter instance
+     */
     public CsvWriter<T> lineEnd(String lineEnd) {
         this.lineEnd = lineEnd;
         return this;
     }
 
+    /**
+     * Sets whether to include the header row in the CSV file.
+     * @param includeHeader true to include header, false otherwise
+     * @return the CsvWriter instance
+     */
     public CsvWriter<T> includeHeader(boolean includeHeader) {
         this.includeHeader = includeHeader;
         return this;
     }
 
+    /**
+     * Writes the data to the CSV file.
+     * @throws IOException if an I/O error occurs
+     */
     public void write() throws IOException {
         if (data == null || data.spliterator().getExactSizeIfKnown() <= 0) return;
 
@@ -164,6 +223,12 @@ public class CsvWriter<T> {
         }
     }
 
+    /**
+     * Gets the field of a class by its Exportable key.
+     * @param clazz the class to search
+     * @param fieldName the Exportable key
+     * @return the Field object, or null if not found
+     */
     private Field getField(Class<?> clazz, String fieldName) {
         for (Field field : clazz.getDeclaredFields()) {
             Exportable exp = field.getAnnotation(Exportable.class);
@@ -174,6 +239,12 @@ public class CsvWriter<T> {
         return null;
     }
 
+    /**
+     * Recursively gets the value of a nested field using dot notation.
+     * @param obj the object to retrieve the field from
+     * @param keyPath the dot-notated key path
+     * @return the field value, or null if not found
+     */
     private Object getNestedFieldValue(Object obj, String keyPath) {
         try {
             String[] parts = keyPath.split("\\.", 2);

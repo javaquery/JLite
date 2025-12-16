@@ -13,8 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Reads a CSV file, transforms each row, and processes them in batches.
  * @author vicky.thakor
  * @since 1.0.0
+ * @param <T> the type of objects to be processed
  */
 public class CsvReader<T> {
     private File source;
@@ -26,30 +28,65 @@ public class CsvReader<T> {
     private BatchProcessor<T> batchProcessor;
     private int batchSize = 1000;
 
+    /**
+     * Private constructor to enforce the use of the builder pattern.
+     */
+    private CsvReader() {}
+
+    /**
+     * Creates a new CsvReader instance using the builder pattern.
+     * @param <T> the type of objects to be processed
+     * @return a new CsvReader instance
+     */
     public static <T> CsvReader<T> builder() {
         return new CsvReader<>();
     }
 
+    /**
+     * Sets the source CSV file to read from.
+     * @param source the source CSV file
+     * @return the CsvReader instance
+     */
     public CsvReader<T> source(File source) {
         this.source = source;
         return this;
     }
 
+    /**
+     * Sets the delimiter character for the CSV file.
+     * @param delimiter the delimiter character
+     * @return the CsvReader instance
+     */
     public CsvReader<T> delimiter(char delimiter) {
         this.delimiter = delimiter;
         return this;
     }
 
+    /**
+     * Sets the quote character for the CSV file.
+     * @param quoteChar the quote character
+     * @return the CsvReader instance
+     */
     public CsvReader<T> quoteChar(char quoteChar) {
         this.quoteChar = quoteChar;
         return this;
     }
 
+    /**
+     * Sets the escape character for the CSV file.
+     * @param escapeChar the escape character
+     * @return the CsvReader instance
+     */
     public CsvReader<T> escapeChar(char escapeChar) {
         this.escapeChar = escapeChar;
         return this;
     }
 
+    /**
+     * Sets the number of lines to skip at the beginning of the CSV file.
+     * @param skipLines the number of lines to skip
+     * @return the CsvReader instance
+     */
     public CsvReader<T> skipLines(int skipLines) {
         if (skipLines < 0) {
             throw new IllegalArgumentException("Skip lines must be non-negative");
@@ -58,21 +95,40 @@ public class CsvReader<T> {
         return this;
     }
 
+    /**
+     * Sets the row transformer to convert CSV rows into objects of type T.
+     * @param rowTransformer the row transformer
+     * @return the CsvReader instance
+     */
     public CsvReader<T> rowTransformer(CsvRowTransformer<T> rowTransformer) {
         this.rowTransformer = rowTransformer;
         return this;
     }
 
+    /**
+     * Sets the batch processor to handle batches of transformed objects.
+     * @param batchProcessor the batch processor
+     * @return the CsvReader instance
+     */
     public CsvReader<T> batchProcessor(BatchProcessor<T> batchProcessor) {
         this.batchProcessor = batchProcessor;
         return this;
     }
 
+    /**
+     * Sets the size of each batch to be processed.
+     * @param batchSize the batch size
+     * @return the CsvReader instance
+     */
     public CsvReader<T> batchSize(int batchSize) {
         this.batchSize = batchSize;
         return this;
     }
 
+    /**
+     * Reads the CSV file, transforms rows, and processes them in batches.
+     * @throws IOException if an I/O error occurs
+     */
     public void read() throws IOException {
         validateInputs();
 
