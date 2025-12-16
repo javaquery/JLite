@@ -32,6 +32,9 @@ public class Customer {
     @Exportable(key = "about")
     private String about;
 
+    @Exportable(key = "passport")
+    private Passport passport;
+
     @Exportable(key = "addresses")
     private Set<Address> addresses;
 
@@ -49,7 +52,8 @@ public class Customer {
                 .firstName(faker.name().firstName())
                 .lastName(faker.name().lastName())
                 .email(faker.internet().emailAddress())
-                .age(faker.number().numberBetween(1, 100));
+                .age(faker.number().numberBetween(1, 100))
+                .passport(Passport.fakeData());
         if (withAddress) {
             builder.addresses(new HashSet<>(Address.fakeData(4)));
         }

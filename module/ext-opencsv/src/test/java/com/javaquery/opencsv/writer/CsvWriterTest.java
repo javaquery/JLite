@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -63,8 +64,8 @@ public class CsvWriterTest {
         tempFile = File.createTempFile("customers_pipe", ".csv");
 
         CsvWriter.<Customer>builder()
-                .headers(List.of("First Name", "Last Name", "Email"))
-                .keys(List.of("firstName", "lastName", "email"))
+                .headers(List.of("First Name", "Last Name", "Email", "Passport Number"))
+                .keys(List.of("firstName", "lastName", "email", "passport.passportNumber"))
                 .data(Customer.fakeData(20, false))
                 .toFile(tempFile)
                 .delimiter('|')
@@ -149,11 +150,44 @@ public class CsvWriterTest {
     }
 
     @Test
+    public void testWriteCsvThrowsExceptionWhenHeadersIsEmpty() {
+        tempFile = new File("test_no_headers.csv");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            CsvWriter.<Customer>builder()
+                    .headers(Collections.emptyList())
+                    .keys(List.of("firstName", "lastName"))
+                    .data(Customer.fakeData(20, false))
+                    .toFile(tempFile)
+                    .includeHeader(true)
+                    .write();
+        });
+
+        assertEquals("Headers must be provided when includeHeader is true", exception.getMessage());
+    }
+
+    @Test
     public void testWriteCsvThrowsExceptionWhenKeysMissing() {
         tempFile = new File("test_no_keys.csv");
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             CsvWriter.<Customer>builder()
+                    .data(Customer.fakeData(1, true))
+                    .toFile(tempFile)
+                    .includeHeader(false)
+                    .write();
+        });
+
+        assertEquals("Keys must be provided when includeHeader is false", exception.getMessage());
+    }
+
+    @Test
+    public void testWriteCsvThrowsExceptionWhenKeysIsEmpty() {
+        tempFile = new File("test_no_keys.csv");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            CsvWriter.<Customer>builder()
+                    .keys(Collections.emptyList())
                     .data(Customer.fakeData(1, true))
                     .toFile(tempFile)
                     .includeHeader(false)
