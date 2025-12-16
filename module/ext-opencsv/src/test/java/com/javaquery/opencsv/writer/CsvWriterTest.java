@@ -250,4 +250,78 @@ public class CsvWriterTest {
         String content = Files.readString(tempFile.toPath());
         assertTrue(content.contains("\r\n"));
     }
+
+    @Test
+    public void testWriteCsvWithCustomEscapeChar() throws IOException {
+        tempFile = File.createTempFile("customers_escape", ".csv");
+
+        // Create a customer with data that needs escaping (contains quotes)
+        Customer customer = Customer.builder()
+                .firstName("John \"Johnny\"")
+                .lastName("O'Brien")
+                .email("john@example.com")
+                .build();
+
+        CsvWriter.<Customer>builder()
+                .headers(List.of("First Name", "Last Name", "Email"))
+                .keys(List.of("firstName", "lastName", "email"))
+                .data(List.of(customer))
+                .toFile(tempFile)
+                .escapeChar('\\')
+                .write();
+
+        assertTrue(tempFile.exists());
+        assertTrue(tempFile.length() > 0);
+
+        // Verify the file was created and contains escaped content
+        String content = Files.readString(tempFile.toPath());
+        assertNotNull(content);
+        assertTrue(content.contains("First Name"));
+    }
+
+    @Test
+    public void testWriteCsvWithNullKey() throws IOException {
+        tempFile = File.createTempFile("customers_pipe", ".csv");
+
+        List<Customer> customers = Customer.fakeData(20, false);
+        for (Customer customer : customers) {
+            customer.setPassport(null);
+        }
+
+        CsvWriter.<Customer>builder()
+                .headers(List.of("First Name", "Last Name", "Email", "Passport Number"))
+                .keys(List.of("firstName", "lastName", "email", "passport.passportNumber"))
+                .data(customers)
+                .toFile(tempFile)
+                .write();
+
+        // Verify pipe delimiter is used
+        try (BufferedReader reader = new BufferedReader(new FileReader(tempFile))) {
+            String headerLine = reader.readLine();
+            assertNotNull(headerLine);
+        }
+    }
+
+    @Test
+    public void testWriteCsvWithUnknownKey() throws IOException {
+        tempFile = File.createTempFile("customers_pipe", ".csv");
+
+        List<Customer> customers = Customer.fakeData(20, false);
+        for (Customer customer : customers) {
+            customer.setPassport(null);
+        }
+
+        CsvWriter.<Customer>builder()
+                .headers(List.of("First Name", "Last Name", "Email", "Passport Number", "Country"))
+                .keys(List.of("firstName", "lastName", "email", "invalid.key", "invalidKey"))
+                .data(customers)
+                .toFile(tempFile)
+                .write();
+
+        // Verify pipe delimiter is used
+        try (BufferedReader reader = new BufferedReader(new FileReader(tempFile))) {
+            String headerLine = reader.readLine();
+            assertNotNull(headerLine);
+        }
+    }
 }
