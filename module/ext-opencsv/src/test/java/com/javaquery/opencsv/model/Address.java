@@ -1,9 +1,11 @@
 package com.javaquery.opencsv.model;
 
 import com.javaquery.Exportable;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import net.datafaker.Faker;
 
 /**
  * @author vicky.thakor
@@ -30,4 +32,24 @@ public class Address {
 
     @Exportable(key = "country")
     private String country;
+
+    public static List<Address> fakeData(int count) {
+        Faker faker = new Faker();
+        return faker.collection()
+                .len(count)
+                .suppliers(() -> createAddress(faker))
+                .build()
+                .get();
+    }
+
+    private static Address createAddress(Faker faker) {
+        return Address.builder()
+                .addressLine1(faker.address().streetAddress())
+                .addressLine2(faker.address().secondaryAddress())
+                .city(faker.address().city())
+                .state(faker.address().state())
+                .zipCode(faker.address().zipCode())
+                .country(faker.address().country())
+                .build();
+    }
 }

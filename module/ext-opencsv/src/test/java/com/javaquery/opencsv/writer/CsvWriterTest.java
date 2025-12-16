@@ -1,12 +1,16 @@
 package com.javaquery.opencsv.writer;
 
-import com.javaquery.opencsv.model.Address;
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.javaquery.opencsv.model.Customer;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
+import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
-import net.datafaker.Faker;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -15,9 +19,18 @@ import org.junit.jupiter.api.Test;
  */
 public class CsvWriterTest {
 
+    private File tempFile;
+
+    @AfterEach
+    public void cleanup() throws IOException {
+        if (tempFile != null && tempFile.exists()) {
+            Files.deleteIfExists(tempFile.toPath());
+        }
+    }
+
     @Test
-    public void testWriteCsv() throws IOException {
-        File tempFile = File.createTempFile("customers", ".csv");
+    public void testWriteCsvWithNestedCollection() throws IOException {
+        tempFile = File.createTempFile("customers", ".csv");
         CsvWriter.<Customer>builder()
                 .headers(List.of("First Name", "Last Name", "Email", "Address Line 1", "City", "State"))
                 .keys(List.of(
@@ -27,43 +40,180 @@ public class CsvWriterTest {
                         "addresses.addressLine1",
                         "addresses.city",
                         "addresses.state"))
-                .data(customerDummyData())
+                .data(Customer.fakeData(20, true))
                 .toFile(tempFile)
                 .write();
+
+        // Verify file exists and has content
+        assertTrue(tempFile.exists());
+        assertTrue(tempFile.length() > 0);
+
+        // Verify headers are written correctly
+        try (BufferedReader reader = new BufferedReader(new FileReader(tempFile))) {
+            String headerLine = reader.readLine();
+            assertNotNull(headerLine);
+            assertTrue(headerLine.contains("First Name"));
+            assertTrue(headerLine.contains("Last Name"));
+            assertTrue(headerLine.contains("Email"));
+        }
     }
 
-    public List<Customer> customerDummyData() {
-        Faker faker = new Faker();
-        return faker.collection()
-                .len(10)
-                .suppliers(() -> createCustomer(faker))
-                .build()
-                .get();
+    @Test
+    public void testWriteCsvWithCustomDelimiter() throws IOException {
+        tempFile = File.createTempFile("customers_pipe", ".csv");
+
+        CsvWriter.<Customer>builder()
+                .headers(List.of("First Name", "Last Name", "Email"))
+                .keys(List.of("firstName", "lastName", "email"))
+                .data(Customer.fakeData(20, false))
+                .toFile(tempFile)
+                .delimiter('|')
+                .write();
+
+        // Verify pipe delimiter is used
+        try (BufferedReader reader = new BufferedReader(new FileReader(tempFile))) {
+            String headerLine = reader.readLine();
+            assertNotNull(headerLine);
+            assertTrue(headerLine.contains("|"));
+        }
     }
 
-    private Customer createCustomer(Faker faker) {
-        List<Address> addresses = faker.collection()
-                .len(2)
-                .suppliers(() -> createAddress(faker))
-                .build()
-                .get();
+    @Test
+    public void testWriteCsvWithoutHeader() throws IOException {
+        tempFile = File.createTempFile("customers_noheader", ".csv");
+        CsvWriter.<Customer>builder()
+                .keys(List.of("firstName", "lastName", "email"))
+                .data(Customer.fakeData(20, false))
+                .toFile(tempFile)
+                .includeHeader(false)
+                .write();
 
-        return Customer.builder()
-                .firstName(faker.name().firstName())
-                .lastName(faker.name().lastName())
-                .email(faker.internet().emailAddress())
-                .addresses(new HashSet<>(addresses))
-                .build();
+        // Verify file exists
+        assertTrue(tempFile.exists());
+
+        // Count lines (should not have header)
+        try (BufferedReader reader = new BufferedReader(new FileReader(tempFile))) {
+            String firstLine = reader.readLine();
+            assertNotNull(firstLine);
+            // First line should be data, not headers
+            assertFalse(firstLine.contains("First Name"));
+        }
     }
 
-    private Address createAddress(Faker faker) {
-        return Address.builder()
-                .addressLine1(faker.address().streetAddress())
-                .addressLine2(faker.address().secondaryAddress())
-                .city(faker.address().city())
-                .state(faker.address().state())
-                .zipCode(faker.address().zipCode())
-                .country(faker.address().country())
-                .build();
+    @Test
+    public void testWriteCsvWithCustomQuoteChar() throws IOException {
+        tempFile = File.createTempFile("customers_quote", ".csv");
+
+        CsvWriter.<Customer>builder()
+                .headers(List.of("First Name", "Last Name"))
+                .keys(List.of("firstName", "lastName"))
+                .data(Customer.fakeData(100, false))
+                .toFile(tempFile)
+                .quoteChar('\'')
+                .write();
+
+        assertTrue(tempFile.exists());
+        assertTrue(tempFile.length() > 0);
+    }
+
+    @Test
+    public void testWriteCsvWithEmptyData() throws IOException {
+        tempFile = File.createTempFile("customers_empty", ".csv");
+
+        // Should not throw exception, should just return without writing
+        CsvWriter.<Customer>builder()
+                .headers(List.of("First Name", "Last Name"))
+                .keys(List.of("firstName", "lastName"))
+                .data(new ArrayList<>())
+                .toFile(tempFile)
+                .write();
+
+        // File should be empty
+        assertEquals(0, tempFile.length());
+    }
+
+    @Test
+    public void testWriteCsvThrowsExceptionWhenHeadersMissing() {
+        tempFile = new File("test_no_headers.csv");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            CsvWriter.<Customer>builder()
+                    .keys(List.of("firstName", "lastName"))
+                    .data(Customer.fakeData(20, false))
+                    .toFile(tempFile)
+                    .includeHeader(true)
+                    .write();
+        });
+
+        assertEquals("Headers must be provided when includeHeader is true", exception.getMessage());
+    }
+
+    @Test
+    public void testWriteCsvThrowsExceptionWhenKeysMissing() {
+        tempFile = new File("test_no_keys.csv");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            CsvWriter.<Customer>builder()
+                    .data(Customer.fakeData(1, true))
+                    .toFile(tempFile)
+                    .includeHeader(false)
+                    .write();
+        });
+
+        assertEquals("Keys must be provided when includeHeader is false", exception.getMessage());
+    }
+
+    @Test
+    public void testWriteCsvThrowsExceptionWhenHeadersAndKeysSizeMismatch() {
+        tempFile = new File("test_size_mismatch.csv");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            CsvWriter.<Customer>builder()
+                    .headers(List.of("First Name", "Last Name", "Email"))
+                    .keys(List.of("firstName", "lastName"))
+                    .data(Customer.fakeData(1, false))
+                    .toFile(tempFile)
+                    .write();
+        });
+
+        assertEquals("Headers and Keys size must be same", exception.getMessage());
+    }
+
+    @Test
+    public void testWriteCsvWithSimpleFields() throws IOException {
+        tempFile = File.createTempFile("customers_simple", ".csv");
+
+        CsvWriter.<Customer>builder()
+                .headers(List.of("First Name", "Last Name", "Email"))
+                .keys(List.of("firstName", "lastName", "email"))
+                .data(Customer.fakeData(30, false))
+                .toFile(tempFile)
+                .write();
+
+        assertTrue(tempFile.exists());
+
+        // Verify content
+        List<String> lines = Files.readAllLines(tempFile.toPath());
+        assertTrue(lines.size() > 1); // At least header + 1 data row
+        assertEquals("\"First Name\",\"Last Name\",\"Email\"", lines.get(0));
+    }
+
+    @Test
+    public void testWriteCsvWithCustomLineEnd() throws IOException {
+        tempFile = File.createTempFile("customers_lineend", ".csv");
+
+        CsvWriter.<Customer>builder()
+                .headers(List.of("First Name"))
+                .keys(List.of("firstName"))
+                .data(Customer.fakeData(20, false))
+                .toFile(tempFile)
+                .lineEnd("\r\n")
+                .write();
+
+        assertTrue(tempFile.exists());
+
+        // Read as bytes to check line ending
+        String content = Files.readString(tempFile.toPath());
+        assertTrue(content.contains("\r\n"));
     }
 }
