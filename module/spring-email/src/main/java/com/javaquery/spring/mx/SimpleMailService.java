@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * @author vicky.thakor
- * @since 2025-12-17
+ * @since 1.0.0
  */
 @Service
 public class SimpleMailService implements MailService {
@@ -30,14 +30,27 @@ public class SimpleMailService implements MailService {
         this.emailSender = emailSender;
     }
 
+    /**
+     * Send email based on the provided payload.
+     *
+     * @param eMailPayload the email payload containing details like recipients, subject, body, etc.
+     */
     @Override
     public void send(EMailPayload eMailPayload) {
         if (enabled) {
+            boolean hasRecipients = Is.nonNullNonEmpty(eMailPayload.getTo())
+                    || Is.nonNullNonEmpty(eMailPayload.getCc())
+                    || Is.nonNullNonEmpty(eMailPayload.getBcc());
+            if (!hasRecipients) {
+                LOGGER.warn("No recipients specified, skipping email send");
+                return;
+            }
+
             try {
                 MimeMessage mimeMessage = emailSender.createMimeMessage();
-                MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, "utf-8");
+                MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "utf-8");
 
-                if (Strings.nonNullNonEmpty(eMailPayload.getFrom())) {
+                if (Strings.nonNullNonEmpty(eMailPayload.getFromName())) {
                     mimeMessageHelper.setFrom(eMailPayload.getFrom(), eMailPayload.getFromName());
                 } else {
                     mimeMessageHelper.setFrom(eMailPayload.getFrom());
@@ -92,8 +105,10 @@ public class SimpleMailService implements MailService {
 
                 emailSender.send(mimeMessage);
             } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
+                throw new RuntimeException("Failed to send email", e);
             }
+        } else {
+            LOGGER.debug("Email sending is disabled, skipping email send");
         }
     }
 }

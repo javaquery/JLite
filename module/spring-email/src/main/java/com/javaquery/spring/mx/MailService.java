@@ -2,8 +2,13 @@ package com.javaquery.spring.mx;
 
 /**
  * @author vicky.thakor
- * @since 1.0.1
+ * @since 1.0.0
  */
 public interface MailService {
+    /**
+     * Send email based on the provided payload.
+     *
+     * @param eMailPayload the email payload containing details like recipients, subject, body, etc.
+     */
     void send(EMailPayload eMailPayload);
 }
