@@ -1,0 +1,13 @@
+plugins{
+    id 'java-conventions'
+    id 'spring-conventions'
+    id 'publishing-conventions'
+}
+
+version = "1.0.0"
+description = "Spring Email Module"
+
+dependencies {
+    compileOnly "org.springframework.boot:spring-boot-starter-mail"
+    implementation project(':core:util')
+}

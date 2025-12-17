@@ -131,12 +131,33 @@ public class Is {
     }
 
     /**
+     * Returns {@code true} if the provided Iterable is {@code null} or empty otherwise
+     * returns {@code false}.
+     *
+     * @param iterable a Iterable to be checked against {@code null} or empty
+     * @return {@code true} if the provided Iterable is {@code null} or empty otherwise
+     *     {@code false}
+     */
+    public static boolean nullOrEmpty(Iterable<?> iterable) {
+        return Collections.nullOrEmpty(iterable);
+    }
+
+    /**
      * Execute code if the provided Collection [List, Set] is {@code null} or empty.
      * @param collection a Collection [List, Set] to be checked against {@code null} or empty
      * @param executableFunction lambda function given executed if the provided Collection [List, Set] is {@code null} or empty.
      */
     public static void nullOrEmpty(Collection<?> collection, ExecutableFunction executableFunction) {
         Collections.nullOrEmpty(collection, executableFunction);
+    }
+
+    /**
+     * Execute code if the provided Iterable is {@code null} or empty.
+     * @param iterable a Iterable to be checked against {@code null} or empty
+     * @param executableFunction lambda function given executed if the provided Iterable is {@code null} or empty.
+     */
+    public static void nullOrEmpty(Iterable<?> iterable, ExecutableFunction executableFunction) {
+        Collections.nullOrEmpty(iterable, executableFunction);
     }
 
     /**
@@ -152,12 +173,33 @@ public class Is {
     }
 
     /**
+     * Returns {@code true} if the provided Iterable is non-{@code null} and non-empty
+     * otherwise returns {@code false}.
+     *
+     * @param iterable a Iterable to be checked against non-{@code null} and non-empty
+     * @return {@code true} if the provided Iterable is non-{@code null} and non-empty
+     *     otherwise {@code false}
+     */
+    public static boolean nonNullNonEmpty(Iterable<?> iterable) {
+        return Collections.nonNullNonEmpty(iterable);
+    }
+
+    /**
      * Execute code if the provided Collection [List, Set] is non-{@code null} and non-empty.
      * @param collection collection a Collection [List, Set] to be checked against non-{@code null} and non-empty
      * @param executableFunction lambda function given executed if the provided Collection [List, Set] is non-{@code null} and non-empty.
      */
     public static void nonNullNonEmpty(Collection<?> collection, ExecutableFunction executableFunction) {
         Collections.nonNullNonEmpty(collection, executableFunction);
+    }
+
+    /**
+     * Execute code if the provided Iterable is non-{@code null} and non-empty.
+     * @param iterable a Iterable to be checked against non-{@code null} and non-empty
+     * @param executableFunction lambda function given executed if the provided Iterable is non-{@code null} and non-empty.
+     */
+    public static void nonNullNonEmpty(Iterable<?> iterable, ExecutableFunction executableFunction) {
+        Collections.nonNullNonEmpty(iterable, executableFunction);
     }
 
     /**

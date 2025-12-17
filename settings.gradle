@@ -1,4 +1,4 @@
-rootProject.name="JLite"
+rootProject.name = "JLite"
 include 'core:util'
 include 'core:spring'
 include 'core:httpclient'
@@ -6,3 +6,4 @@ include 'core:ftpclient'
 include 'module'
 include 'module:spring-aws'
 include 'module:ext-opencsv'
+include 'module:spring-email'

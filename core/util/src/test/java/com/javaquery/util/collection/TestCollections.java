@@ -14,6 +14,9 @@ public class TestCollections {
 
     private static final List<String> EMPTY_LIST = new ArrayList<>(1);
     private static final List<String> NULL_LIST = null;
+    private static final Iterable<String> EMPTY_ITERABLE = new ArrayList<>(1);
+    private static final Iterable<String> NULL_ITERABLE = null;
+    private static final Iterable<String> NON_EMPTY_ITERABLE = Collections.singletonList("dummy");
     private static final Set<String> EMPTY_SET = new HashSet<>(1);
     private static final Map<String, String> EMPTY_MAP = new HashMap<>(1);
     private static final Map<String, String> NULL_MAP = null;
@@ -67,12 +70,25 @@ public class TestCollections {
         Assertions.assertFalse(Collections.nullOrEmpty(Collections.singletonList("A")));
         Assertions.assertTrue(Collections.nullOrEmpty(NULL_MAP));
         Assertions.assertTrue(Collections.nullOrEmpty(EMPTY_MAP));
+        Assertions.assertTrue(Collections.nullOrEmpty(NULL_ITERABLE));
+        Assertions.assertTrue(Collections.nullOrEmpty(EMPTY_ITERABLE));
+        Assertions.assertFalse(Collections.nullOrEmpty(NON_EMPTY_ITERABLE));
     }
 
     @Test
     public void test_nullOrEmpty_ExecutableFunction() {
         Collections.nullOrEmpty(NULL_LIST, () -> Assertions.assertTrue(true));
+        Collections.nullOrEmpty(EMPTY_ITERABLE, () -> Assertions.assertTrue(true));
         Collections.nullOrEmpty(NULL_MAP, () -> Assertions.assertTrue(true));
+        Collections.nullOrEmpty(NON_EMPTY_ITERABLE, () -> {
+            throw new AssertionError("Should not be called");
+        });
+        Collections.nullOrEmpty(List.of("A"), () -> {
+            throw new AssertionError("Should not be called");
+        });
+        Collections.nullOrEmpty(Map.of("A", "B"), () -> {
+            throw new AssertionError("Should not be called");
+        });
     }
 
     @Test
@@ -83,13 +99,23 @@ public class TestCollections {
     @Test
     public void test_nonNullNotEmpty() {
         Assertions.assertTrue(Collections.nonNullNonEmpty(Collections.singletonList("A")));
+        Assertions.assertTrue(Collections.nonNullNonEmpty(NON_EMPTY_ITERABLE));
         Assertions.assertFalse(Collections.nonNullNonEmpty(NULL_LIST));
         Assertions.assertFalse(Collections.nonNullNonEmpty(EMPTY_SET));
+        Assertions.assertFalse(Collections.nonNullNonEmpty(NULL_ITERABLE));
+        Assertions.assertFalse(Collections.nonNullNonEmpty(EMPTY_ITERABLE));
     }
 
     @Test
     public void test_nonNullNotEmpty_ExecutableFunction() {
         Collections.nonNullNonEmpty(Collections.singletonList("A"), () -> Assertions.assertTrue(true));
+        Collections.nonNullNonEmpty(NON_EMPTY_ITERABLE, () -> Assertions.assertTrue(true));
+        Collections.nonNullNonEmpty(NULL_LIST, () -> {
+            throw new AssertionError("Should not be called");
+        });
+        Collections.nonNullNonEmpty(NULL_ITERABLE, () -> {
+            throw new AssertionError("Should not be called");
+        });
     }
 
     @Test
@@ -114,6 +140,9 @@ public class TestCollections {
     @Test
     public void test_nonNullNotEmptyMap_ExecutableFunction() {
         Collections.nonNullNonEmpty(Collections.singletonMap("A", "B"), () -> Assertions.assertTrue(true));
+        Collections.nonNullNonEmpty(NULL_MAP, () -> {
+            throw new AssertionError("Should not be called");
+        });
     }
 
     @Test
