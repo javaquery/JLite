@@ -21,7 +21,7 @@ public abstract class AbstractService<T, ID> implements IAbstractService<T, ID> 
     protected final JpaSpecificationExecutor<T> specificationExecutor;
     protected final ApplicationEventPublisher applicationEventPublisher;
 
-    protected AbstractService(JpaRepository<T, ID> repository, ApplicationEventPublisher applicationEventPublisher) {
+    public AbstractService(JpaRepository<T, ID> repository, ApplicationEventPublisher applicationEventPublisher) {
         this.repository = repository;
         this.applicationEventPublisher = applicationEventPublisher;
         if (repository instanceof JpaSpecificationExecutor) {
@@ -76,7 +76,9 @@ public abstract class AbstractService<T, ID> implements IAbstractService<T, ID> 
      */
     public T deleteById(ID id, Supplier<? extends RuntimeException> throwExceptionIfNotFound) {
         T entity = findById(id, throwExceptionIfNotFound);
-        repository.deleteById(id);
+        if (entity != null) {
+            repository.deleteById(id);
+        }
         return entity;
     }
 

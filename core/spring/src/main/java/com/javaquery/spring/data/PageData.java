@@ -1,11 +1,13 @@
 package com.javaquery.spring.data;
 
 import java.util.List;
+import lombok.Getter;
 
 /**
  * @author vicky.thakor
  * @since 1.0.0
  */
+@Getter
 public class PageData<T> {
     private final long totalElements;
     private final int totalPages;
@@ -19,25 +21,5 @@ public class PageData<T> {
         this.currentPage = currentPage;
         this.pageSize = pageSize;
         this.data = data;
-    }
-
-    public long getTotalElements() {
-        return totalElements;
-    }
-
-    public int getTotalPages() {
-        return totalPages;
-    }
-
-    public int getCurrentPage() {
-        return currentPage;
-    }
-
-    public int getPageSize() {
-        return pageSize;
-    }
-
-    public List<T> getData() {
-        return data;
     }
 }

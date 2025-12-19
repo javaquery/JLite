@@ -1,0 +1,30 @@
+-- BELOW TABLES ARE CREATED JUST TO SUPPORT THE TEST EXECUTION --
+DROP TABLE IF EXISTS customers;
+CREATE TABLE customers (
+   id INT NOT NULL AUTO_INCREMENT,
+   firstName VARCHAR(50) NOT NULL,
+   lastName VARCHAR(50),
+   email VARCHAR(100) NOT NULL,
+   phone VARCHAR(30),
+   isActive SMALLINT DEFAULT 1,
+   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   modifiedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   PRIMARY KEY (id),
+   UNIQUE (email)
+);
+
+DROP TABLE IF EXISTS customerAttributes;
+CREATE TABLE customerAttributes (
+    id INT NOT NULL AUTO_INCREMENT,
+    customerId INT NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    val VARCHAR(500) NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE (customerId, name),
+
+    CONSTRAINT FK_CUSTOMER_ATTRIBUTE_CUSTOMER_ID
+        FOREIGN KEY (customerId)
+            REFERENCES customers(id)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
+);

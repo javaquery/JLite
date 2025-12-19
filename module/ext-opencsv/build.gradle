@@ -11,9 +11,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.opencsv:opencsv:5.12.0'
+    compileOnly "com.opencsv:opencsv:${opencsvVersion}"
 
-    testImplementation 'com.opencsv:opencsv:5.12.0'
-    testImplementation 'org.projectlombok:lombok:1.18.42'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.42'
+    testImplementation "com.opencsv:opencsv:${opencsvVersion}"
 }

@@ -3,11 +3,12 @@ package com.javaquery.spring.json;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.javaquery.util.time.DatePattern;
-import com.javaquery.util.time.LocalDates;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import org.springframework.boot.jackson.JsonComponent;
 
@@ -28,7 +29,7 @@ public class LocalDateTimeJsonDeserializer extends JsonDeserializer<LocalDateTim
         } catch (DateTimeParseException e1) {
             try {
                 // Try parsing with space separator: "2025-07-25 10:30:45"
-                return LocalDates.parseLocalDateTime(dateTimeString, DatePattern.Y_M_D__HMS);
+                return parseLocalDateTime(dateTimeString, ZoneId.systemDefault());
             } catch (DateTimeParseException e2) {
                 try {
                     // Try parsing as date only: "2025-07-25"
@@ -41,5 +42,30 @@ public class LocalDateTimeJsonDeserializer extends JsonDeserializer<LocalDateTim
                 }
             }
         }
+    }
+
+    /**
+     * Parses the given date string into a LocalDateTime using the specified DateTimeFormat and ZoneId.
+     *
+     * @param date   the date string to parse
+     * @param zoneId the ZoneId to consider during parsing
+     * @return the parsed LocalDateTime, or null if parsing fails
+     */
+    private LocalDateTime parseLocalDateTime(String date, ZoneId zoneId) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+            // Try to parse as ZonedDateTime first (for patterns with timezone info)
+            try {
+                ZonedDateTime zonedDateTime = ZonedDateTime.parse(date, formatter.withZone(zoneId));
+                return zonedDateTime.toLocalDateTime();
+            } catch (Exception e) {
+                // If that fails, try parsing as LocalDateTime directly
+                return LocalDateTime.parse(date, formatter);
+            }
+        } catch (Exception e) {
+            /* Silent exception - matches your original behavior */
+        }
+        return null;
     }
 }
