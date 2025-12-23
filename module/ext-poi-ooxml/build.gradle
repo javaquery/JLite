@@ -1,0 +1,13 @@
+plugins {
+    id 'java-conventions'
+    id 'publishing-conventions'
+}
+
+group = 'com.javaquery'
+version = '1.0.0'
+
+dependencies {
+    compileOnly "org.apache.poi:poi-ooxml:${poiOoxmlVersion}"
+
+    testImplementation "org.apache.poi:poi-ooxml:${poiOoxmlVersion}"
+}

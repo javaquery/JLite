@@ -6,10 +6,6 @@ plugins {
 version = '1.0.0'
 description = 'OpenCSV extension library'
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     compileOnly "com.opencsv:opencsv:${opencsvVersion}"
 
