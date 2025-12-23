@@ -19,15 +19,15 @@ public @interface Exportable {
      */
     String key();
 
-    /**
-     * Indicates if the field should be treated as a formula.
-     * @return true if the field is a formula, false otherwise
-     */
-    boolean isFormula() default false;
-
-    /**
-     * Indicates if the field contains rich text.
-     * @return true if the field is rich text, false otherwise
-     */
-    boolean isRichText() default false;
+    //    /**
+    //     * Indicates if the field should be treated as a formula.
+    //     * @return true if the field is a formula, false otherwise
+    //     */
+    //    boolean isFormula() default false;
+    //
+    //    /**
+    //     * Indicates if the field contains rich text.
+    //     * @return true if the field is rich text, false otherwise
+    //     */
+    //    boolean isRichText() default false;
 }

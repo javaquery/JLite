@@ -11,11 +11,9 @@ import java.util.List;
 import java.util.Set;
 import lombok.Getter;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 
 /**
  * Writes data to an Excel file with customizable options.
@@ -283,15 +281,18 @@ public class ExcelWriter<T> {
             cell.setCellValue("");
             return;
         }
+        // TODO: Handle Exportable properties like isFormula, isRichText etc.
+        // Same annotation is used in CSV module but not implemented isFormula.
         Exportable exportable = cellValue.getExportable();
         Object value = cellValue.getValue();
 
-        if (exportable != null && exportable.isFormula()) {
-            cell.setCellFormula(value.toString());
-        } else if (exportable != null && exportable.isRichText()) {
-            RichTextString richText = new XSSFRichTextString(value.toString());
-            cell.setCellValue(richText);
-        } else if (value instanceof Number) {
+        //        if (exportable != null && exportable.isFormula()) {
+        //            cell.setCellFormula(value.toString());
+        //        } else if (exportable != null && exportable.isRichText()) {
+        //            RichTextString richText = new XSSFRichTextString(value.toString());
+        //            cell.setCellValue(richText);
+        //        } else
+        if (value instanceof Number) {
             cell.setCellValue(((Number) value).doubleValue());
         } else if (value instanceof Boolean) {
             cell.setCellValue((Boolean) value);
