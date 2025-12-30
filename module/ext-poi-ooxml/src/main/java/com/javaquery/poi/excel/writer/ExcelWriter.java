@@ -283,8 +283,7 @@ public class ExcelWriter<T> {
             cell.setCellValue("");
             return;
         }
-        // TODO: Handle Exportable properties like isFormula, isRichText etc.
-        // Same annotation is used in CSV module but not implemented isFormula.
+
         Exportable exportable = cellValue.getExportable();
         Object value = cellValue.getValue();
 
