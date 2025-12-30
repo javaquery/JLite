@@ -1,5 +1,6 @@
 package com.javaquery.opencsv.reader;
 
+import com.javaquery.helper.BatchProcessor;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
@@ -110,7 +111,7 @@ public class CsvReader<T> {
      * @param batchProcessor the batch processor
      * @return the CsvReader instance
      */
-    public CsvReader<T> batchProcessor(BatchProcessor<T> batchProcessor) {
+    public CsvReader<T> batchProcessor(com.javaquery.helper.BatchProcessor<T> batchProcessor) {
         this.batchProcessor = batchProcessor;
         return this;
     }

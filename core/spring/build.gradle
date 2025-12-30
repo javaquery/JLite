@@ -8,6 +8,8 @@ version = "1.0.1"
 description = "Utility classes for Spring Boot Projects"
 
 dependencies {
+    api project(':core:util')
+
     testImplementation "com.h2database:h2:${h2DatabaseVersion}"
     testImplementation "org.springframework.boot:spring-boot-starter-data-jpa"
 }

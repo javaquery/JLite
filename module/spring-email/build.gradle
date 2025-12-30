@@ -9,7 +9,7 @@ description = "Spring Email Module"
 
 dependencies {
     compileOnly "org.springframework.boot:spring-boot-starter-mail"
-    implementation project(':core:util')
+    api project(':core:util')
 
     testImplementation "org.springframework.boot:spring-boot-starter-mail"
     testImplementation "com.icegreen:greenmail:1.6.15"

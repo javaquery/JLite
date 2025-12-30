@@ -1,6 +1,6 @@
 package com.javaquery.poi.excel.writer;
 
-import com.javaquery.Exportable;
+import com.javaquery.annotations.Exportable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -11,9 +11,11 @@ import java.util.List;
 import java.util.Set;
 import lombok.Getter;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 
 /**
  * Writes data to an Excel file with customizable options.
@@ -286,13 +288,12 @@ public class ExcelWriter<T> {
         Exportable exportable = cellValue.getExportable();
         Object value = cellValue.getValue();
 
-        //        if (exportable != null && exportable.isFormula()) {
-        //            cell.setCellFormula(value.toString());
-        //        } else if (exportable != null && exportable.isRichText()) {
-        //            RichTextString richText = new XSSFRichTextString(value.toString());
-        //            cell.setCellValue(richText);
-        //        } else
-        if (value instanceof Number) {
+        if (exportable != null && exportable.isFormula()) {
+            cell.setCellFormula(value.toString());
+        } else if (exportable != null && exportable.isRichText()) {
+            RichTextString richText = new XSSFRichTextString(value.toString());
+            cell.setCellValue(richText);
+        } else if (value instanceof Number) {
             cell.setCellValue(((Number) value).doubleValue());
         } else if (value instanceof Boolean) {
             cell.setCellValue((Boolean) value);

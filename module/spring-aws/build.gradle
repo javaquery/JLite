@@ -10,5 +10,5 @@ description= "Spring Boot integration with AWS configurations and utilities"
 dependencies {
     compileOnly "software.amazon.awssdk:auth:2.39.5"
 
-    implementation project(':core:util')
+    api project(':core:util')
 }

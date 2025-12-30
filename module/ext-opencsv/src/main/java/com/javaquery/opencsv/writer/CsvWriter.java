@@ -1,6 +1,6 @@
 package com.javaquery.opencsv.writer;
 
-import com.javaquery.Exportable;
+import com.javaquery.annotations.Exportable;
 import com.opencsv.CSVWriter;
 import java.io.BufferedWriter;
 import java.io.File;

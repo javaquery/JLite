@@ -98,7 +98,7 @@ ExcelWriter.<Customer>builder()
 Use the `@Exportable` annotation to mark fields for Excel export:
 
 ```java
-import com.javaquery.Exportable;
+import com.javaquery.annotations.Exportable;
 
 public class Customer {
     @Exportable(key = "firstName")

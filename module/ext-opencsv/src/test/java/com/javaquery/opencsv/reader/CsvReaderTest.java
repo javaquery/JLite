@@ -2,6 +2,7 @@ package com.javaquery.opencsv.reader;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.javaquery.helper.BatchProcessor;
 import com.javaquery.opencsv.model.Customer;
 import com.javaquery.opencsv.writer.CsvWriter;
 import java.io.BufferedWriter;
@@ -151,7 +152,7 @@ public class CsvReaderTest {
                         return null;
                     }
                 })
-                .batchProcessor(new BatchProcessor<Customer>() {
+                .batchProcessor(new com.javaquery.helper.BatchProcessor<Customer>() {
                     @Override
                     public void onBatch(List<Customer> batch) {
                         allResults.addAll(batch);
@@ -250,12 +251,7 @@ public class CsvReaderTest {
                         .firstName(rowValues[0])
                         .about(rowValues[1])
                         .build())
-                .batchProcessor(new BatchProcessor<Customer>() {
-                    @Override
-                    public void onBatch(List<Customer> batch) {
-                        allResults.addAll(batch);
-                    }
-                })
+                .batchProcessor(batch -> allResults.addAll(batch))
                 .read();
 
         assertEquals(2, allResults.size());
@@ -636,7 +632,7 @@ public class CsvReaderTest {
                         .email(rowValues[1])
                         .age(Integer.parseInt(rowValues[2]))
                         .build())
-                .batchProcessor(new BatchProcessor<Customer>() {
+                .batchProcessor(new com.javaquery.helper.BatchProcessor<Customer>() {
                     @Override
                     public void onBatch(List<Customer> batch) {
                         allResults.addAll(batch);
@@ -667,7 +663,7 @@ public class CsvReaderTest {
         CsvReader.<Customer>builder()
                 .source(tempCsvFile)
                 .rowTransformer((headers, rowValues, previousRow) -> null) // Always return null
-                .batchProcessor(new BatchProcessor<Customer>() {
+                .batchProcessor(new com.javaquery.helper.BatchProcessor<Customer>() {
                     @Override
                     public void onBatch(List<Customer> batch) {
                         allResults.addAll(batch);
@@ -729,7 +725,7 @@ public class CsvReaderTest {
                         .email(rowValues[1])
                         .age(Integer.parseInt(rowValues[2]))
                         .build())
-                .batchProcessor(new BatchProcessor<Customer>() {
+                .batchProcessor(new com.javaquery.helper.BatchProcessor<Customer>() {
                     @Override
                     public void onBatch(List<Customer> batch) {
                         allResults.addAll(batch);

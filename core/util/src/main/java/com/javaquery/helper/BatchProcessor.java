@@ -1,11 +1,11 @@
-package com.javaquery.opencsv.reader;
+package com.javaquery.helper;
 
 import java.util.List;
 
 /**
  * Batch processor interface for handling batches of records.
  * @author vicky.thakor
- * @since 1.0.0
+ * @since 1.2.8
  * @param <E> the type of records to be processed
  */
 public interface BatchProcessor<E> {

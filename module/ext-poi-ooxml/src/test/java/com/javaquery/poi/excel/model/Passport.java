@@ -1,6 +1,6 @@
 package com.javaquery.poi.excel.model;
 
-import com.javaquery.Exportable;
+import com.javaquery.annotations.Exportable;
 import lombok.*;
 import net.datafaker.Faker;
 

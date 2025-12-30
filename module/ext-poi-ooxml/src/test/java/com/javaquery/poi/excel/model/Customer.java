@@ -1,6 +1,6 @@
 package com.javaquery.poi.excel.model;
 
-import com.javaquery.Exportable;
+import com.javaquery.annotations.Exportable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

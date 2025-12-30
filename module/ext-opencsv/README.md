@@ -102,7 +102,7 @@ CsvWriter.<Customer>builder()
 
 ```java
 import com.javaquery.opencsv.reader.CsvReader;
-import com.javaquery.opencsv.reader.BatchProcessor;
+import com.javaquery.helper.BatchProcessor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -224,7 +224,7 @@ CsvReader.<Customer>builder()
 Use the `@Exportable` annotation to mark fields for CSV export:
 
 ```java
-import com.javaquery.Exportable;
+import com.javaquery.annotations.Exportable;
 
 public class Customer {
     @Exportable(key = "firstName")
