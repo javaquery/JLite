@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 import lombok.Getter;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -188,8 +189,8 @@ public class ExcelWriter<T> {
                             setCellValue(cell, cellValue);
                         }
 
-                        // Track max column width
-                        int cellValueLength = cell.getStringCellValue().length();
+                        // Track max column width - need to handle different cell types
+                        int cellValueLength = getCellValueAsString(cell).length();
                         if (cellValueLength > maxColWidths[colIdx]) {
                             maxColWidths[colIdx] = cellValueLength;
                         }
@@ -304,4 +305,37 @@ public class ExcelWriter<T> {
             cell.setCellValue(value.toString());
         }
     }
+
+    /**
+     * Gets the cell value as a string for column width calculation.
+     * Handles different cell types appropriately.
+     * @param cell the cell to get the value from
+     * @return the cell value as a string
+     */
+    private String getCellValueAsString(Cell cell) {
+        if (cell == null) {
+            return "";
+        }
+
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    return cell.getDateCellValue().toString();
+                }
+                return String.valueOf(cell.getNumericCellValue());
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            case FORMULA:
+                return cell.getCellFormula();
+            case BLANK:
+                return "";
+            case ERROR:
+                return String.valueOf(cell.getErrorCellValue());
+            default:
+                return "";
+        }
+    }
 }
+
