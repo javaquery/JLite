@@ -1,21 +1,20 @@
 package com.javaquery.http;
 
+import static net.logstash.logback.marker.Markers.appendEntries;
+
 import com.javaquery.http.handler.HttpResponseHandler;
 import com.javaquery.http.retry.RetryPolicy;
 import com.javaquery.util.collection.Collections;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-
-import static net.logstash.logback.marker.Markers.appendEntries;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Http client responsible for making http requests.
@@ -38,7 +37,10 @@ public class HttpClient {
      * @param httpResponseHandler  the http response handler
      * @return the r
      */
-    public <R> R execute(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponseHandler<R> httpResponseHandler) {
+    public <R> R execute(
+            HttpExecutionContext httpExecutionContext,
+            HttpRequest httpRequest,
+            HttpResponseHandler<R> httpResponseHandler) {
         final Map<String, String> originalHeaders = new HashMap<>(httpRequest.getHeaders());
         final Map<String, String> originalQueryParameters = new LinkedHashMap<>(httpRequest.getQueryParameters());
         HttpRequestResponse httpRequestResponse = new HttpRequestResponse(httpRequest);
@@ -55,7 +57,8 @@ public class HttpClient {
                 httpRequest.withQueryParameter(originalQueryParameters);
                 responseHandlerResult = doExecute(httpExecutionContext, httpRequestResponse, httpResponseHandler);
             }
-            if (httpRequestResponse.getRetriesAttempted() == httpRequest.getRetryPolicy().getMaxErrorRetry()) {
+            if (httpRequestResponse.getRetriesAttempted()
+                    == httpRequest.getRetryPolicy().getMaxErrorRetry()) {
                 httpResponseHandler.onMaxRetryAttempted(httpRequestResponse.getHttpResponse());
             }
         }
@@ -70,7 +73,10 @@ public class HttpClient {
      * @param <R> result type
      * @return result
      */
-    private <R> R doExecute(HttpExecutionContext httpExecutionContext, HttpRequestResponse httpRequestResponse, HttpResponseHandler<R> httpResponseHandler) {
+    private <R> R doExecute(
+            HttpExecutionContext httpExecutionContext,
+            HttpRequestResponse httpRequestResponse,
+            HttpResponseHandler<R> httpResponseHandler) {
         HttpRequest httpRequest = httpRequestResponse.getHttpRequest();
         try {
             beforeRequest(httpExecutionContext, httpRequest);
@@ -106,7 +112,9 @@ public class HttpClient {
      */
     private void beforeRequest(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest) {
         if (Collections.nonNullNonEmpty(httpExecutionContext.getHttpRequestHandlers())) {
-            httpExecutionContext.getHttpRequestHandlers().forEach(httpRequestHandler -> httpRequestHandler.beforeRequest(httpExecutionContext, httpRequest));
+            httpExecutionContext
+                    .getHttpRequestHandlers()
+                    .forEach(httpRequestHandler -> httpRequestHandler.beforeRequest(httpExecutionContext, httpRequest));
         }
     }
 
@@ -116,9 +124,13 @@ public class HttpClient {
      * @param httpRequest the http request
      * @param httpResponse the http response
      */
-    private void afterResponse(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponse httpResponse) {
+    private void afterResponse(
+            HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponse httpResponse) {
         if (Collections.nonNullNonEmpty(httpExecutionContext.getHttpRequestHandlers())) {
-            httpExecutionContext.getHttpRequestHandlers().forEach(httpRequestHandler -> httpRequestHandler.afterResponse(httpExecutionContext, httpRequest, httpResponse));
+            httpExecutionContext
+                    .getHttpRequestHandlers()
+                    .forEach(httpRequestHandler ->
+                            httpRequestHandler.afterResponse(httpExecutionContext, httpRequest, httpResponse));
         }
     }
 
@@ -130,7 +142,10 @@ public class HttpClient {
      */
     private void onError(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, Exception exception) {
         if (Collections.nonNullNonEmpty(httpExecutionContext.getHttpRequestHandlers())) {
-            httpExecutionContext.getHttpRequestHandlers().forEach(httpRequestHandler -> httpRequestHandler.onError(httpExecutionContext, httpRequest, exception));
+            httpExecutionContext
+                    .getHttpRequestHandlers()
+                    .forEach(httpRequestHandler ->
+                            httpRequestHandler.onError(httpExecutionContext, httpRequest, exception));
         }
     }
 
@@ -151,8 +166,11 @@ public class HttpClient {
      * @return result true or false
      */
     private boolean shouldRetry(RetryPolicy retryPolicy, HttpRequestResponse httpRequestResponse) {
-        boolean shouldRetryAttempted = retryPolicy.isRetryTillSucceed() || retryPolicy.getMaxErrorRetry() > httpRequestResponse.getRetriesAttempted();
-        boolean shouldRetryCustomCondition = retryPolicy.getRetryCondition().shouldRetry(httpRequestResponse, httpRequestResponse.getRetriesAttempted());
+        boolean shouldRetryAttempted = retryPolicy.isRetryTillSucceed()
+                || retryPolicy.getMaxErrorRetry() > httpRequestResponse.getRetriesAttempted();
+        boolean shouldRetryCustomCondition = retryPolicy
+                .getRetryCondition()
+                .shouldRetry(httpRequestResponse, httpRequestResponse.getRetriesAttempted());
         return shouldRetryAttempted && shouldRetryCustomCondition;
     }
 

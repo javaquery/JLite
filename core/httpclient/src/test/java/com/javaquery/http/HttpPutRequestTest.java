@@ -10,13 +10,12 @@ import org.junit.jupiter.api.Test;
  * @author javaquery
  * @since 1.0.0
  */
-
 public class HttpPutRequestTest {
 
     private static final String SAMPLE_POST_PAYLOAD = "{\"javaquery-key\":\"javaquery-value\"}";
 
     @Test
-    public void performJSONPutRequest(){
+    public void performJSONPutRequest() {
         HttpRequest httpRequest = new HttpRequest.HttpRequestBuilder("PutRequest", HttpMethod.PUT)
                 .withHost("https://httpbin.org")
                 .withEndPoint("/put")
@@ -48,13 +47,11 @@ public class HttpPutRequestTest {
             }
 
             @Override
-            public void onMaxRetryAttempted(HttpResponse httpResponse) {
-
-            }
+            public void onMaxRetryAttempted(HttpResponse httpResponse) {}
         });
     }
 
-    private HttpRequestHandler headerHttpRequestHandler(){
+    private HttpRequestHandler headerHttpRequestHandler() {
         return new HttpRequestHandler() {
             @Override
             public void beforeRequest(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest) {
@@ -62,13 +59,14 @@ public class HttpPutRequestTest {
             }
 
             @Override
-            public void afterResponse(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponse httpResponse) {
+            public void afterResponse(
+                    HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponse httpResponse) {
                 Assertions.assertNotNull(httpResponse);
             }
 
             @Override
-            public void onError(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, Exception exception) {
-            }
+            public void onError(
+                    HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, Exception exception) {}
         };
     }
 }

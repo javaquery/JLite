@@ -1,10 +1,9 @@
 package com.javaquery.util.security;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test cases for {@link SecurityProvider}
@@ -236,9 +235,9 @@ public class TestSecurityProvider {
 
     @Test
     public void test_encodeDecodeBase64_roundTrip_longString() {
-        String originalData = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-                "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. " +
-                "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.";
+        String originalData = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+                + "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
+                + "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.";
 
         String encoded = SecurityProvider.encodeBase64(originalData);
         String decoded = SecurityProvider.decodeBase64(encoded);
@@ -291,4 +290,3 @@ public class TestSecurityProvider {
         Assertions.assertEquals(jsonData, decoded);
     }
 }
-

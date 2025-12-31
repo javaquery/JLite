@@ -6,9 +6,9 @@ package com.javaquery.ftp.exception;
  * @author javaquery
  * @since 1.0.0
  */
-public class FTPException extends RuntimeException{
+public class FTPException extends RuntimeException {
 
-    public FTPException(String message, Exception e){
+    public FTPException(String message, Exception e) {
         super(message, e);
     }
 }

@@ -7,7 +7,6 @@ import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -69,7 +68,9 @@ public class SFTPClientImpl implements FileTransferClient {
             try {
                 List<ChannelSftp.LsEntry> files = channelSftp.ls(directoryPath);
                 for (ChannelSftp.LsEntry entry : files) {
-                    String filepath = directoryPath.endsWith(File.separator) ? directoryPath + entry.getFilename() : directoryPath + File.separatorChar + entry.getFilename();
+                    String filepath = directoryPath.endsWith(File.separator)
+                            ? directoryPath + entry.getFilename()
+                            : directoryPath + File.separatorChar + entry.getFilename();
 
                     Calendar timestamp = Calendar.getInstance();
                     timestamp.setTimeInMillis(((long) entry.getAttrs().getMTime()) * 1000);

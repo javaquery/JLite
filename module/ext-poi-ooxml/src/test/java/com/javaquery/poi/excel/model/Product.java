@@ -52,4 +52,3 @@ public class Product {
     @Exportable(key = "views")
     private Short views;
 }
-

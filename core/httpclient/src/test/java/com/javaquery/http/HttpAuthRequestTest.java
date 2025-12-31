@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 public class HttpAuthRequestTest {
 
     @Test
-    public void performBasicAuthRequest(){
+    public void performBasicAuthRequest() {
         HttpRequest httpRequest = new HttpRequest.HttpRequestBuilder("GetRequest", HttpMethod.GET)
                 .withHost("https://httpbin.org")
                 .withEndPoint("/basic-auth/test/test")
@@ -38,13 +38,11 @@ public class HttpAuthRequestTest {
             }
 
             @Override
-            public void onMaxRetryAttempted(HttpResponse httpResponse) {
-
-            }
+            public void onMaxRetryAttempted(HttpResponse httpResponse) {}
         });
     }
 
-    private HttpRequestHandler headerHttpRequestHandler(){
+    private HttpRequestHandler headerHttpRequestHandler() {
         return new HttpRequestHandler() {
             @Override
             public void beforeRequest(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest) {
@@ -52,14 +50,14 @@ public class HttpAuthRequestTest {
             }
 
             @Override
-            public void afterResponse(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponse httpResponse) {
+            public void afterResponse(
+                    HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponse httpResponse) {
                 Assertions.assertNotNull(httpResponse);
             }
 
             @Override
-            public void onError(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, Exception exception) {
-
-            }
+            public void onError(
+                    HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, Exception exception) {}
         };
     }
 }

@@ -3,6 +3,10 @@ package com.javaquery.http;
 import com.javaquery.http.handler.HttpRequestHandler;
 import com.javaquery.http.handler.HttpResponseHandler;
 import com.javaquery.util.io.Files;
+import java.io.File;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.http.entity.StringEntity;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
@@ -10,23 +14,17 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author javaquery
  * @since 1.0.0
  */
-
 public class HttpPostRequestTest {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(HttpPostRequestTest.class);
     private static final String SAMPLE_POST_PAYLOAD = "{\"javaquery-key\":\"javaquery-value\"}";
 
     @Test
-    public void performJSONPostRequest(){
+    public void performJSONPostRequest() {
         HttpRequest httpRequest = new HttpRequest.HttpRequestBuilder("PostRequest", HttpMethod.POST)
                 .withHost("https://httpbin.org")
                 .withEndPoint("/post")
@@ -58,14 +56,12 @@ public class HttpPostRequestTest {
             }
 
             @Override
-            public void onMaxRetryAttempted(HttpResponse httpResponse) {
-
-            }
+            public void onMaxRetryAttempted(HttpResponse httpResponse) {}
         });
     }
 
     @Test
-    public void performFormPostRequest(){
+    public void performFormPostRequest() {
         Map<String, Object> form = new HashMap<>();
         form.put("form-key", "form-value");
 
@@ -73,7 +69,8 @@ public class HttpPostRequestTest {
                 .withHost("https://httpbin.org")
                 .withEndPoint("/post")
                 .withQueryParameter("utm_source", "javaquery")
-                .withHttpPayload(new HttpRequest.HttpPayload(StringPool.UTF8, "application/x-www-form-urlencoded", form))
+                .withHttpPayload(
+                        new HttpRequest.HttpPayload(StringPool.UTF8, "application/x-www-form-urlencoded", form))
                 .build();
 
         HttpExecutionContext httpExecutionContext = new HttpExecutionContext();
@@ -100,14 +97,12 @@ public class HttpPostRequestTest {
             }
 
             @Override
-            public void onMaxRetryAttempted(HttpResponse httpResponse) {
-
-            }
+            public void onMaxRetryAttempted(HttpResponse httpResponse) {}
         });
     }
 
     @Test
-    public void performFormPostRequestWithFile(){
+    public void performFormPostRequestWithFile() {
         File file = new File(System.getProperty("java.io.tmpdir") + File.separatorChar + "dummy.txt");
         Files.writeToFile(file, "Hello World!");
 
@@ -149,14 +144,12 @@ public class HttpPostRequestTest {
             }
 
             @Override
-            public void onMaxRetryAttempted(HttpResponse httpResponse) {
-
-            }
+            public void onMaxRetryAttempted(HttpResponse httpResponse) {}
         });
     }
 
     @Test
-    public void performPostRequestWithoutPayload(){
+    public void performPostRequestWithoutPayload() {
         HttpRequest httpRequest = new HttpRequest.HttpRequestBuilder("PostRequest", HttpMethod.POST)
                 .withHost("https://httpbin.org")
                 .withEndPoint("/post")
@@ -187,13 +180,11 @@ public class HttpPostRequestTest {
             }
 
             @Override
-            public void onMaxRetryAttempted(HttpResponse httpResponse) {
-
-            }
+            public void onMaxRetryAttempted(HttpResponse httpResponse) {}
         });
     }
 
-    private HttpRequestHandler headerHttpRequestHandler(){
+    private HttpRequestHandler headerHttpRequestHandler() {
         return new HttpRequestHandler() {
             @Override
             public void beforeRequest(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest) {
@@ -201,7 +192,8 @@ public class HttpPostRequestTest {
             }
 
             @Override
-            public void afterResponse(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponse httpResponse) {
+            public void afterResponse(
+                    HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponse httpResponse) {
                 Assertions.assertNotNull(httpResponse);
                 JSONObject jsonResponse = httpResponse.getJSONObjectBody();
                 jsonResponse.put("github", "https://github.com/javaquery/httpclient");
@@ -211,9 +203,8 @@ public class HttpPostRequestTest {
             }
 
             @Override
-            public void onError(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, Exception exception) {
-
-            }
+            public void onError(
+                    HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, Exception exception) {}
         };
     }
 }

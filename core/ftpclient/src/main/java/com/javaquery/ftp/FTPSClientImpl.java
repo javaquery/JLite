@@ -3,18 +3,17 @@ package com.javaquery.ftp;
 import com.javaquery.ftp.exception.FTPException;
 import com.javaquery.ftp.io.RemoteFile;
 import com.javaquery.util.Is;
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.net.ProtocolCommandEvent;
 import org.apache.commons.net.ProtocolCommandListener;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPSClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author javaquery
@@ -78,7 +77,9 @@ public class FTPSClientImpl implements FileTransferClient {
             try {
                 FTPFile[] files = ftpsClient.listFiles(directoryPath);
                 for (FTPFile ftpFile : files) {
-                    String filepath = directoryPath.endsWith(File.separator) ? directoryPath + ftpFile.getName() : directoryPath + File.separatorChar + ftpFile.getName();
+                    String filepath = directoryPath.endsWith(File.separator)
+                            ? directoryPath + ftpFile.getName()
+                            : directoryPath + File.separatorChar + ftpFile.getName();
 
                     RemoteFile remoteFile = RemoteFile.builder()
                             .name(ftpFile.getName())

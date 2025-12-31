@@ -1,10 +1,9 @@
 package com.javaquery.ftp.io;
 
+import java.util.Calendar;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Calendar;
 
 /**
  * @author javaquery

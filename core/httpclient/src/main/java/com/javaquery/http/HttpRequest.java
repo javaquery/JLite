@@ -5,13 +5,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.javaquery.http.exception.HttpException;
 import com.javaquery.http.retry.RetryPolicy;
 import com.javaquery.util.collection.Collections;
-import org.apache.http.client.utils.URIBuilder;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.apache.http.client.utils.URIBuilder;
 
 /**
  * The build Http request using the class.
@@ -25,8 +24,10 @@ public class HttpRequest {
     private final String httpRequestName;
     private final HttpMethod httpMethod;
     private final String username;
+
     @JsonIgnore
     private final String password;
+
     private final URI host;
     private final int port;
     private final String endPoint;
@@ -36,6 +37,7 @@ public class HttpRequest {
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, String> queryParameters;
+
     private final HttpPayload httpPayload;
     private final RetryPolicy retryPolicy;
 
@@ -234,6 +236,7 @@ public class HttpRequest {
         private final String charset;
         private final String contentType;
         private final String payload;
+
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         private final Map<String, Object> form;
 

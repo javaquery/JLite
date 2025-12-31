@@ -425,9 +425,7 @@ public class ExcelWriterTest {
     public void testWriteExcelWithStringDataType() throws IOException {
         tempFile = File.createTempFile("product_string", ".xlsx");
 
-        Product product = Product.builder()
-                .name("Laptop")
-                .build();
+        Product product = Product.builder().name("Laptop").build();
 
         ExcelWriter.<Product>builder()
                 .headers(List.of("Name"))
@@ -451,10 +449,7 @@ public class ExcelWriterTest {
     public void testWriteExcelWithDoubleDataType() throws IOException {
         tempFile = File.createTempFile("product_double", ".xlsx");
 
-        Product product = Product.builder()
-                .name("Laptop")
-                .price(999.99)
-                .build();
+        Product product = Product.builder().name("Laptop").price(999.99).build();
 
         ExcelWriter.<Product>builder()
                 .headers(List.of("Name", "Price"))
@@ -478,10 +473,7 @@ public class ExcelWriterTest {
     public void testWriteExcelWithIntegerDataType() throws IOException {
         tempFile = File.createTempFile("product_integer", ".xlsx");
 
-        Product product = Product.builder()
-                .name("Laptop")
-                .quantity(10)
-                .build();
+        Product product = Product.builder().name("Laptop").quantity(10).build();
 
         ExcelWriter.<Product>builder()
                 .headers(List.of("Name", "Quantity"))
@@ -505,10 +497,7 @@ public class ExcelWriterTest {
     public void testWriteExcelWithFloatDataType() throws IOException {
         tempFile = File.createTempFile("product_float", ".xlsx");
 
-        Product product = Product.builder()
-                .name("Laptop")
-                .discount(15.5f)
-                .build();
+        Product product = Product.builder().name("Laptop").discount(15.5f).build();
 
         ExcelWriter.<Product>builder()
                 .headers(List.of("Name", "Discount"))
@@ -532,10 +521,7 @@ public class ExcelWriterTest {
     public void testWriteExcelWithLongDataType() throws IOException {
         tempFile = File.createTempFile("product_long", ".xlsx");
 
-        Product product = Product.builder()
-                .name("Laptop")
-                .weight(5000L)
-                .build();
+        Product product = Product.builder().name("Laptop").weight(5000L).build();
 
         ExcelWriter.<Product>builder()
                 .headers(List.of("Name", "Weight"))
@@ -559,10 +545,7 @@ public class ExcelWriterTest {
     public void testWriteExcelWithByteDataType() throws IOException {
         tempFile = File.createTempFile("product_byte", ".xlsx");
 
-        Product product = Product.builder()
-                .name("Laptop")
-                .rating((byte) 5)
-                .build();
+        Product product = Product.builder().name("Laptop").rating((byte) 5).build();
 
         ExcelWriter.<Product>builder()
                 .headers(List.of("Name", "Rating"))
@@ -586,10 +569,7 @@ public class ExcelWriterTest {
     public void testWriteExcelWithShortDataType() throws IOException {
         tempFile = File.createTempFile("product_short", ".xlsx");
 
-        Product product = Product.builder()
-                .name("Laptop")
-                .views((short) 1500)
-                .build();
+        Product product = Product.builder().name("Laptop").views((short) 1500).build();
 
         ExcelWriter.<Product>builder()
                 .headers(List.of("Name", "Views"))
@@ -613,15 +593,9 @@ public class ExcelWriterTest {
     public void testWriteExcelWithBooleanDataType() throws IOException {
         tempFile = File.createTempFile("product_boolean", ".xlsx");
 
-        Product product1 = Product.builder()
-                .name("Laptop")
-                .available(true)
-                .build();
+        Product product1 = Product.builder().name("Laptop").available(true).build();
 
-        Product product2 = Product.builder()
-                .name("Mouse")
-                .available(false)
-                .build();
+        Product product2 = Product.builder().name("Mouse").available(false).build();
 
         ExcelWriter.<Product>builder()
                 .headers(List.of("Name", "Available"))
@@ -682,10 +656,8 @@ public class ExcelWriterTest {
         tempFile = File.createTempFile("product_localdatetime", ".xlsx");
 
         LocalDateTime expiryDate = LocalDateTime.now().plusMonths(6);
-        Product product = Product.builder()
-                .name("Laptop")
-                .expiryDate(expiryDate)
-                .build();
+        Product product =
+                Product.builder().name("Laptop").expiryDate(expiryDate).build();
 
         ExcelWriter.<Product>builder()
                 .headers(List.of("Name", "Expiry Date"))
@@ -772,11 +744,8 @@ public class ExcelWriterTest {
     public void testWriteExcelWithNullCellValue() throws IOException {
         tempFile = File.createTempFile("product_null", ".xlsx");
 
-        Product product = Product.builder()
-                .name("Laptop")
-                .price(null)
-                .available(null)
-                .build();
+        Product product =
+                Product.builder().name("Laptop").price(null).available(null).build();
 
         ExcelWriter.<Product>builder()
                 .headers(List.of("Name", "Price", "Available"))
@@ -860,7 +829,9 @@ public class ExcelWriterTest {
 
             // Verify all data types
             assertEquals("Laptop", dataRow.getCell(0).getStringCellValue());
-            assertEquals("High-performance laptop", dataRow.getCell(1).getRichStringCellValue().getString());
+            assertEquals(
+                    "High-performance laptop",
+                    dataRow.getCell(1).getRichStringCellValue().getString());
             assertEquals(999.99, dataRow.getCell(2).getNumericCellValue(), 0.001);
             assertEquals(10.0, dataRow.getCell(3).getNumericCellValue(), 0.001);
             assertEquals(15.5, dataRow.getCell(4).getNumericCellValue(), 0.1);

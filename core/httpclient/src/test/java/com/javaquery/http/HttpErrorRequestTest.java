@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
  */
 public class HttpErrorRequestTest {
     @Test
-    public void performWrongProtocolRequest(){
+    public void performWrongProtocolRequest() {
         HttpRequest httpRequest = new HttpRequest.HttpRequestBuilder("GetRequest", HttpMethod.GET)
                 .withHost("httxp://httpbin.org")
                 .withEndPoint("/get")
@@ -29,32 +29,31 @@ public class HttpErrorRequestTest {
             }
 
             @Override
-            public void onMaxRetryAttempted(HttpResponse httpResponse) {
-            }
+            public void onMaxRetryAttempted(HttpResponse httpResponse) {}
         });
     }
 
     @Test()
-    public void performWrongURLSyntaxRequest(){
+    public void performWrongURLSyntaxRequest() {
         Assertions.assertThrows(HttpException.class, () -> {
-                new HttpRequest.HttpRequestBuilder("GetRequest", HttpMethod.GET)
-                .withHost("https://httpbin^org")
-                .withEndPoint("/get");
+            new HttpRequest.HttpRequestBuilder("GetRequest", HttpMethod.GET)
+                    .withHost("https://httpbin^org")
+                    .withEndPoint("/get");
         });
     }
 
-    private HttpRequestHandler headerHttpRequestHandler(){
+    private HttpRequestHandler headerHttpRequestHandler() {
         return new HttpRequestHandler() {
             @Override
-            public void beforeRequest(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest) {
-            }
+            public void beforeRequest(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest) {}
 
             @Override
-            public void afterResponse(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponse httpResponse) {
-            }
+            public void afterResponse(
+                    HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponse httpResponse) {}
 
             @Override
-            public void onError(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, Exception exception) {
+            public void onError(
+                    HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, Exception exception) {
                 Assertions.assertNotNull(exception);
             }
         };

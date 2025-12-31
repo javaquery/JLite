@@ -3,6 +3,10 @@ package com.javaquery.http;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.javaquery.util.Strings;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import lombok.Getter;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -11,11 +15,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * The Http response object.
@@ -46,10 +45,9 @@ public class HttpResponse {
      */
     public HttpResponse(org.apache.http.HttpResponse httpResponse) {
         apacheHttpResponse = httpResponse;
-        if(Objects.nonNull(httpResponse.getAllHeaders())
-            && httpResponse.getAllHeaders().length > 0){
+        if (Objects.nonNull(httpResponse.getAllHeaders()) && httpResponse.getAllHeaders().length > 0) {
             headers = new HashMap<>();
-            for (Header header: httpResponse.getAllHeaders()) {
+            for (Header header : httpResponse.getAllHeaders()) {
                 headers.put(header.getName(), header.getValue());
             }
         }
@@ -70,10 +68,10 @@ public class HttpResponse {
      * @return the body
      */
     public String getBody() {
-        if(Objects.nonNull(apacheHttpResponse)){
+        if (Objects.nonNull(apacheHttpResponse)) {
             try {
                 body = EntityUtils.toString(apacheHttpResponse.getEntity());
-                if(Strings.nonNullNonEmpty(body) && body.startsWith(StringPool.UTF8_BOM)){
+                if (Strings.nonNullNonEmpty(body) && body.startsWith(StringPool.UTF8_BOM)) {
                     body = body.substring(1);
                 }
             } catch (IOException e) {
@@ -91,7 +89,7 @@ public class HttpResponse {
     @JsonIgnore
     public JSONObject getJSONObjectBody() {
         String strResponse = getBody();
-        if(Strings.nonNullNonEmpty(strResponse)){
+        if (Strings.nonNullNonEmpty(strResponse)) {
             return new JSONObject(strResponse);
         }
         return null;
@@ -103,9 +101,9 @@ public class HttpResponse {
      * @return the json array
      */
     @JsonIgnore
-    public JSONArray getJSONArrayBody(){
+    public JSONArray getJSONArrayBody() {
         String strResponse = getBody();
-        if(Strings.nonNullNonEmpty(strResponse)){
+        if (Strings.nonNullNonEmpty(strResponse)) {
             return new JSONArray(strResponse);
         }
         return null;
@@ -117,6 +115,8 @@ public class HttpResponse {
      * @return the status code
      */
     public int getStatusCode() {
-        return Objects.nonNull(apacheHttpResponse) ? apacheHttpResponse.getStatusLine().getStatusCode() : -1;
+        return Objects.nonNull(apacheHttpResponse)
+                ? apacheHttpResponse.getStatusLine().getStatusCode()
+                : -1;
     }
 }

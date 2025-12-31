@@ -2,12 +2,11 @@ package com.javaquery.http;
 
 import com.javaquery.http.handler.HttpRequestHandler;
 import com.javaquery.http.handler.HttpResponseHandler;
+import java.util.HashMap;
+import java.util.Map;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author javaquery
@@ -16,7 +15,7 @@ import java.util.Map;
 public class HttpGetRequestTest {
 
     @Test
-    public void performGetRequest(){
+    public void performGetRequest() {
         HttpRequest httpRequest = new HttpRequest.HttpRequestBuilder("InventoryUpdate", HttpMethod.GET)
                 .withHost("https://www.google.com")
                 .build();
@@ -33,14 +32,12 @@ public class HttpGetRequestTest {
             }
 
             @Override
-            public void onMaxRetryAttempted(HttpResponse httpResponse) {
-
-            }
+            public void onMaxRetryAttempted(HttpResponse httpResponse) {}
         });
     }
 
     @Test
-    public void performJSONGetRequest(){
+    public void performJSONGetRequest() {
         HttpRequest httpRequest = new HttpRequest.HttpRequestBuilder("GetRequest", HttpMethod.GET)
                 .withHost("https://httpbin.org")
                 .withEndPoint("/get")
@@ -81,14 +78,12 @@ public class HttpGetRequestTest {
             }
 
             @Override
-            public void onMaxRetryAttempted(HttpResponse httpResponse) {
-
-            }
+            public void onMaxRetryAttempted(HttpResponse httpResponse) {}
         });
     }
 
     @Test
-    public void performRetryGetRequest(){
+    public void performRetryGetRequest() {
         HttpRequest httpRequest = new HttpRequest.HttpRequestBuilder("GetRequest", HttpMethod.GET)
                 .withHost("https://httpbin.org")
                 .withEndPoint("/status/500")
@@ -113,7 +108,7 @@ public class HttpGetRequestTest {
     }
 
     @Test
-    public void performGetRedirect(){
+    public void performGetRedirect() {
         HttpRequest httpRequest = new HttpRequest.HttpRequestBuilder("GetRequest", HttpMethod.GET)
                 .withHost("https://httpbin.org")
                 .withEndPoint("/redirect-to")
@@ -147,7 +142,7 @@ public class HttpGetRequestTest {
         });
     }
 
-    private HttpRequestHandler headerHttpRequestHandler(){
+    private HttpRequestHandler headerHttpRequestHandler() {
         return new HttpRequestHandler() {
             @Override
             public void beforeRequest(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest) {
@@ -156,7 +151,8 @@ public class HttpGetRequestTest {
             }
 
             @Override
-            public void afterResponse(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponse httpResponse) {
+            public void afterResponse(
+                    HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponse httpResponse) {
                 Assertions.assertNotNull(httpResponse);
                 Assertions.assertNotNull(httpExecutionContext.getMetaData());
                 Assertions.assertEquals("data", httpExecutionContext.getMeta("meta", null));
@@ -165,13 +161,12 @@ public class HttpGetRequestTest {
             }
 
             @Override
-            public void onError(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, Exception exception) {
-
-            }
+            public void onError(
+                    HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, Exception exception) {}
         };
     }
 
-    public Map<String, String> dummyHeaderParameters(){
+    public Map<String, String> dummyHeaderParameters() {
         Map<String, String> map = new HashMap<>();
         map.put("dummy", "dummy");
         return map;

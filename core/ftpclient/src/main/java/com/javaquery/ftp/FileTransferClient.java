@@ -2,7 +2,6 @@ package com.javaquery.ftp;
 
 import com.javaquery.ftp.exception.FTPException;
 import com.javaquery.ftp.io.RemoteFile;
-
 import java.util.List;
 
 /**

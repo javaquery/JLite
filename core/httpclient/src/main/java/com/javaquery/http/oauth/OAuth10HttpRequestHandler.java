@@ -26,7 +26,7 @@ public class OAuth10HttpRequestHandler implements HttpRequestHandler {
         ServiceBuilder serviceBuilder = new ServiceBuilder(oAuthConfig.getConsumerKey())
                 .apiSecret(oAuthConfig.getConsumerSecret())
                 .callback(oAuthConfig.getCallbackUrl());
-        Is.nonNullNonEmpty(oAuthConfig.getScope(), ()-> serviceBuilder.withScope(oAuthConfig.getScope()));
+        Is.nonNullNonEmpty(oAuthConfig.getScope(), () -> serviceBuilder.withScope(oAuthConfig.getScope()));
 
         oAuth10aService = serviceBuilder.build(new DefaultApi10a() {
             @Override
@@ -49,13 +49,17 @@ public class OAuth10HttpRequestHandler implements HttpRequestHandler {
     @Override
     public void beforeRequest(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest) {
         String accessToken = Is.nonNullNonEmpty(oAuthConfig.getAccessToken()) ? oAuthConfig.getAccessToken() : "";
-        String accessTokenSecret = Is.nonNullNonEmpty(oAuthConfig.getAccessTokenSecret()) ? oAuthConfig.getAccessTokenSecret() : "";
+        String accessTokenSecret =
+                Is.nonNullNonEmpty(oAuthConfig.getAccessTokenSecret()) ? oAuthConfig.getAccessTokenSecret() : "";
 
         OAuth1AccessToken oAuth1AccessToken = new OAuth1AccessToken(accessToken, accessTokenSecret);
         Verb verb = Verb.valueOf(httpRequest.getHttpMethod().name());
 
-        OAuthRequest authRequest = new OAuthRequest(verb, httpRequest.httpRequestURI().toString());
-        Is.nonNull(httpRequest.getHttpPayload(), ()-> authRequest.setPayload(httpRequest.getHttpPayload().getPayload()));
+        OAuthRequest authRequest =
+                new OAuthRequest(verb, httpRequest.httpRequestURI().toString());
+        Is.nonNull(
+                httpRequest.getHttpPayload(),
+                () -> authRequest.setPayload(httpRequest.getHttpPayload().getPayload()));
 
         oAuth10aService.signRequest(oAuth1AccessToken, authRequest);
         for (String headerKey : authRequest.getHeaders().keySet()) {
@@ -64,11 +68,9 @@ public class OAuth10HttpRequestHandler implements HttpRequestHandler {
     }
 
     @Override
-    public void afterResponse(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponse httpResponse) {
-    }
+    public void afterResponse(
+            HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponse httpResponse) {}
 
     @Override
-    public void onError(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, Exception exception) {
-
-    }
+    public void onError(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, Exception exception) {}
 }

@@ -1,11 +1,10 @@
 package com.javaquery.http;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Holds http request and response object.
@@ -27,7 +26,7 @@ public class HttpRequestResponse {
      *
      * @param httpRequest the http request
      */
-    public HttpRequestResponse(HttpRequest httpRequest){
+    public HttpRequestResponse(HttpRequest httpRequest) {
         this.httpRequest = httpRequest;
         this.executionStartTime = System.currentTimeMillis();
     }
@@ -35,7 +34,7 @@ public class HttpRequestResponse {
     /**
      * Set execution end time and executionTime (milliseconds) will be added in attributes.
      */
-    public void setExecutionEndTime(){
+    public void setExecutionEndTime() {
         executionEndTime = System.currentTimeMillis();
     }
 
@@ -47,11 +46,11 @@ public class HttpRequestResponse {
     public Map<String, Object> getAttributes() {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put(StringPool.LOG_ACTION, StringPool.LOG_HTTP_REQUEST);
-        if(executionStartTime != 0 && executionEndTime != 0){
+        if (executionStartTime != 0 && executionEndTime != 0) {
             attributes.put(StringPool.EXECUTION_TIME_MS, (executionEndTime - executionStartTime));
         }
         attributes.put(StringPool.LOG_HTTP_REQUEST, httpRequest);
-        if(Objects.nonNull(httpResponse)){
+        if (Objects.nonNull(httpResponse)) {
             attributes.put(StringPool.LOG_HTTP_RESPONSE, httpResponse);
         }
         attributes.put(StringPool.RETRIES_ATTEMPTED, retriesAttempted);

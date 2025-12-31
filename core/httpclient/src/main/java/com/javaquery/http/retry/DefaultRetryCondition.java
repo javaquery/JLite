@@ -1,7 +1,6 @@
 package com.javaquery.http.retry;
 
 import com.javaquery.http.HttpRequestResponse;
-
 import java.util.Objects;
 
 /**
@@ -18,8 +17,8 @@ public class DefaultRetryCondition implements RetryPolicy.RetryCondition {
         return isServiceOutage(httpRequestResponse);
     }
 
-    private boolean isServiceOutage(HttpRequestResponse httpRequestResponse){
-        if(Objects.isNull(httpRequestResponse) || Objects.isNull(httpRequestResponse.getHttpResponse())){
+    private boolean isServiceOutage(HttpRequestResponse httpRequestResponse) {
+        if (Objects.isNull(httpRequestResponse) || Objects.isNull(httpRequestResponse.getHttpResponse())) {
             return false;
         }
         return httpRequestResponse.getHttpResponse().getStatusCode() == 500

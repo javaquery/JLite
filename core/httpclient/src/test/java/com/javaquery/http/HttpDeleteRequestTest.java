@@ -10,11 +10,10 @@ import org.junit.jupiter.api.Test;
  * @author javaquery
  * @since 1.0.0
  */
-
 public class HttpDeleteRequestTest {
 
     @Test
-    public void performDeleteRequest(){
+    public void performDeleteRequest() {
         HttpRequest httpRequest = new HttpRequest.HttpRequestBuilder("DeleteRequest", HttpMethod.DELETE)
                 .withHost("https://httpbin.org")
                 .withEndPoint("/delete")
@@ -47,7 +46,7 @@ public class HttpDeleteRequestTest {
         });
     }
 
-    private HttpRequestHandler headerHttpRequestHandler(){
+    private HttpRequestHandler headerHttpRequestHandler() {
         return new HttpRequestHandler() {
             @Override
             public void beforeRequest(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest) {
@@ -55,14 +54,14 @@ public class HttpDeleteRequestTest {
             }
 
             @Override
-            public void afterResponse(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponse httpResponse) {
+            public void afterResponse(
+                    HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponse httpResponse) {
                 Assertions.assertNotNull(httpResponse);
             }
 
             @Override
-            public void onError(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, Exception exception) {
-
-            }
+            public void onError(
+                    HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, Exception exception) {}
         };
     }
 }

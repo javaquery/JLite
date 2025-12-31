@@ -1,8 +1,14 @@
 package com.javaquery.ftp;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.javaquery.ftp.exception.FTPException;
 import com.javaquery.ftp.io.RemoteFile;
 import com.javaquery.util.io.Files;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,13 +18,6 @@ import org.mockftpserver.fake.filesystem.DirectoryEntry;
 import org.mockftpserver.fake.filesystem.FileEntry;
 import org.mockftpserver.fake.filesystem.FileSystem;
 import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author javaquery
@@ -112,7 +111,8 @@ public class FTPClientImplTest {
 
         FTPClientImpl ftpClient = new FTPClientImpl();
         ftpClient.connect(credentials);
-        List<RemoteFile> files = ftpClient.listFiles("/data", remoteFile -> remoteFile.getName().endsWith(".pdf"));
+        List<RemoteFile> files =
+                ftpClient.listFiles("/data", remoteFile -> remoteFile.getName().endsWith(".pdf"));
         assertTrue(files.isEmpty());
         ftpClient.disconnect();
     }
@@ -139,7 +139,6 @@ public class FTPClientImplTest {
         ftpClient.disconnect();
     }
 
-
     @Test
     void uploadFile_success() throws IOException {
         String fileNamePrefix = UUID.randomUUID().toString();
@@ -158,7 +157,8 @@ public class FTPClientImplTest {
         ftpClient.connect(credentials);
 
         ftpClient.uploadFile(file.getAbsolutePath(), "/data/newfile.json");
-        List<RemoteFile> files = ftpClient.listFiles("/data", remoteFile -> remoteFile.getName().equals("newfile.json"));
+        List<RemoteFile> files =
+                ftpClient.listFiles("/data", remoteFile -> remoteFile.getName().equals("newfile.json"));
         assertFalse(files.isEmpty());
         ftpClient.disconnect();
     }
@@ -227,7 +227,8 @@ public class FTPClientImplTest {
         FTPClientImpl ftpClient = new FTPClientImpl();
         ftpClient.connect(credentials);
 
-        assertThrows(FTPException.class, () -> ftpClient.downloadFile("/data/foobar.txt", downloadFile.getAbsolutePath()));
+        assertThrows(
+                FTPException.class, () -> ftpClient.downloadFile("/data/foobar.txt", downloadFile.getAbsolutePath()));
         ftpClient.disconnect();
     }
 
@@ -238,7 +239,8 @@ public class FTPClientImplTest {
         File downloadFile = File.createTempFile(fileNamePrefix, fileNameSuffix);
 
         FTPClientImpl ftpClient = new FTPClientImpl();
-        assertThrows(FTPException.class, () -> ftpClient.downloadFile("/data/foobar.txt", downloadFile.getAbsolutePath()));
+        assertThrows(
+                FTPException.class, () -> ftpClient.downloadFile("/data/foobar.txt", downloadFile.getAbsolutePath()));
     }
 
     @Test

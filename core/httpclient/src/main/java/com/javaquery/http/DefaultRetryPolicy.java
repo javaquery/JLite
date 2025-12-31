@@ -19,7 +19,7 @@ public class DefaultRetryPolicy {
      * @param maxErrorRetry the max error retry
      * @return the retry policy
      */
-    public static RetryPolicy get(int maxErrorRetry){
+    public static RetryPolicy get(int maxErrorRetry) {
         return new RetryPolicy(new DefaultRetryCondition(), new DefaultBackoffStrategy(), maxErrorRetry);
     }
 }

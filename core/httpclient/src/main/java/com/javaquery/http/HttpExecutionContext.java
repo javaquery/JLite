@@ -1,7 +1,6 @@
 package com.javaquery.http;
 
 import com.javaquery.http.handler.HttpRequestHandler;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +42,7 @@ public class HttpExecutionContext {
      * @param defaultValue the default value
      * @return the object
      */
-    public Object getMeta(String key, Object defaultValue){
+    public Object getMeta(String key, Object defaultValue) {
         return metaData.getOrDefault(key, defaultValue);
     }
 
@@ -62,7 +61,7 @@ public class HttpExecutionContext {
      * @param key   the key
      * @param value the value
      */
-    public void addMetaData(String key, Object value){
+    public void addMetaData(String key, Object value) {
         this.metaData.put(key, value);
     }
 
@@ -89,7 +88,7 @@ public class HttpExecutionContext {
      *
      * @param httpRequestHandler the http request handler
      */
-    public void addHttpRequestHandler(HttpRequestHandler httpRequestHandler){
+    public void addHttpRequestHandler(HttpRequestHandler httpRequestHandler) {
         this.httpRequestHandlers.add(httpRequestHandler);
     }
 }

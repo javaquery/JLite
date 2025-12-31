@@ -1,8 +1,14 @@
 package com.javaquery.ftp;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.javaquery.ftp.exception.FTPException;
 import com.javaquery.ftp.io.RemoteFile;
 import com.javaquery.util.io.Files;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,13 +18,6 @@ import org.mockftpserver.fake.filesystem.DirectoryEntry;
 import org.mockftpserver.fake.filesystem.FileEntry;
 import org.mockftpserver.fake.filesystem.FileSystem;
 import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author javaquery
@@ -110,7 +109,8 @@ public class JFTPClientTest {
 
         JFTPClient jftpClient = new JFTPClient(FTPType.FTP);
         jftpClient.connect(credentials);
-        List<RemoteFile> files = jftpClient.listFiles("/data-jftp", remoteFile -> remoteFile.getName().endsWith(".pdf"));
+        List<RemoteFile> files = jftpClient.listFiles(
+                "/data-jftp", remoteFile -> remoteFile.getName().endsWith(".pdf"));
         assertTrue(files.isEmpty());
         jftpClient.disconnect();
     }
@@ -137,7 +137,6 @@ public class JFTPClientTest {
         jftpClient.disconnect();
     }
 
-
     @Test
     void uploadFile_success() throws IOException {
         String fileNamePrefix = UUID.randomUUID().toString();
@@ -156,7 +155,8 @@ public class JFTPClientTest {
         jftpClient.connect(credentials);
 
         jftpClient.uploadFile(file.getAbsolutePath(), "/data-jftp/newfile.json");
-        List<RemoteFile> files = jftpClient.listFiles("/data-jftp", remoteFile -> remoteFile.getName().equals("newfile.json"));
+        List<RemoteFile> files = jftpClient.listFiles(
+                "/data-jftp", remoteFile -> remoteFile.getName().equals("newfile.json"));
         assertFalse(files.isEmpty());
         jftpClient.disconnect();
     }
@@ -184,7 +184,8 @@ public class JFTPClientTest {
         Files.writeToFile(file, "{\"key\":\"value\"}");
 
         JFTPClient jftpClient = new JFTPClient(FTPType.FTP);
-        assertThrows(FTPException.class, () -> jftpClient.uploadFile(file.getAbsolutePath(), "/data-jftp/newfile.json"));
+        assertThrows(
+                FTPException.class, () -> jftpClient.uploadFile(file.getAbsolutePath(), "/data-jftp/newfile.json"));
     }
 
     @Test
@@ -225,7 +226,9 @@ public class JFTPClientTest {
         JFTPClient jftpClient = new JFTPClient(FTPType.FTP);
         jftpClient.connect(credentials);
 
-        assertThrows(FTPException.class, () -> jftpClient.downloadFile("/data-jftp/foobar.txt", downloadFile.getAbsolutePath()));
+        assertThrows(
+                FTPException.class,
+                () -> jftpClient.downloadFile("/data-jftp/foobar.txt", downloadFile.getAbsolutePath()));
         jftpClient.disconnect();
     }
 
@@ -236,7 +239,9 @@ public class JFTPClientTest {
         File downloadFile = File.createTempFile(fileNamePrefix, fileNameSuffix);
 
         JFTPClient jftpClient = new JFTPClient(FTPType.FTP);
-        assertThrows(FTPException.class, () -> jftpClient.downloadFile("/data-jftp/foobar.txt", downloadFile.getAbsolutePath()));
+        assertThrows(
+                FTPException.class,
+                () -> jftpClient.downloadFile("/data-jftp/foobar.txt", downloadFile.getAbsolutePath()));
     }
 
     @Test
