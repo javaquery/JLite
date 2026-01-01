@@ -8,7 +8,8 @@ version = "1.0.0"
 description= "Spring Boot integration with AWS configurations and utilities"
 
 dependencies {
-    compileOnly "software.amazon.awssdk:auth:2.39.5"
+    compileOnly "software.amazon.awssdk:auth:${awsAuthVersion}"
+    compileOnly "software.amazon.awssdk:s3:${awsS3Version}"
 
     api project(':core:util')
 }
