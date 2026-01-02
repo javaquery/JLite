@@ -44,6 +44,9 @@ public class Customer implements AbstractSpecification<Customer> {
     @Column(name = "email", nullable = false, length = 100)
     private String email;
 
+    @Column(name = "age")
+    private Integer age;
+
     @CreatedDate
     @Column(name = "createdAt", nullable = false)
     private LocalDateTime createdAt;
@@ -65,7 +68,8 @@ public class Customer implements AbstractSpecification<Customer> {
         Customer.CustomerBuilder builder = Customer.builder()
                 .firstName(faker.name().firstName())
                 .lastName(faker.name().lastName())
-                .email(faker.internet().emailAddress());
+                .email(faker.internet().emailAddress())
+                .age(faker.number().numberBetween(18, 80));
         return builder.build();
     }
 }

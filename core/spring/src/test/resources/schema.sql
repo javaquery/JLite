@@ -5,6 +5,7 @@ CREATE TABLE customers (
    firstName VARCHAR(50) NOT NULL,
    lastName VARCHAR(50),
    email VARCHAR(100) NOT NULL,
+   age INT,
    phone VARCHAR(30),
    isActive SMALLINT DEFAULT 1,
    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

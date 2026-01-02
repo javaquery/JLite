@@ -1,11 +1,15 @@
 package com.javaquery.spring;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.javaquery.spring.repository.CustomerAttributeRepository;
 import com.javaquery.spring.repository.CustomerRepository;
 import com.javaquery.spring.service.CustomerAttributeService;
 import com.javaquery.spring.service.CustomerService;
+import com.javaquery.spring.service.ObjectMapperService;
 import com.javaquery.spring.service.impl.CustomerAttributeServiceImpl;
 import com.javaquery.spring.service.impl.CustomerServiceImpl;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.ApplicationEventPublisher;
@@ -38,5 +42,24 @@ public class TestConfiguration {
             CustomerAttributeRepository customerAttributeRepository,
             ApplicationEventPublisher applicationEventPublisher) {
         return new CustomerAttributeServiceImpl(customerAttributeRepository, applicationEventPublisher);
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+
+    @Bean
+    @Qualifier("snakeCaseObjectMapper")
+    public ObjectMapper snakeCaseObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+        return mapper;
+    }
+
+    @Bean
+    public ObjectMapperService objectMapperService(
+            ObjectMapper objectMapper, @Qualifier("snakeCaseObjectMapper") ObjectMapper snakeCaseObjectMapper) {
+        return new ObjectMapperService(objectMapper, snakeCaseObjectMapper);
     }
 }
