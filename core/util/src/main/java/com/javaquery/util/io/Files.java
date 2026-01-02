@@ -181,4 +181,19 @@ public final class Files {
         }
         return null;
     }
+
+    /**
+     * Determine content type of file
+     *
+     * @param file file to determine content type
+     * @return content type of file
+     */
+    public static String determineContentType(File file) {
+        try {
+            String contentType = java.nio.file.Files.probeContentType(file.toPath());
+            return contentType != null ? contentType : FileTypes.APPLICATION_OCTET_STREAM;
+        } catch (IOException e) {
+            return FileTypes.APPLICATION_OCTET_STREAM;
+        }
+    }
 }

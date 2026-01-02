@@ -2,13 +2,13 @@ plugins {
     id 'java-conventions'
     id 'spring-conventions'
     id 'publishing-conventions'
+    id 'aws-conventions'
 }
 
 version = "1.0.0"
 description= "Spring Boot integration with AWS configurations and utilities"
 
 dependencies {
-    compileOnly "software.amazon.awssdk:auth:${awsAuthVersion}"
     compileOnly "software.amazon.awssdk:s3:${awsS3Version}"
 
     api project(':core:util')

@@ -101,16 +101,25 @@ public class S3Service {
      * @param uploadObject The S3UploadObject containing upload details.
      * @return A presigned URL as a String.
      */
-    // TODO set metadata, content-type etc.
     public String uploadObject(S3UploadObject uploadObject) {
         try (S3AsyncClient s3AsyncClient = S3AsyncClient.builder()
                 .region(uploadObject.getRegion())
                 .credentialsProvider(awsCredentialsProvider)
                 .build()) {
 
+            String contentType = null;
+            if (Is.nonNullNonEmpty(uploadObject.getMetadata())) {
+                contentType = uploadObject.getMetadata().get("Content-Type");
+                if (Is.nullOrEmpty(contentType)) {
+                    contentType = Files.determineContentType(uploadObject.getSource());
+                }
+            }
+
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(uploadObject.getBucketName())
                     .key(uploadObject.getDestination())
+                    .contentType(contentType)
+                    .metadata(uploadObject.getMetadata())
                     .build();
 
             CompletableFuture<PutObjectResponse> response = s3AsyncClient.putObject(
@@ -306,5 +315,6 @@ public class S3Service {
         private String destination;
         private File source;
         private Map<String, String> tags;
+        private Map<String, String> metadata;
     }
 }
