@@ -1,9 +1,12 @@
 package com.javaquery.spring.aws;
 
 import com.javaquery.util.Is;
+import com.javaquery.util.io.Files;
 import java.io.File;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -98,6 +101,7 @@ public class S3Service {
      * @param uploadObject The S3UploadObject containing upload details.
      * @return A presigned URL as a String.
      */
+    // TODO set metadata, content-type etc.
     public String uploadObject(S3UploadObject uploadObject) {
         try (S3AsyncClient s3AsyncClient = S3AsyncClient.builder()
                 .region(uploadObject.getRegion())
@@ -137,28 +141,72 @@ public class S3Service {
     }
 
     /**
-     * Delete an object from S3.
+     * Download an object from S3 to a temporary file.
      *
      * @param region     The AWS region where the S3 bucket is located.
      * @param bucketName The name of the S3 bucket.
-     * @param objectKey  The key (path) of the object to be deleted.
+     * @param objectKey  The key (path) of the object to be downloaded.
+     * @return The file path of the downloaded object.
      */
-    public void deleteObject(Region region, String bucketName, String objectKey) {
+    public String downloadObject(Region region, String bucketName, String objectKey) {
         try (S3AsyncClient s3AsyncClient = S3AsyncClient.builder()
                 .region(region)
                 .credentialsProvider(awsCredentialsProvider)
                 .build()) {
 
-            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+            String downloadFilePath = Files.SYSTEM_TMP_DIR + File.separator + objectKey;
+            GetObjectRequest getObjectRequest =
+                    GetObjectRequest.builder().bucket(bucketName).key(objectKey).build();
+
+            CompletableFuture<GetObjectResponse> response =
+                    s3AsyncClient.getObject(getObjectRequest, Paths.get(downloadFilePath));
+
+            response.join();
+            return downloadFilePath;
+        }
+    }
+
+    /**
+     * Delete single/multiple objects from an S3 bucket.
+     *
+     * @param region      The AWS region where the S3 bucket is located.
+     * @param bucketName  The name of the S3 bucket.
+     * @param objectKeys  An iterable of object keys (paths) to be deleted.
+     */
+    public void deleteObjects(Region region, String bucketName, Iterable<String> objectKeys) {
+        try (S3AsyncClient s3AsyncClient = S3AsyncClient.builder()
+                .region(region)
+                .credentialsProvider(awsCredentialsProvider)
+                .build()) {
+
+            List<ObjectIdentifier> objectIdentifiers = new ArrayList<>();
+            for (String objectKey : objectKeys) {
+                objectIdentifiers.add(ObjectIdentifier.builder().key(objectKey).build());
+            }
+
+            Delete delete = Delete.builder().objects(objectIdentifiers).build();
+
+            DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
                     .bucket(bucketName)
-                    .key(objectKey)
+                    .delete(delete)
                     .build();
 
-            CompletableFuture<DeleteObjectResponse> response = s3AsyncClient.deleteObject(deleteObjectRequest);
+            CompletableFuture<DeleteObjectsResponse> response = s3AsyncClient.deleteObjects(deleteObjectsRequest);
 
-            response.whenComplete((deleteObjectResponse, ex) -> {
-                if (deleteObjectResponse == null) {
+            response.whenComplete((deleteObjectsResponse, ex) -> {
+                if (deleteObjectsResponse == null) {
                     LOGGER.error(ex.getMessage(), ex);
+                } else {
+                    List<S3Error> errors = deleteObjectsResponse.errors();
+                    if (Is.nonNullNonEmpty(errors)) {
+                        for (S3Error error : errors) {
+                            LOGGER.error(
+                                    "Failed to delete object: {} - Code: {}, Message: {}",
+                                    error.key(),
+                                    error.code(),
+                                    error.message());
+                        }
+                    }
                 }
             });
             response.thenApply(r -> null);
@@ -205,6 +253,20 @@ public class S3Service {
     }
 
     /**
+     * Copy an object within the same S3 bucket.
+     *
+     * @param region            The AWS region where the S3 bucket is located.
+     * @param sourceBucketName  The name of the S3 bucket.
+     * @param sourceKey         The key (path) of the source object.
+     * @param destinationKey    The key (path) for the copied object.
+     * @return A CompletableFuture containing the copy result as a String.
+     */
+    public CompletableFuture<String> copyObjectAsync(
+            Region region, String sourceBucketName, String sourceKey, String destinationKey) {
+        return copyObjectAsync(region, sourceBucketName, sourceKey, sourceBucketName, destinationKey);
+    }
+
+    /**
      * Move an object from one S3 location to another by copying and then deleting the source object.
      *
      * @param region                 The AWS region where the S3 buckets are located.
@@ -223,7 +285,7 @@ public class S3Service {
                 copyObjectAsync(region, sourceBucketName, sourceKey, destinationBucketName, destinationKey);
         response.whenComplete((copyRes, ex) -> {
             if (copyRes != null) {
-                deleteObject(region, sourceBucketName, sourceKey);
+                deleteObjects(region, sourceBucketName, List.of(sourceKey));
             } else {
                 LOGGER.error(ex.getMessage(), ex);
             }
