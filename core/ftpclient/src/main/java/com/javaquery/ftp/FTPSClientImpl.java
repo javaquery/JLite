@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author javaquery
- * @since 2025-10-30
+ * @since 1.0.0
  */
 public class FTPSClientImpl implements FileTransferClient {
 

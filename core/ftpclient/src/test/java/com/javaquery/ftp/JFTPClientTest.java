@@ -21,7 +21,7 @@ import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
 
 /**
  * @author javaquery
- * @since 2025-10-30
+ * @since 1.0.0
  */
 public class JFTPClientTest {
 

@@ -9,7 +9,7 @@ import javax.mail.internet.MimeMultipart;
 
 /**
  * @author vicky.thakor
- * @since 2025-12-17
+ * @since 1.0.0
  */
 public class MimeMessageHelper {
 

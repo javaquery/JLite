@@ -21,7 +21,7 @@ import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
 
 /**
  * @author javaquery
- * @since 2025-10-30
+ * @since 1.0.0
  * <a href="https://mockftpserver.org/">mockftpserver</a>
  * NOTE: The MockFtpServer project does not support FTPS or SFTP.
  */

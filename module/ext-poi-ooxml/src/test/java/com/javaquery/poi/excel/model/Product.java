@@ -8,7 +8,7 @@ import lombok.*;
 /**
  * Test model class with various data types to test ExcelWriter's setCellValue method.
  * @author vicky.thakor
- * @since 2025-12-30
+ * @since 1.0.0
  */
 @Getter
 @Setter

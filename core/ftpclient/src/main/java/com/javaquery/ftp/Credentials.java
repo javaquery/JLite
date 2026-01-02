@@ -6,7 +6,7 @@ import lombok.Setter;
 
 /**
  * @author javaquery
- * @since 2025-10-30
+ * @since 1.0.0
  */
 @Getter
 @Setter

@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * @author javaquery
- * @since 2025-10-30
+ * @since 1.0.0
  */
 public interface FileTransferClient {
     void connect(Credentials credentials) throws FTPException;

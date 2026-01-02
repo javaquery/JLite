@@ -26,7 +26,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * Integration test for SimpleMailService using Spring Boot context
  *
  * @author vicky.thakor
- * @since 2025-12-17
+ * @since 1.0.0
  */
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = TestConfiguration.class)

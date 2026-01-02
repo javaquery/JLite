@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * @author vicky.thakor
- * @since 2025-12-19
+ * @since 1.0.0
  */
 @Service
 public class CustomerAttributeServiceImpl extends AbstractService<CustomerAttribute, Long>
