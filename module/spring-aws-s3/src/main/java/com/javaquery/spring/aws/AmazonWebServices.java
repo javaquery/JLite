@@ -1,9 +1,8 @@
 package com.javaquery.spring.aws;
 
 import com.javaquery.util.Is;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
@@ -17,31 +16,25 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
  * @author javaquery
  * @since 1.0.0
  */
-@Component
+@Configuration
 public class AmazonWebServices {
 
-    @Value("${aws.accessKeyId:null}")
-    private String accessKeyId;
+    private final AwsProperties awsProperties;
 
-    @Value("${aws.secretAccessKey:null}")
-    private String secretAccessKey;
-
-    @Value("${aws.providerName:null}")
-    private String providerName;
-
-    @Value("${aws.accountId:null}")
-    private String accountId;
+    public AmazonWebServices(AwsProperties awsProperties) {
+        this.awsProperties = awsProperties;
+    }
 
     @Bean
     public AwsCredentialsProvider awsCredentialsProvider() {
-        if (Is.nullOrEmpty(accessKeyId) || Is.nullOrEmpty(secretAccessKey)) {
+        if (Is.nullOrEmpty(awsProperties.getAccessKeyId()) || Is.nullOrEmpty(awsProperties.getSecretAccessKey())) {
             return DefaultCredentialsProvider.builder().build();
         } else {
             AwsBasicCredentials awsCreds = AwsBasicCredentials.builder()
-                    .accessKeyId(accessKeyId)
-                    .secretAccessKey(secretAccessKey)
-                    .providerName(providerName)
-                    .accountId(accountId)
+                    .accessKeyId(awsProperties.getAccessKeyId())
+                    .secretAccessKey(awsProperties.getSecretAccessKey())
+                    .providerName(awsProperties.getProviderName())
+                    .accountId(awsProperties.getAccountId())
                     .build();
             return StaticCredentialsProvider.create(awsCreds);
         }
