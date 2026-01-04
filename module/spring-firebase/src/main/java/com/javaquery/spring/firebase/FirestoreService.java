@@ -3,9 +3,13 @@ package com.javaquery.spring.firebase;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
+import com.javaquery.util.Is;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -14,6 +18,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class FirestoreService {
+
+    @Value("${firebase.firestore.queryTimeout:10}")
+    private int firestoreQueryTimeout;
+
+    @Value("${firebase.firestore.pageSize:50}")
+    private int firestorePageSize;
 
     private Firestore getFirestore() {
         return FirestoreClient.getFirestore();
@@ -92,7 +102,7 @@ public class FirestoreService {
         DocumentReference docRef = db.collection(collectionName).document(documentId);
 
         ApiFuture<DocumentSnapshot> getFuture = docRef.get();
-        DocumentSnapshot document = getFuture.get();
+        DocumentSnapshot document = getFuture.get(firestoreQueryTimeout, TimeUnit.SECONDS);
 
         if (!document.exists()) {
             throw new RuntimeException("Document not found");
@@ -150,7 +160,7 @@ public class FirestoreService {
         Firestore db = getFirestore();
         DocumentReference docRef = db.collection(collection).document(documentId);
         ApiFuture<DocumentSnapshot> future = docRef.get();
-        DocumentSnapshot document = future.get();
+        DocumentSnapshot document = future.get(firestoreQueryTimeout, TimeUnit.SECONDS);
         if (document.exists()) {
             return document.getData();
         } else {
@@ -172,12 +182,57 @@ public class FirestoreService {
         Firestore db = getFirestore();
         DocumentReference docRef = db.collection(collection).document(documentId);
         ApiFuture<DocumentSnapshot> future = docRef.get();
-        DocumentSnapshot document = future.get();
+        DocumentSnapshot document = future.get(firestoreQueryTimeout, TimeUnit.SECONDS);
         if (document.exists()) {
             return document.toObject(valueType);
         } else {
             throw new RuntimeException("Document not found");
         }
+    }
+
+    /**
+     * List documents from a Firestore collection with pagination.
+     *
+     * @param collectionName the name of the collection
+     * @param fields         the fields to retrieve, you can pass null or empty list to get all fields
+     * @param limit          the maximum number of documents to retrieve
+     * @param offSet         the number of documents to skip, use negative value for no offset
+     * @return a list of maps, each containing a document's data
+     * @throws Exception if an error occurs during the operation
+     */
+    public List<Map<String, Object>> listDocuments(String collectionName, List<String> fields, int limit, int offSet)
+            throws Exception {
+        Firestore db = getFirestore();
+        CollectionReference collectionRef = db.collection(collectionName);
+        Query query = collectionRef.limit(limit);
+
+        if (Is.nonNullNonEmpty(fields)) {
+            query = query.select(fields.toArray(new String[0]));
+        }
+
+        if (offSet > 0) {
+            query = query.offset(offSet);
+        }
+
+        ApiFuture<QuerySnapshot> querySnapshotFuture = query.get();
+        QuerySnapshot querySnapshot = querySnapshotFuture.get(firestoreQueryTimeout, TimeUnit.SECONDS);
+
+        return querySnapshot.getDocuments().stream()
+                .map(DocumentSnapshot::getData)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * List documents from a Firestore collection with default pagination.<br/>
+     * DEFAULT PAGE SIZE is used and no offset. Yuu can override page size using firebase.firestore.pageSize property.
+     *
+     * @param collectionName the name of the collection
+     * @param fields         the fields to retrieve, you can pass null or empty list to get all fields
+     * @return a list of maps, each containing a document's data
+     * @throws Exception if an error occurs during the operation
+     */
+    public List<Map<String, Object>> listDocuments(String collectionName, List<String> fields) throws Exception {
+        return listDocuments(collectionName, fields, firestorePageSize, -1);
     }
 
     /**
@@ -194,7 +249,7 @@ public class FirestoreService {
 
         // Add timeout to prevent indefinite waiting
         ApiFuture<DocumentSnapshot> future = docRef.get(FieldMask.of(new String[0]));
-        DocumentSnapshot document = future.get(5, TimeUnit.SECONDS);
+        DocumentSnapshot document = future.get(firestoreQueryTimeout, TimeUnit.SECONDS);
         return document.exists();
     }
 
@@ -209,7 +264,7 @@ public class FirestoreService {
         Firestore db = getFirestore();
 
         AggregateQuerySnapshot snapshot =
-                db.collection(collection).count().get().get(5, TimeUnit.SECONDS);
+                db.collection(collection).count().get().get(firestoreQueryTimeout, TimeUnit.SECONDS);
 
         return snapshot.getCount();
     }

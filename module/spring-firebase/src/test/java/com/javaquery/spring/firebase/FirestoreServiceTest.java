@@ -539,4 +539,377 @@ class FirestoreServiceTest {
         firestoreService.deleteDocument(testCollection, docId2);
         assertEquals(0, firestoreService.countDocuments(testCollection), "Final count should be 0");
     }
+
+    @Test
+    @Order(29)
+    void testListDocuments_WithEmptyCollection_ShouldReturnEmptyList() throws Exception {
+        String emptyCollection = "empty-list-test-" + UUID.randomUUID();
+
+        List<Map<String, Object>> documents = firestoreService.listDocuments(emptyCollection, null);
+
+        assertNotNull(documents, "Documents list should not be null");
+        assertTrue(documents.isEmpty(), "Empty collection should return empty list");
+    }
+
+    @Test
+    @Order(30)
+    void testListDocuments_WithSingleDocument_ShouldReturnOneDocument() throws Exception {
+        String testCollection = "list-single-" + UUID.randomUUID();
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "John Doe");
+        data.put("email", "john@example.com");
+        data.put("age", 30);
+        firestoreService.saveOrUpdate(testCollection, "doc1", data);
+
+        List<Map<String, Object>> documents = firestoreService.listDocuments(testCollection, null);
+
+        assertNotNull(documents);
+        assertEquals(1, documents.size(), "Should return exactly one document");
+        assertEquals("John Doe", documents.get(0).get("name"));
+        assertEquals("john@example.com", documents.get(0).get("email"));
+
+        firestoreService.deleteDocument(testCollection, "doc1");
+    }
+
+    @Test
+    @Order(31)
+    void testListDocuments_WithMultipleDocuments_ShouldReturnAllDocuments() throws Exception {
+        String testCollection = "list-multiple-" + UUID.randomUUID();
+        int numDocs = 5;
+
+        for (int i = 0; i < numDocs; i++) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("name", "User " + i);
+            data.put("index", i);
+            data.put("email", "user" + i + "@example.com");
+            firestoreService.saveOrUpdate(testCollection, "doc-" + i, data);
+        }
+
+        List<Map<String, Object>> documents = firestoreService.listDocuments(testCollection, null);
+
+        assertNotNull(documents);
+        assertEquals(numDocs, documents.size(), "Should return all " + numDocs + " documents");
+
+        for (Map<String, Object> doc : documents) {
+            assertNotNull(doc.get("name"), "Document should have name field");
+            assertNotNull(doc.get("email"), "Document should have email field");
+        }
+
+        for (int i = 0; i < numDocs; i++) {
+            firestoreService.deleteDocument(testCollection, "doc-" + i);
+        }
+    }
+
+    @Test
+    @Order(32)
+    void testListDocuments_WithSpecificFields_ShouldReturnOnlySelectedFields() throws Exception {
+        String testCollection = "list-fields-" + UUID.randomUUID();
+        Map<String, Object> data = new HashMap<>();
+        data.put("firstName", "John");
+        data.put("lastName", "Doe");
+        data.put("email", "john@example.com");
+        data.put("age", 30);
+        data.put("address", "123 Main St");
+        firestoreService.saveOrUpdate(testCollection, "doc1", data);
+
+        List<String> fieldsToRetrieve = List.of("firstName", "email");
+        List<Map<String, Object>> documents = firestoreService.listDocuments(testCollection, fieldsToRetrieve, 10, -1);
+
+        assertNotNull(documents);
+        assertEquals(1, documents.size());
+
+        Map<String, Object> doc = documents.get(0);
+        assertTrue(doc.containsKey("firstName"), "Should contain firstName field");
+        assertTrue(doc.containsKey("email"), "Should contain email field");
+        assertFalse(doc.containsKey("lastName"), "Should not contain lastName field");
+        assertFalse(doc.containsKey("age"), "Should not contain age field");
+        assertFalse(doc.containsKey("address"), "Should not contain address field");
+
+        assertEquals("John", doc.get("firstName"));
+        assertEquals("john@example.com", doc.get("email"));
+
+        firestoreService.deleteDocument(testCollection, "doc1");
+    }
+
+    @Test
+    @Order(33)
+    void testListDocuments_WithNullFields_ShouldReturnAllFields() throws Exception {
+        String testCollection = "list-null-fields-" + UUID.randomUUID();
+        Map<String, Object> data = new HashMap<>();
+        data.put("firstName", "Jane");
+        data.put("lastName", "Smith");
+        data.put("email", "jane@example.com");
+        data.put("age", 25);
+        firestoreService.saveOrUpdate(testCollection, "doc1", data);
+
+        List<Map<String, Object>> documents = firestoreService.listDocuments(testCollection, null, 10, -1);
+
+        assertNotNull(documents);
+        assertEquals(1, documents.size());
+
+        Map<String, Object> doc = documents.get(0);
+        assertTrue(doc.containsKey("firstName"), "Should contain firstName");
+        assertTrue(doc.containsKey("lastName"), "Should contain lastName");
+        assertTrue(doc.containsKey("email"), "Should contain email");
+        assertTrue(doc.containsKey("age"), "Should contain age");
+
+        assertEquals("Jane", doc.get("firstName"));
+        assertEquals("Smith", doc.get("lastName"));
+        assertEquals("jane@example.com", doc.get("email"));
+
+        firestoreService.deleteDocument(testCollection, "doc1");
+    }
+
+    @Test
+    @Order(34)
+    void testListDocuments_WithEmptyFieldsList_ShouldReturnAllFields() throws Exception {
+        String testCollection = "list-empty-fields-" + UUID.randomUUID();
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("email", "test@example.com");
+        firestoreService.saveOrUpdate(testCollection, "doc1", data);
+
+        List<Map<String, Object>> documents = firestoreService.listDocuments(testCollection, List.of(), 10, -1);
+
+        assertNotNull(documents);
+        assertEquals(1, documents.size());
+
+        Map<String, Object> doc = documents.get(0);
+        assertTrue(doc.containsKey("name"));
+        assertTrue(doc.containsKey("email"));
+
+        firestoreService.deleteDocument(testCollection, "doc1");
+    }
+
+    @Test
+    @Order(35)
+    void testListDocuments_WithLimit_ShouldReturnLimitedResults() throws Exception {
+        String testCollection = "list-limit-" + UUID.randomUUID();
+        int totalDocs = 10;
+        int limit = 5;
+
+        for (int i = 0; i < totalDocs; i++) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("name", "User " + i);
+            data.put("index", i);
+            firestoreService.saveOrUpdate(testCollection, "doc-" + i, data);
+        }
+
+        List<Map<String, Object>> documents = firestoreService.listDocuments(testCollection, null, limit, -1);
+
+        assertNotNull(documents);
+        assertEquals(limit, documents.size(), "Should return exactly " + limit + " documents");
+
+        for (int i = 0; i < totalDocs; i++) {
+            firestoreService.deleteDocument(testCollection, "doc-" + i);
+        }
+    }
+
+    @Test
+    @Order(36)
+    void testListDocuments_WithOffset_ShouldSkipDocuments() throws Exception {
+        String testCollection = "list-offset-" + UUID.randomUUID();
+        int totalDocs = 10;
+        int offset = 5;
+
+        for (int i = 0; i < totalDocs; i++) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("name", "User " + i);
+            data.put("index", i);
+            firestoreService.saveOrUpdate(testCollection, "doc-" + i, data);
+        }
+
+        List<Map<String, Object>> documents = firestoreService.listDocuments(testCollection, null, 10, offset);
+
+        assertNotNull(documents);
+        assertEquals(totalDocs - offset, documents.size(), "Should return " + (totalDocs - offset) + " documents");
+
+        for (int i = 0; i < totalDocs; i++) {
+            firestoreService.deleteDocument(testCollection, "doc-" + i);
+        }
+    }
+
+    @Test
+    @Order(37)
+    void testListDocuments_WithNegativeOffset_ShouldIgnoreOffset() throws Exception {
+        String testCollection = "list-neg-offset-" + UUID.randomUUID();
+        int totalDocs = 5;
+
+        for (int i = 0; i < totalDocs; i++) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("name", "User " + i);
+            firestoreService.saveOrUpdate(testCollection, "doc-" + i, data);
+        }
+
+        List<Map<String, Object>> documents = firestoreService.listDocuments(testCollection, null, 10, -1);
+
+        assertNotNull(documents);
+        assertEquals(totalDocs, documents.size(), "Should return all documents when offset is negative");
+
+        for (int i = 0; i < totalDocs; i++) {
+            firestoreService.deleteDocument(testCollection, "doc-" + i);
+        }
+    }
+
+    @Test
+    @Order(38)
+    void testListDocuments_WithLimitAndOffset_ShouldReturnCorrectSubset() throws Exception {
+        String testCollection = "list-limit-offset-" + UUID.randomUUID();
+        int totalDocs = 20;
+        int limit = 5;
+        int offset = 10;
+
+        for (int i = 0; i < totalDocs; i++) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("name", "User " + i);
+            data.put("index", i);
+            firestoreService.saveOrUpdate(testCollection, "doc-" + i, data);
+        }
+
+        List<Map<String, Object>> documents = firestoreService.listDocuments(testCollection, null, limit, offset);
+
+        assertNotNull(documents);
+        assertEquals(limit, documents.size(), "Should return " + limit + " documents");
+
+        for (int i = 0; i < totalDocs; i++) {
+            firestoreService.deleteDocument(testCollection, "doc-" + i);
+        }
+    }
+
+    @Test
+    @Order(39)
+    void testListDocuments_DefaultPagination_ShouldUseDefaultPageSize() throws Exception {
+        String testCollection = "list-default-page-" + UUID.randomUUID();
+        int numDocs = 10; // Less than default page size of 50
+
+        for (int i = 0; i < numDocs; i++) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("name", "User " + i);
+            data.put("index", i);
+            firestoreService.saveOrUpdate(testCollection, "doc-" + i, data);
+        }
+
+        List<Map<String, Object>> documents = firestoreService.listDocuments(testCollection, null);
+
+        assertNotNull(documents);
+        assertEquals(numDocs, documents.size(), "Should return all documents using default pagination");
+
+        for (int i = 0; i < numDocs; i++) {
+            firestoreService.deleteDocument(testCollection, "doc-" + i);
+        }
+    }
+
+    @Test
+    @Order(40)
+    void testListDocuments_DefaultPagination_WithSpecificFields() throws Exception {
+        String testCollection = "list-default-fields-" + UUID.randomUUID();
+        Map<String, Object> data = new HashMap<>();
+        data.put("firstName", "Alice");
+        data.put("lastName", "Wonder");
+        data.put("email", "alice@example.com");
+        data.put("age", 28);
+        data.put("city", "Wonderland");
+        firestoreService.saveOrUpdate(testCollection, "doc1", data);
+
+        List<String> fields = List.of("firstName", "city");
+        List<Map<String, Object>> documents = firestoreService.listDocuments(testCollection, fields);
+
+        assertNotNull(documents);
+        assertEquals(1, documents.size());
+
+        Map<String, Object> doc = documents.get(0);
+        assertTrue(doc.containsKey("firstName"), "Should contain firstName");
+        assertTrue(doc.containsKey("city"), "Should contain city");
+        assertFalse(doc.containsKey("lastName"), "Should not contain lastName");
+        assertFalse(doc.containsKey("email"), "Should not contain email");
+        assertFalse(doc.containsKey("age"), "Should not contain age");
+
+        firestoreService.deleteDocument(testCollection, "doc1");
+    }
+
+    @Test
+    @Order(41)
+    void testListDocuments_WithComplexData_ShouldHandleNestedStructures() throws Exception {
+        String testCollection = "list-complex-" + UUID.randomUUID();
+
+        Map<String, Object> address = new HashMap<>();
+        address.put("street", "123 Main St");
+        address.put("city", "New York");
+        address.put("zipCode", "10001");
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Complex User");
+        data.put("address", address);
+        data.put("tags", List.of("developer", "tester"));
+
+        firestoreService.saveOrUpdate(testCollection, "doc1", data);
+
+        List<Map<String, Object>> documents = firestoreService.listDocuments(testCollection, null);
+
+        assertNotNull(documents);
+        assertEquals(1, documents.size());
+
+        Map<String, Object> doc = documents.get(0);
+        assertEquals("Complex User", doc.get("name"));
+        assertNotNull(doc.get("address"));
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> retrievedAddress = (Map<String, Object>) doc.get("address");
+        assertEquals("123 Main St", retrievedAddress.get("street"));
+        assertEquals("New York", retrievedAddress.get("city"));
+
+        firestoreService.deleteDocument(testCollection, "doc1");
+    }
+
+    @Test
+    @Order(42)
+    void testListDocuments_Pagination_SimulateMultiplePages() throws Exception {
+        String testCollection = "list-pages-" + UUID.randomUUID();
+        int totalDocs = 15;
+        int pageSize = 5;
+
+        for (int i = 0; i < totalDocs; i++) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("name", "User " + i);
+            data.put("index", i);
+            firestoreService.saveOrUpdate(testCollection, "doc-" + String.format("%02d", i), data);
+        }
+
+        List<Map<String, Object>> page1 = firestoreService.listDocuments(testCollection, null, pageSize, 0);
+        List<Map<String, Object>> page2 = firestoreService.listDocuments(testCollection, null, pageSize, pageSize);
+        List<Map<String, Object>> page3 = firestoreService.listDocuments(testCollection, null, pageSize, pageSize * 2);
+
+        assertNotNull(page1);
+        assertEquals(pageSize, page1.size(), "Page 1 should have " + pageSize + " documents");
+
+        assertNotNull(page2);
+        assertEquals(pageSize, page2.size(), "Page 2 should have " + pageSize + " documents");
+
+        assertNotNull(page3);
+        assertEquals(pageSize, page3.size(), "Page 3 should have " + pageSize + " documents");
+
+        int totalRetrieved = page1.size() + page2.size() + page3.size();
+        assertEquals(totalDocs, totalRetrieved, "Total retrieved should equal total documents");
+
+        for (int i = 0; i < totalDocs; i++) {
+            firestoreService.deleteDocument(testCollection, "doc-" + String.format("%02d", i));
+        }
+    }
+
+    @Test
+    @Order(43)
+    void testListDocuments_WithZeroLimit_ShouldReturnEmptyList() throws Exception {
+        String testCollection = "list-zero-limit-" + UUID.randomUUID();
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        firestoreService.saveOrUpdate(testCollection, "doc1", data);
+
+        List<Map<String, Object>> documents = firestoreService.listDocuments(testCollection, null, 0, -1);
+
+        assertNotNull(documents);
+        assertTrue(documents.isEmpty(), "Zero limit should return empty list");
+
+        // Cleanup
+        firestoreService.deleteDocument(testCollection, "doc1");
+    }
 }

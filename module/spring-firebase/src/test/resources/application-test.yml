@@ -1,3 +1,6 @@
 firebase:
   credentials:
     file: classpath:firebase-service-account-test.json
+  firestore:
+    queryTimeout: 5
+    pageSize: 20
