@@ -10,6 +10,8 @@ import java.nio.charset.StandardCharsets;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
 /**
  * @author vicky.thakor
@@ -18,17 +20,30 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class GoogleCloudPlatform {
 
+    private final ResourceLoader resourceLoader;
+
     @Value("${firebase.credentials.file:}")
     private String credentialsFile;
 
     @Value("${firebase.credentials.string:}")
     private String credentialsString;
 
+    public GoogleCloudPlatform(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
+
     @Bean
     public GoogleCredentials googleCredentials() throws IOException {
         if (Is.nonNullNonEmpty(credentialsFile)) {
-            try (FileInputStream serviceAccountStream = new FileInputStream(credentialsFile)) {
-                return GoogleCredentials.fromStream(serviceAccountStream);
+            if (credentialsFile.startsWith("classpath:")) {
+                Resource resource = resourceLoader.getResource(credentialsFile);
+                try (InputStream inputStream = resource.getInputStream()) {
+                    return GoogleCredentials.fromStream(inputStream);
+                }
+            } else {
+                try (FileInputStream serviceAccountStream = new FileInputStream(credentialsFile)) {
+                    return GoogleCredentials.fromStream(serviceAccountStream);
+                }
             }
         } else if (Is.nonNullNonEmpty(credentialsString)) {
             try (InputStream inputStream =

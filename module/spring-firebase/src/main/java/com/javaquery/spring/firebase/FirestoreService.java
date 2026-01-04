@@ -6,10 +6,9 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.cloud.FirestoreClient;
-import org.springframework.stereotype.Service;
-
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import org.springframework.stereotype.Service;
 
 /**
  * @author vicky.thakor
@@ -32,9 +31,8 @@ public class FirestoreService {
      */
     public void saveOrUpdate(String collectionName, String documentId, Object data) throws Exception {
         Firestore firestore = getFirestore();
-        ApiFuture<WriteResult> writeResult = firestore.collection(collectionName)
-                .document(documentId)
-                .set(data);
+        ApiFuture<WriteResult> writeResult =
+                firestore.collection(collectionName).document(documentId).set(data);
         writeResult.get();
     }
 
@@ -48,8 +46,8 @@ public class FirestoreService {
      */
     public String addDocument(String collectionName, Object data) throws Exception {
         Firestore firestore = getFirestore();
-        ApiFuture<DocumentReference> addedDocRef = firestore.collection(collectionName)
-                .add(data);
+        ApiFuture<DocumentReference> addedDocRef =
+                firestore.collection(collectionName).add(data);
         return addedDocRef.get().getId();
     }
 
@@ -61,11 +59,11 @@ public class FirestoreService {
      * @param data           a map of fields to be updated
      * @throws Exception if an error occurs during the operation
      */
-    public void updateDocumentFields(String collectionName, String documentId, Map<String, Object> data) throws Exception {
+    public void updateDocumentFields(String collectionName, String documentId, Map<String, Object> data)
+            throws Exception {
         Firestore firestore = getFirestore();
-        ApiFuture<WriteResult> writeResult = firestore.collection(collectionName)
-                .document(documentId)
-                .update(data);
+        ApiFuture<WriteResult> writeResult =
+                firestore.collection(collectionName).document(documentId).update(data);
         writeResult.get();
     }
 
@@ -78,9 +76,8 @@ public class FirestoreService {
      */
     public void deleteDocument(String collectionName, String documentId) throws Exception {
         Firestore firestore = getFirestore();
-        ApiFuture<WriteResult> writeResult = firestore.collection(collectionName)
-                .document(documentId)
-                .delete();
+        ApiFuture<WriteResult> writeResult =
+                firestore.collection(collectionName).document(documentId).delete();
         writeResult.get();
     }
 
