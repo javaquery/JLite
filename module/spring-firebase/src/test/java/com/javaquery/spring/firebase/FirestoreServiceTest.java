@@ -319,4 +319,224 @@ class FirestoreServiceTest {
 
         firestoreService.deleteDocument(TEST_COLLECTION, docId);
     }
+
+    @Test
+    @Order(18)
+    void testDocumentExists_WithExistingDocument_ShouldReturnTrue() throws Exception {
+        String docId = "test-exists-" + UUID.randomUUID();
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Exists Test");
+        data.put("email", "exists@example.com");
+        firestoreService.saveOrUpdate(TEST_COLLECTION, docId, data);
+
+        boolean exists = firestoreService.documentExists(TEST_COLLECTION, docId);
+
+        assertTrue(exists, "Document should exist");
+
+        firestoreService.deleteDocument(TEST_COLLECTION, docId);
+    }
+
+    @Test
+    @Order(19)
+    void testDocumentExists_WithNonExistentDocument_ShouldReturnFalse() throws Exception {
+        String nonExistentDocId = "non-existent-exists-" + UUID.randomUUID();
+        boolean exists = firestoreService.documentExists(TEST_COLLECTION, nonExistentDocId);
+
+        assertFalse(exists, "Document should not exist");
+    }
+
+    @Test
+    @Order(20)
+    void testDocumentExists_AfterDeletion_ShouldReturnFalse() throws Exception {
+        String docId = "test-exists-deleted-" + UUID.randomUUID();
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "To Be Deleted");
+        firestoreService.saveOrUpdate(TEST_COLLECTION, docId, data);
+
+        assertTrue(firestoreService.documentExists(TEST_COLLECTION, docId), "Document should exist before deletion");
+
+        firestoreService.deleteDocument(TEST_COLLECTION, docId);
+
+        boolean existsAfterDelete = firestoreService.documentExists(TEST_COLLECTION, docId);
+        assertFalse(existsAfterDelete, "Document should not exist after deletion");
+    }
+
+    @Test
+    @Order(21)
+    void testDocumentExists_WithEmptyDocument_ShouldReturnTrue() throws Exception {
+        String docId = "test-exists-empty-" + UUID.randomUUID();
+        Map<String, Object> emptyData = new HashMap<>();
+        firestoreService.saveOrUpdate(TEST_COLLECTION, docId, emptyData);
+
+        boolean exists = firestoreService.documentExists(TEST_COLLECTION, docId);
+
+        assertTrue(exists, "Empty document should still exist");
+        firestoreService.deleteDocument(TEST_COLLECTION, docId);
+    }
+
+    @Test
+    @Order(22)
+    void testCountDocuments_WithEmptyCollection_ShouldReturnZero() throws Exception {
+        String emptyCollection = "empty-collection-" + UUID.randomUUID();
+        long count = firestoreService.countDocuments(emptyCollection);
+
+        assertEquals(0, count, "Empty collection should have 0 documents");
+    }
+
+    @Test
+    @Order(23)
+    void testCountDocuments_WithSingleDocument_ShouldReturnOne() throws Exception {
+        String testCollection = "count-test-single-" + UUID.randomUUID();
+        String docId = "doc1";
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        long count = firestoreService.countDocuments(testCollection);
+
+        assertEquals(1, count, "Collection should have 1 document");
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(24)
+    void testCountDocuments_WithMultipleDocuments_ShouldReturnCorrectCount() throws Exception {
+        String testCollection = "count-test-multiple-" + UUID.randomUUID();
+        int numDocuments = 5;
+
+        for (int i = 0; i < numDocuments; i++) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("name", "User " + i);
+            data.put("index", i);
+            firestoreService.saveOrUpdate(testCollection, "doc-" + i, data);
+        }
+
+        long count = firestoreService.countDocuments(testCollection);
+
+        assertEquals(numDocuments, count, "Collection should have " + numDocuments + " documents");
+
+        for (int i = 0; i < numDocuments; i++) {
+            firestoreService.deleteDocument(testCollection, "doc-" + i);
+        }
+    }
+
+    @Test
+    @Order(25)
+    void testCountDocuments_AfterAddingDocuments_ShouldUpdateCount() throws Exception {
+        String testCollection = "count-test-incremental-" + UUID.randomUUID();
+
+        assertEquals(0, firestoreService.countDocuments(testCollection), "Initial count should be 0");
+
+        Map<String, Object> data1 = new HashMap<>();
+        data1.put("name", "First User");
+        firestoreService.saveOrUpdate(testCollection, "doc1", data1);
+
+        assertEquals(
+                1, firestoreService.countDocuments(testCollection), "Count should be 1 after adding first document");
+
+        Map<String, Object> data2 = new HashMap<>();
+        data2.put("name", "Second User");
+        firestoreService.saveOrUpdate(testCollection, "doc2", data2);
+
+        assertEquals(
+                2, firestoreService.countDocuments(testCollection), "Count should be 2 after adding second document");
+
+        firestoreService.deleteDocument(testCollection, "doc1");
+        firestoreService.deleteDocument(testCollection, "doc2");
+    }
+
+    @Test
+    @Order(26)
+    void testCountDocuments_AfterDeletingDocuments_ShouldUpdateCount() throws Exception {
+        String testCollection = "count-test-delete-" + UUID.randomUUID();
+        int initialCount = 3;
+
+        for (int i = 0; i < initialCount; i++) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("name", "User " + i);
+            firestoreService.saveOrUpdate(testCollection, "doc-" + i, data);
+        }
+
+        assertEquals(
+                initialCount,
+                firestoreService.countDocuments(testCollection),
+                "Initial count should be " + initialCount);
+
+        firestoreService.deleteDocument(testCollection, "doc-0");
+
+        assertEquals(
+                initialCount - 1,
+                firestoreService.countDocuments(testCollection),
+                "Count should be " + (initialCount - 1) + " after deletion");
+
+        firestoreService.deleteDocument(testCollection, "doc-1");
+
+        assertEquals(
+                initialCount - 2,
+                firestoreService.countDocuments(testCollection),
+                "Count should be " + (initialCount - 2) + " after second deletion");
+
+        firestoreService.deleteDocument(testCollection, "doc-2");
+    }
+
+    @Test
+    @Order(27)
+    void testCountDocuments_WithLargeCollection_ShouldReturnCorrectCount() throws Exception {
+        String testCollection = "count-test-large-" + UUID.randomUUID();
+        int numDocuments = 25;
+
+        for (int i = 0; i < numDocuments; i++) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("name", "User " + i);
+            data.put("index", i);
+            data.put("email", "user" + i + "@example.com");
+            firestoreService.saveOrUpdate(testCollection, "doc-" + i, data);
+        }
+
+        long count = firestoreService.countDocuments(testCollection);
+
+        assertEquals(numDocuments, count, "Collection should have " + numDocuments + " documents");
+
+        for (int i = 0; i < numDocuments; i++) {
+            firestoreService.deleteDocument(testCollection, "doc-" + i);
+        }
+    }
+
+    @Test
+    @Order(28)
+    void testDocumentExists_And_CountDocuments_Integration() throws Exception {
+        String testCollection = "integration-test-" + UUID.randomUUID();
+        String docId1 = "doc1";
+        String docId2 = "doc2";
+
+        assertFalse(firestoreService.documentExists(testCollection, docId1), "Document 1 should not exist initially");
+        assertFalse(firestoreService.documentExists(testCollection, docId2), "Document 2 should not exist initially");
+        assertEquals(0, firestoreService.countDocuments(testCollection), "Initial count should be 0");
+
+        Map<String, Object> data1 = new HashMap<>();
+        data1.put("name", "User 1");
+        firestoreService.saveOrUpdate(testCollection, docId1, data1);
+
+        assertTrue(firestoreService.documentExists(testCollection, docId1), "Document 1 should exist");
+        assertFalse(firestoreService.documentExists(testCollection, docId2), "Document 2 should not exist yet");
+        assertEquals(1, firestoreService.countDocuments(testCollection), "Count should be 1");
+
+        Map<String, Object> data2 = new HashMap<>();
+        data2.put("name", "User 2");
+        firestoreService.saveOrUpdate(testCollection, docId2, data2);
+
+        assertTrue(firestoreService.documentExists(testCollection, docId1), "Document 1 should exist");
+        assertTrue(firestoreService.documentExists(testCollection, docId2), "Document 2 should exist");
+        assertEquals(2, firestoreService.countDocuments(testCollection), "Count should be 2");
+
+        firestoreService.deleteDocument(testCollection, docId1);
+
+        assertFalse(
+                firestoreService.documentExists(testCollection, docId1), "Document 1 should not exist after deletion");
+        assertTrue(firestoreService.documentExists(testCollection, docId2), "Document 2 should still exist");
+        assertEquals(1, firestoreService.countDocuments(testCollection), "Count should be 1 after deletion");
+
+        firestoreService.deleteDocument(testCollection, docId2);
+        assertEquals(0, firestoreService.countDocuments(testCollection), "Final count should be 0");
+    }
 }

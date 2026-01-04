@@ -1,13 +1,11 @@
 package com.javaquery.spring.firebase;
 
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.WriteResult;
+import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Service;
 
 /**
@@ -180,5 +178,39 @@ public class FirestoreService {
         } else {
             throw new RuntimeException("Document not found");
         }
+    }
+
+    /**
+     * Check if a document exists in Firestore.
+     *
+     * @param collection the name of the collection
+     * @param documentId the ID of the document
+     * @return true if the document exists, false otherwise
+     * @throws Exception if an error occurs during the operation
+     */
+    public boolean documentExists(String collection, String documentId) throws Exception {
+        Firestore db = getFirestore();
+        DocumentReference docRef = db.collection(collection).document(documentId);
+
+        // Add timeout to prevent indefinite waiting
+        ApiFuture<DocumentSnapshot> future = docRef.get(FieldMask.of(new String[0]));
+        DocumentSnapshot document = future.get(5, TimeUnit.SECONDS);
+        return document.exists();
+    }
+
+    /**
+     * Count the number of documents in a collection.
+     *
+     * @param collection the name of the collection
+     * @return the count of documents
+     * @throws Exception if an error occurs during the operation
+     */
+    public long countDocuments(String collection) throws Exception {
+        Firestore db = getFirestore();
+
+        AggregateQuerySnapshot snapshot =
+                db.collection(collection).count().get().get(5, TimeUnit.SECONDS);
+
+        return snapshot.getCount();
     }
 }
