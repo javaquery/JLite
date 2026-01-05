@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -224,14 +225,11 @@ public class FirestoreService {
      * @throws Exception if an error occurs during the operation
      */
     public <T> T getDocument(String collection, String documentId, Class<T> valueType) throws Exception {
-        Firestore db = getFirestore();
-        DocumentReference docRef = db.collection(collection).document(documentId);
-        ApiFuture<DocumentSnapshot> future = docRef.get();
-        DocumentSnapshot document = future.get(firestoreQueryTimeout, TimeUnit.SECONDS);
-        if (document.exists()) {
-            return document.toObject(valueType);
-        } else {
+        List<T> documents = getDocuments(collection, List.of(documentId), valueType);
+        if (documents.isEmpty()) {
             throw new RuntimeException("Document not found");
+        } else {
+            return documents.get(0);
         }
     }
 
@@ -360,5 +358,50 @@ public class FirestoreService {
         DocumentReference docRef = db.collection(collection).document(documentId);
         ApiFuture<WriteResult> future = docRef.update(field, FieldValue.arrayRemove(values));
         future.get();
+    }
+
+    /**
+     * Query documents from a Firestore collection using a custom query builder.
+     *
+     * @param collectionName the name of the collection
+     * @param queryBuilder   a function that builds the query
+     * @return a list of maps, each containing a document's data
+     * @throws Exception if an error occurs during the operation
+     */
+    public List<Map<String, Object>> queryDocuments(
+            String collectionName, Function<CollectionReference, Query> queryBuilder) throws Exception {
+        Firestore db = getFirestore();
+        CollectionReference collectionRef = db.collection(collectionName);
+        Query query = queryBuilder.apply(collectionRef);
+
+        ApiFuture<QuerySnapshot> querySnapshotFuture = query.get();
+        QuerySnapshot querySnapshot = querySnapshotFuture.get(firestoreQueryTimeout, TimeUnit.SECONDS);
+        return querySnapshot.getDocuments().stream()
+                .map(DocumentSnapshot::getData)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Query documents from a Firestore collection using a custom query builder and map them to a specific class type.
+     *
+     * @param collectionName the name of the collection
+     * @param valueType      the class type to map the documents to
+     * @param queryBuilder   a function that builds the query
+     * @param <T>            the type parameter
+     * @return a list of instances of the specified class type containing the documents' data
+     * @throws Exception if an error occurs during the operation
+     */
+    public <T> List<T> queryDocuments(
+            String collectionName, Class<T> valueType, Function<CollectionReference, Query> queryBuilder)
+            throws Exception {
+        Firestore db = getFirestore();
+        CollectionReference collectionRef = db.collection(collectionName);
+        Query query = queryBuilder.apply(collectionRef);
+
+        ApiFuture<QuerySnapshot> querySnapshotFuture = query.get();
+        QuerySnapshot querySnapshot = querySnapshotFuture.get(firestoreQueryTimeout, TimeUnit.SECONDS);
+        return querySnapshot.getDocuments().stream()
+                .map(doc -> doc.toObject(valueType))
+                .collect(Collectors.toList());
     }
 }

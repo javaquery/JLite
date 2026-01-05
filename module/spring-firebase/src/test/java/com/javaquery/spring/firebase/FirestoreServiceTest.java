@@ -2241,4 +2241,585 @@ class FirestoreServiceTest {
 
         firestoreService.deleteDocument(testCollection, docId);
     }
+
+    @Test
+    @Order(96)
+    void testQueryDocuments_WithSimpleQuery_ShouldReturnMatchingDocuments() throws Exception {
+        String testCollection = "query-test-" + UUID.randomUUID();
+
+        // Create test documents
+        Map<String, Object> doc1 = new HashMap<>();
+        doc1.put("name", "Alice");
+        doc1.put("age", 25);
+        doc1.put("city", "New York");
+
+        Map<String, Object> doc2 = new HashMap<>();
+        doc2.put("name", "Bob");
+        doc2.put("age", 30);
+        doc2.put("city", "New York");
+
+        Map<String, Object> doc3 = new HashMap<>();
+        doc3.put("name", "Charlie");
+        doc3.put("age", 25);
+        doc3.put("city", "Boston");
+
+        firestoreService.saveOrUpdate(testCollection, "doc1", doc1);
+        firestoreService.saveOrUpdate(testCollection, "doc2", doc2);
+        firestoreService.saveOrUpdate(testCollection, "doc3", doc3);
+
+        // Query documents where age equals 25
+        List<Map<String, Object>> results =
+                firestoreService.queryDocuments(testCollection, collectionRef -> collectionRef.whereEqualTo("age", 25));
+
+        assertNotNull(results);
+        assertEquals(2, results.size());
+        assertTrue(results.stream().allMatch(doc -> ((Long) doc.get("age")).intValue() == 25));
+
+        // Cleanup
+        firestoreService.deleteDocument(testCollection, "doc1");
+        firestoreService.deleteDocument(testCollection, "doc2");
+        firestoreService.deleteDocument(testCollection, "doc3");
+    }
+
+    @Test
+    @Order(97)
+    void testQueryDocuments_WithMultipleConditions_ShouldReturnMatchingDocuments() throws Exception {
+        String testCollection = "query-multi-" + UUID.randomUUID();
+
+        // Create test documents
+        Map<String, Object> doc1 = new HashMap<>();
+        doc1.put("name", "Alice");
+        doc1.put("age", 25);
+        doc1.put("city", "New York");
+        doc1.put("active", true);
+
+        Map<String, Object> doc2 = new HashMap<>();
+        doc2.put("name", "Bob");
+        doc2.put("age", 30);
+        doc2.put("city", "New York");
+        doc2.put("active", true);
+
+        Map<String, Object> doc3 = new HashMap<>();
+        doc3.put("name", "Charlie");
+        doc3.put("age", 25);
+        doc3.put("city", "New York");
+        doc3.put("active", false);
+
+        firestoreService.saveOrUpdate(testCollection, "doc1", doc1);
+        firestoreService.saveOrUpdate(testCollection, "doc2", doc2);
+        firestoreService.saveOrUpdate(testCollection, "doc3", doc3);
+
+        // Query documents where city is "New York" AND active is true
+        List<Map<String, Object>> results = firestoreService.queryDocuments(
+                testCollection,
+                collectionRef -> collectionRef.whereEqualTo("city", "New York").whereEqualTo("active", true));
+
+        assertNotNull(results);
+        assertEquals(2, results.size());
+        assertTrue(results.stream()
+                .allMatch(doc -> "New York".equals(doc.get("city")) && Boolean.TRUE.equals(doc.get("active"))));
+
+        // Cleanup
+        firestoreService.deleteDocument(testCollection, "doc1");
+        firestoreService.deleteDocument(testCollection, "doc2");
+        firestoreService.deleteDocument(testCollection, "doc3");
+    }
+
+    @Test
+    @Order(98)
+    void testQueryDocuments_WithOrderByAndLimit_ShouldReturnOrderedLimitedResults() throws Exception {
+        String testCollection = "query-order-limit-" + UUID.randomUUID();
+
+        // Create test documents
+        for (int i = 1; i <= 5; i++) {
+            Map<String, Object> doc = new HashMap<>();
+            doc.put("name", "User" + i);
+            doc.put("score", i * 10);
+            firestoreService.saveOrUpdate(testCollection, "doc" + i, doc);
+        }
+
+        // Query with order by score descending and limit 3
+        List<Map<String, Object>> results =
+                firestoreService.queryDocuments(testCollection, collectionRef -> collectionRef
+                        .orderBy("score", com.google.cloud.firestore.Query.Direction.DESCENDING)
+                        .limit(3));
+
+        assertNotNull(results);
+        assertEquals(3, results.size());
+        assertEquals(50, ((Long) results.get(0).get("score")).intValue());
+        assertEquals(40, ((Long) results.get(1).get("score")).intValue());
+        assertEquals(30, ((Long) results.get(2).get("score")).intValue());
+
+        // Cleanup
+        for (int i = 1; i <= 5; i++) {
+            firestoreService.deleteDocument(testCollection, "doc" + i);
+        }
+    }
+
+    @Test
+    @Order(99)
+    void testQueryDocuments_WithRangeQuery_ShouldReturnMatchingDocuments() throws Exception {
+        String testCollection = "query-range-" + UUID.randomUUID();
+
+        // Create test documents with different ages
+        for (int i = 1; i <= 10; i++) {
+            Map<String, Object> doc = new HashMap<>();
+            doc.put("name", "Person" + i);
+            doc.put("age", 20 + i);
+            firestoreService.saveOrUpdate(testCollection, "doc" + i, doc);
+        }
+
+        // Query documents where age is between 25 and 28 (inclusive)
+        List<Map<String, Object>> results =
+                firestoreService.queryDocuments(testCollection, collectionRef -> collectionRef
+                        .whereGreaterThanOrEqualTo("age", 25)
+                        .whereLessThanOrEqualTo("age", 28));
+
+        assertNotNull(results);
+        assertEquals(4, results.size());
+        assertTrue(results.stream().allMatch(doc -> {
+            int age = ((Long) doc.get("age")).intValue();
+            return age >= 25 && age <= 28;
+        }));
+
+        // Cleanup
+        for (int i = 1; i <= 10; i++) {
+            firestoreService.deleteDocument(testCollection, "doc" + i);
+        }
+    }
+
+    @Test
+    @Order(100)
+    void testQueryDocuments_WithNoResults_ShouldReturnEmptyList() throws Exception {
+        String testCollection = "query-empty-" + UUID.randomUUID();
+
+        // Create test documents
+        Map<String, Object> doc1 = new HashMap<>();
+        doc1.put("name", "Alice");
+        doc1.put("age", 25);
+        firestoreService.saveOrUpdate(testCollection, "doc1", doc1);
+
+        // Query for non-existent data
+        List<Map<String, Object>> results = firestoreService.queryDocuments(
+                testCollection, collectionRef -> collectionRef.whereEqualTo("age", 999));
+
+        assertNotNull(results);
+        assertTrue(results.isEmpty());
+
+        // Cleanup
+        firestoreService.deleteDocument(testCollection, "doc1");
+    }
+
+    @Test
+    @Order(101)
+    void testQueryDocuments_WithTypedResults_ShouldReturnMappedObjects() throws Exception {
+        String testCollection = "query-typed-" + UUID.randomUUID();
+
+        // Create test customers
+        List<Customer> testCustomers = Customer.fakeData(3);
+        for (int i = 0; i < testCustomers.size(); i++) {
+            Customer customer = testCustomers.get(i);
+            // Set specific age for testing
+            customer.setAge(30 + i);
+            firestoreService.saveOrUpdate(testCollection, "customer" + i, customer);
+        }
+
+        // Query using the private method through reflection or create a public wrapper
+        // Since the typed version is private, we'll test the Map version and verify mapping
+        List<Map<String, Object>> results = firestoreService.queryDocuments(
+                testCollection, collectionRef -> collectionRef.whereGreaterThanOrEqualTo("age", 30));
+
+        assertNotNull(results);
+        assertEquals(3, results.size());
+        assertTrue(results.stream().allMatch(doc -> {
+            Long age = (Long) doc.get("age");
+            return age != null && age >= 30;
+        }));
+
+        // Verify all required fields are present
+        for (Map<String, Object> result : results) {
+            assertNotNull(result.get("firstName"));
+            assertNotNull(result.get("email"));
+            assertNotNull(result.get("age"));
+        }
+
+        // Cleanup
+        for (int i = 0; i < testCustomers.size(); i++) {
+            firestoreService.deleteDocument(testCollection, "customer" + i);
+        }
+    }
+
+    @Test
+    @Order(102)
+    void testQueryDocuments_WithArrayContains_ShouldReturnMatchingDocuments() throws Exception {
+        String testCollection = "query-array-" + UUID.randomUUID();
+
+        // Create documents with array fields
+        Map<String, Object> doc1 = new HashMap<>();
+        doc1.put("name", "User1");
+        doc1.put("tags", List.of("java", "spring", "firebase"));
+
+        Map<String, Object> doc2 = new HashMap<>();
+        doc2.put("name", "User2");
+        doc2.put("tags", List.of("python", "django"));
+
+        Map<String, Object> doc3 = new HashMap<>();
+        doc3.put("name", "User3");
+        doc3.put("tags", List.of("java", "hibernate"));
+
+        firestoreService.saveOrUpdate(testCollection, "doc1", doc1);
+        firestoreService.saveOrUpdate(testCollection, "doc2", doc2);
+        firestoreService.saveOrUpdate(testCollection, "doc3", doc3);
+
+        // Query documents where tags array contains "java"
+        List<Map<String, Object>> results = firestoreService.queryDocuments(
+                testCollection, collectionRef -> collectionRef.whereArrayContains("tags", "java"));
+
+        assertNotNull(results);
+        assertEquals(2, results.size());
+        assertTrue(results.stream().allMatch(doc -> {
+            @SuppressWarnings("unchecked")
+            List<String> tags = (List<String>) doc.get("tags");
+            return tags != null && tags.contains("java");
+        }));
+
+        // Cleanup
+        firestoreService.deleteDocument(testCollection, "doc1");
+        firestoreService.deleteDocument(testCollection, "doc2");
+        firestoreService.deleteDocument(testCollection, "doc3");
+    }
+
+    @Test
+    @Order(103)
+    void testQueryDocuments_WithInQuery_ShouldReturnMatchingDocuments() throws Exception {
+        String testCollection = "query-in-" + UUID.randomUUID();
+
+        // Create test documents
+        for (int i = 1; i <= 5; i++) {
+            Map<String, Object> doc = new HashMap<>();
+            doc.put("name", "User" + i);
+            doc.put("status", i % 2 == 0 ? "active" : "inactive");
+            doc.put("role", i <= 2 ? "admin" : "user");
+            firestoreService.saveOrUpdate(testCollection, "doc" + i, doc);
+        }
+
+        // Query documents where role is in ["admin", "moderator"]
+        List<Map<String, Object>> results = firestoreService.queryDocuments(
+                testCollection, collectionRef -> collectionRef.whereIn("role", List.of("admin", "moderator")));
+
+        assertNotNull(results);
+        assertEquals(2, results.size());
+        assertTrue(results.stream().allMatch(doc -> "admin".equals(doc.get("role"))));
+
+        // Cleanup
+        for (int i = 1; i <= 5; i++) {
+            firestoreService.deleteDocument(testCollection, "doc" + i);
+        }
+    }
+
+    @Test
+    @Order(105)
+    void testQueryDocumentsTyped_WithSimpleQuery_ShouldReturnTypedObjects() throws Exception {
+        String testCollection = "query-typed-simple-" + UUID.randomUUID();
+
+        // Create test customers
+        List<Customer> testCustomers = Customer.fakeData(5);
+        for (int i = 0; i < testCustomers.size(); i++) {
+            Customer customer = testCustomers.get(i);
+            customer.setAge(25 + i); // Set ages 25, 26, 27, 28, 29
+            firestoreService.saveOrUpdate(testCollection, "customer" + i, customer);
+        }
+
+        // Query using typed method where age equals 27
+        List<Customer> results = firestoreService.queryDocuments(
+                testCollection, Customer.class, collectionRef -> collectionRef.whereEqualTo("age", 27));
+
+        assertNotNull(results);
+        assertEquals(1, results.size());
+        Customer customer = results.get(0);
+        assertNotNull(customer);
+        assertEquals(27, customer.getAge());
+        assertNotNull(customer.getFirstName());
+        assertNotNull(customer.getEmail());
+
+        // Cleanup
+        for (int i = 0; i < testCustomers.size(); i++) {
+            firestoreService.deleteDocument(testCollection, "customer" + i);
+        }
+    }
+
+    @Test
+    @Order(106)
+    void testQueryDocumentsTyped_WithMultipleResults_ShouldReturnAllTypedObjects() throws Exception {
+        String testCollection = "query-typed-multi-" + UUID.randomUUID();
+
+        // Create test customers with specific ages
+        List<Customer> testCustomers = Customer.fakeData(6);
+        for (int i = 0; i < testCustomers.size(); i++) {
+            Customer customer = testCustomers.get(i);
+            customer.setAge(i % 2 == 0 ? 30 : 35); // Alternate between 30 and 35
+            firestoreService.saveOrUpdate(testCollection, "customer" + i, customer);
+        }
+
+        // Query for age 30 - should return 3 customers
+        List<Customer> results = firestoreService.queryDocuments(
+                testCollection, Customer.class, collectionRef -> collectionRef.whereEqualTo("age", 30));
+
+        assertNotNull(results);
+        assertEquals(3, results.size());
+        for (Customer customer : results) {
+            assertNotNull(customer);
+            assertEquals(30, customer.getAge());
+            assertNotNull(customer.getFirstName());
+            assertNotNull(customer.getLastName());
+            assertNotNull(customer.getEmail());
+        }
+
+        // Cleanup
+        for (int i = 0; i < testCustomers.size(); i++) {
+            firestoreService.deleteDocument(testCollection, "customer" + i);
+        }
+    }
+
+    @Test
+    @Order(107)
+    void testQueryDocumentsTyped_WithOrderByAndLimit_ShouldReturnOrderedTypedObjects() throws Exception {
+        String testCollection = "query-typed-order-" + UUID.randomUUID();
+
+        // Create test customers with different ages
+        List<Customer> testCustomers = Customer.fakeData(8);
+        for (int i = 0; i < testCustomers.size(); i++) {
+            Customer customer = testCustomers.get(i);
+            customer.setAge(20 + (i * 5)); // Ages: 20, 25, 30, 35, 40, 45, 50, 55
+            firestoreService.saveOrUpdate(testCollection, "customer" + i, customer);
+        }
+
+        // Query with order by age descending and limit 4
+        List<Customer> results =
+                firestoreService.queryDocuments(testCollection, Customer.class, collectionRef -> collectionRef
+                        .orderBy("age", com.google.cloud.firestore.Query.Direction.DESCENDING)
+                        .limit(4));
+
+        assertNotNull(results);
+        assertEquals(4, results.size());
+        // Verify descending order: 55, 50, 45, 40
+        assertEquals(55, results.get(0).getAge());
+        assertEquals(50, results.get(1).getAge());
+        assertEquals(45, results.get(2).getAge());
+        assertEquals(40, results.get(3).getAge());
+
+        // Verify all objects are properly typed
+        for (Customer customer : results) {
+            assertNotNull(customer.getFirstName());
+            assertNotNull(customer.getEmail());
+        }
+
+        // Cleanup
+        for (int i = 0; i < testCustomers.size(); i++) {
+            firestoreService.deleteDocument(testCollection, "customer" + i);
+        }
+    }
+
+    @Test
+    @Order(108)
+    void testQueryDocumentsTyped_WithRangeQuery_ShouldReturnTypedObjectsInRange() throws Exception {
+        String testCollection = "query-typed-range-" + UUID.randomUUID();
+
+        // Create test customers with ages from 20 to 60
+        List<Customer> testCustomers = Customer.fakeData(9);
+        for (int i = 0; i < testCustomers.size(); i++) {
+            Customer customer = testCustomers.get(i);
+            customer.setAge(20 + (i * 5)); // Ages: 20, 25, 30, 35, 40, 45, 50, 55, 60
+            firestoreService.saveOrUpdate(testCollection, "customer" + i, customer);
+        }
+
+        // Query for customers aged between 30 and 45 (inclusive)
+        List<Customer> results =
+                firestoreService.queryDocuments(testCollection, Customer.class, collectionRef -> collectionRef
+                        .whereGreaterThanOrEqualTo("age", 30)
+                        .whereLessThanOrEqualTo("age", 45));
+
+        assertNotNull(results);
+        assertEquals(4, results.size()); // Should match ages: 30, 35, 40, 45
+        for (Customer customer : results) {
+            assertNotNull(customer);
+            assertTrue(customer.getAge() >= 30 && customer.getAge() <= 45);
+            assertNotNull(customer.getFirstName());
+            assertNotNull(customer.getEmail());
+        }
+
+        // Cleanup
+        for (int i = 0; i < testCustomers.size(); i++) {
+            firestoreService.deleteDocument(testCollection, "customer" + i);
+        }
+    }
+
+    @Test
+    @Order(109)
+    void testQueryDocumentsTyped_WithNoResults_ShouldReturnEmptyList() throws Exception {
+        String testCollection = "query-typed-empty-" + UUID.randomUUID();
+
+        // Create test customers
+        List<Customer> testCustomers = Customer.fakeData(3);
+        for (int i = 0; i < testCustomers.size(); i++) {
+            Customer customer = testCustomers.get(i);
+            customer.setAge(25);
+            firestoreService.saveOrUpdate(testCollection, "customer" + i, customer);
+        }
+
+        // Query for non-existent age
+        List<Customer> results = firestoreService.queryDocuments(
+                testCollection, Customer.class, collectionRef -> collectionRef.whereEqualTo("age", 999));
+
+        assertNotNull(results);
+        assertTrue(results.isEmpty());
+
+        // Cleanup
+        for (int i = 0; i < testCustomers.size(); i++) {
+            firestoreService.deleteDocument(testCollection, "customer" + i);
+        }
+    }
+
+    @Test
+    @Order(110)
+    void testQueryDocumentsTyped_WithFieldSelection_ShouldMapAvailableFields() throws Exception {
+        String testCollection = "query-typed-fields-" + UUID.randomUUID();
+
+        // Create test customers with all fields
+        List<Customer> testCustomers = Customer.fakeData(3);
+        for (int i = 0; i < testCustomers.size(); i++) {
+            Customer customer = testCustomers.get(i);
+            customer.setAge(30 + i);
+            customer.setAbout("This is customer " + i);
+            firestoreService.saveOrUpdate(testCollection, "customer" + i, customer);
+        }
+
+        // Query all customers aged >= 30
+        List<Customer> results = firestoreService.queryDocuments(
+                testCollection, Customer.class, collectionRef -> collectionRef.whereGreaterThanOrEqualTo("age", 30));
+
+        assertNotNull(results);
+        assertEquals(3, results.size());
+
+        // Verify all fields are properly mapped
+        for (Customer customer : results) {
+            assertNotNull(customer);
+            assertTrue(customer.getAge() >= 30);
+            assertNotNull(customer.getFirstName());
+            assertNotNull(customer.getLastName());
+            assertNotNull(customer.getEmail());
+            // Note: 'about' field should also be present if it was saved
+        }
+
+        // Cleanup
+        for (int i = 0; i < testCustomers.size(); i++) {
+            firestoreService.deleteDocument(testCollection, "customer" + i);
+        }
+    }
+
+    @Test
+    @Order(111)
+    void testQueryDocumentsTyped_WithOrderByAscending_ShouldReturnTypedObjectsInAscendingOrder() throws Exception {
+        String testCollection = "query-typed-asc-" + UUID.randomUUID();
+
+        // Create customers with random ages
+        List<Customer> testCustomers = Customer.fakeData(5);
+        int[] ages = {45, 25, 60, 30, 50};
+        for (int i = 0; i < testCustomers.size(); i++) {
+            Customer customer = testCustomers.get(i);
+            customer.setAge(ages[i]);
+            firestoreService.saveOrUpdate(testCollection, "customer" + i, customer);
+        }
+
+        // Query with ascending order
+        List<Customer> results = firestoreService.queryDocuments(
+                testCollection,
+                Customer.class,
+                collectionRef -> collectionRef.orderBy("age", com.google.cloud.firestore.Query.Direction.ASCENDING));
+
+        assertNotNull(results);
+        assertEquals(5, results.size());
+
+        // Verify ascending order: 25, 30, 45, 50, 60
+        assertEquals(25, results.get(0).getAge());
+        assertEquals(30, results.get(1).getAge());
+        assertEquals(45, results.get(2).getAge());
+        assertEquals(50, results.get(3).getAge());
+        assertEquals(60, results.get(4).getAge());
+
+        // Cleanup
+        for (int i = 0; i < testCustomers.size(); i++) {
+            firestoreService.deleteDocument(testCollection, "customer" + i);
+        }
+    }
+
+    @Test
+    @Order(112)
+    void testQueryDocumentsTyped_WithGreaterThanQuery_ShouldReturnTypedObjectsAboveThreshold() throws Exception {
+        String testCollection = "query-typed-gt-" + UUID.randomUUID();
+
+        // Create customers with different ages
+        List<Customer> testCustomers = Customer.fakeData(7);
+        for (int i = 0; i < testCustomers.size(); i++) {
+            Customer customer = testCustomers.get(i);
+            customer.setAge(20 + (i * 10)); // Ages: 20, 30, 40, 50, 60, 70, 80
+            firestoreService.saveOrUpdate(testCollection, "customer" + i, customer);
+        }
+
+        // Query for age > 45
+        List<Customer> results = firestoreService.queryDocuments(
+                testCollection, Customer.class, collectionRef -> collectionRef.whereGreaterThan("age", 45));
+
+        assertNotNull(results);
+        assertEquals(4, results.size()); // Should match ages: 50, 60, 70, 80
+        for (Customer customer : results) {
+            assertNotNull(customer);
+            assertTrue(customer.getAge() > 45);
+        }
+
+        // Cleanup
+        for (int i = 0; i < testCustomers.size(); i++) {
+            firestoreService.deleteDocument(testCollection, "customer" + i);
+        }
+    }
+
+    @Test
+    @Order(113)
+    void testQueryDocumentsTyped_WithLimitAndOffset_ShouldReturnPaginatedTypedResults() throws Exception {
+        String testCollection = "query-typed-paginate-" + UUID.randomUUID();
+
+        // Create 10 customers with sequential ages
+        List<Customer> testCustomers = Customer.fakeData(10);
+        for (int i = 0; i < testCustomers.size(); i++) {
+            Customer customer = testCustomers.get(i);
+            customer.setAge(20 + i); // Ages: 20, 21, 22, ..., 29
+            firestoreService.saveOrUpdate(testCollection, "customer" + i, customer);
+        }
+
+        // Query with offset and limit for pagination
+        List<Customer> results =
+                firestoreService.queryDocuments(testCollection, Customer.class, collectionRef -> collectionRef
+                        .orderBy("age", com.google.cloud.firestore.Query.Direction.ASCENDING)
+                        .offset(3)
+                        .limit(4));
+
+        assertNotNull(results);
+        assertEquals(4, results.size());
+        // After offset 3, we skip ages 20, 21, 22 and get 23, 24, 25, 26
+        assertEquals(23, results.get(0).getAge());
+        assertEquals(24, results.get(1).getAge());
+        assertEquals(25, results.get(2).getAge());
+        assertEquals(26, results.get(3).getAge());
+
+        // Cleanup
+        for (int i = 0; i < testCustomers.size(); i++) {
+            firestoreService.deleteDocument(testCollection, "customer" + i);
+        }
+    }
+
+    @Test
+    @Order(9999)
+    void testCleanup_FirestoreServiceTestCollections() throws Exception {
+        firestoreService.deleteDocument(TEST_COLLECTION, testDocumentId);
+    }
 }
