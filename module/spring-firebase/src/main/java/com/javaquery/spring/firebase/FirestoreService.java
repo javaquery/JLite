@@ -34,7 +34,7 @@ public class FirestoreService {
     /**
      * Save or update a document in Firestore.
      *
-     * @param collectionName the name of the collection
+     * @param collectionName the name/path of the collection/subcollection
      * @param documentId     the ID of the document
      * @param data           the data to be saved or updated
      * @throws Exception if an error occurs during the operation
@@ -49,7 +49,7 @@ public class FirestoreService {
     /**
      * Add a new document to Firestore.
      *
-     * @param collectionName the name of the collection
+     * @param collectionName the name/path of the collection/subcollection
      * @param data           the data to be added
      * @return the ID of the newly created document
      * @throws Exception if an error occurs during the operation
@@ -64,7 +64,7 @@ public class FirestoreService {
     /**
      * Update specific fields of a document in Firestore.
      *
-     * @param collectionName the name of the collection
+     * @param collectionName the name/path of the collection/subcollection
      * @param documentId     the ID of the document
      * @param data           a map of fields to be updated
      * @throws Exception if an error occurs during the operation
@@ -80,7 +80,7 @@ public class FirestoreService {
     /**
      * Delete a document from Firestore.
      *
-     * @param collectionName the name of the collection
+     * @param collectionName the name/path of the collection/subcollection
      * @param documentId     the ID of the document
      * @throws Exception if an error occurs during the operation
      */
@@ -94,7 +94,7 @@ public class FirestoreService {
     /**
      * Delete a document from Firestore and return its data before deletion.
      *
-     * @param collectionName the name of the collection
+     * @param collectionName the name/path of the collection/subcollection
      * @param documentId     the ID of the document
      * @return a map containing the document's data before deletion
      * @throws Exception if an error occurs during the operation
@@ -120,7 +120,7 @@ public class FirestoreService {
     /**
      * Delete a document atomically within a transaction and return its data before deletion.
      *
-     * @param collection the name of the collection
+     * @param collection the name/path of the collection/subcollection
      * @param documentId the ID of the document
      * @return a map containing the document's data before deletion
      * @throws ExecutionException   if an error occurs during the operation
@@ -153,7 +153,7 @@ public class FirestoreService {
     /**
      * Retrieve multiple documents from Firestore.
      *
-     * @param collection  the name of the collection
+     * @param collection  the name/path of the collection/subcollection
      * @param documentIds a collection of document IDs
      * @return a list of maps, each containing a document's data
      * @throws Exception if an error occurs during the operation
@@ -175,7 +175,7 @@ public class FirestoreService {
     /**
      * Retrieve multiple documents from Firestore and map them to a specific class type.
      *
-     * @param collection  the name of the collection
+     * @param collection  the name/path of the collection/subcollection
      * @param documentIds a collection of document IDs
      * @param valueType   the class type to map the documents to
      * @param <T>         the type parameter
@@ -200,7 +200,7 @@ public class FirestoreService {
     /**
      * Retrieve a document from Firestore.
      *
-     * @param collection the name of the collection
+     * @param collection the name/path of the collection/subcollection
      * @param documentId the ID of the document
      * @return a map containing the document's data
      * @throws Exception if an error occurs during the operation
@@ -217,7 +217,7 @@ public class FirestoreService {
     /**
      * Retrieve a document from Firestore and map it to a specific class type.
      *
-     * @param collection the name of the collection
+     * @param collection the name/path of the collection/subcollection
      * @param documentId the ID of the document
      * @param valueType  the class type to map the document to
      * @param <T>        the type parameter
@@ -236,7 +236,7 @@ public class FirestoreService {
     /**
      * List documents from a Firestore collection with pagination.
      *
-     * @param collectionName the name of the collection
+     * @param collectionName the name/path of the collection/subcollection
      * @param fields         the fields to retrieve, you can pass null or empty list to get all fields
      * @param limit          the maximum number of documents to retrieve
      * @param offSet         the number of documents to skip, use negative value for no offset
@@ -269,7 +269,7 @@ public class FirestoreService {
      * List documents from a Firestore collection with default pagination.<br/>
      * DEFAULT PAGE SIZE is used and no offset. Yuu can override page size using firebase.firestore.pageSize property.
      *
-     * @param collectionName the name of the collection
+     * @param collectionName the name/path of the collection/subcollection
      * @param fields         the fields to retrieve, you can pass null or empty list to get all fields
      * @return a list of maps, each containing a document's data
      * @throws Exception if an error occurs during the operation
@@ -281,7 +281,7 @@ public class FirestoreService {
     /**
      * Check if a document exists in Firestore.
      *
-     * @param collection the name of the collection
+     * @param collection the name/path of the collection/subcollection
      * @param documentId the ID of the document
      * @return true if the document exists, false otherwise
      * @throws Exception if an error occurs during the operation
@@ -299,7 +299,7 @@ public class FirestoreService {
     /**
      * Count the number of documents in a collection.
      *
-     * @param collection the name of the collection
+     * @param collection the name/path of the collection/subcollection
      * @return the count of documents
      * @throws Exception if an error occurs during the operation
      */
@@ -315,7 +315,7 @@ public class FirestoreService {
     /**
      * Increment a numeric field in a document.
      *
-     * @param collection the name of the collection
+     * @param collection the name/path of the collection/subcollection
      * @param documentId the ID of the document
      * @param field      the field to increment
      * @param value      the value to increment by
@@ -331,7 +331,7 @@ public class FirestoreService {
     /**
      * Add an element to an array field in a document.
      *
-     * @param collection the name of the collection
+     * @param collection the name/path of the collection/subcollection
      * @param documentId the ID of the document
      * @param field      the array field name
      * @param values     the values to add to the array
@@ -347,7 +347,7 @@ public class FirestoreService {
     /**
      * Remove elements from an array field in a document.
      *
-     * @param collection the name of the collection
+     * @param collection the name/path of the collection/subcollection
      * @param documentId the ID of the document
      * @param field      the array field name
      * @param values     the values to remove from the array
@@ -363,7 +363,7 @@ public class FirestoreService {
     /**
      * Query documents from a Firestore collection using a custom query builder.
      *
-     * @param collectionName the name of the collection
+     * @param collectionName the name/path of the collection/subcollection
      * @param queryBuilder   a function that builds the query
      * @return a list of maps, each containing a document's data
      * @throws Exception if an error occurs during the operation
@@ -384,7 +384,7 @@ public class FirestoreService {
     /**
      * Query documents from a Firestore collection using a custom query builder and map them to a specific class type.
      *
-     * @param collectionName the name of the collection
+     * @param collectionName the name/path of the collection/subcollection
      * @param valueType      the class type to map the documents to
      * @param queryBuilder   a function that builds the query
      * @param <T>            the type parameter
