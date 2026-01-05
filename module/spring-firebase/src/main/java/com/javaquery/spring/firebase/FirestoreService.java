@@ -4,7 +4,6 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import com.javaquery.util.Is;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -162,7 +161,8 @@ public class FirestoreService {
         Firestore db = getFirestore();
 
         ApiFuture<List<DocumentSnapshot>> future = db.getAll(documentIds.stream()
-                .map(id -> db.collection(collection).document(id)).toArray(DocumentReference[]::new));
+                .map(id -> db.collection(collection).document(id))
+                .toArray(DocumentReference[]::new));
         List<DocumentSnapshot> documents = future.get(firestoreQueryTimeout, TimeUnit.SECONDS);
 
         return documents.stream()
@@ -181,11 +181,13 @@ public class FirestoreService {
      * @return a list of instances of the specified class type containing the documents' data
      * @throws Exception if an error occurs during the operation
      */
-    public <T> List<T> getDocuments(String collection, Collection<String> documentIds, Class<T> valueType) throws Exception {
+    public <T> List<T> getDocuments(String collection, Collection<String> documentIds, Class<T> valueType)
+            throws Exception {
         Firestore db = getFirestore();
 
         ApiFuture<List<DocumentSnapshot>> future = db.getAll(documentIds.stream()
-                .map(id -> db.collection(collection).document(id)).toArray(DocumentReference[]::new));
+                .map(id -> db.collection(collection).document(id))
+                .toArray(DocumentReference[]::new));
         List<DocumentSnapshot> documents = future.get(firestoreQueryTimeout, TimeUnit.SECONDS);
 
         return documents.stream()
@@ -243,8 +245,8 @@ public class FirestoreService {
      * @return a list of maps, each containing a document's data
      * @throws Exception if an error occurs during the operation
      */
-    public List<Map<String, Object>> listDocuments(String collectionName, Collection<String> fields, int limit, int offSet)
-            throws Exception {
+    public List<Map<String, Object>> listDocuments(
+            String collectionName, Collection<String> fields, int limit, int offSet) throws Exception {
         Firestore db = getFirestore();
         CollectionReference collectionRef = db.collection(collectionName);
         Query query = collectionRef.limit(limit);
@@ -310,5 +312,53 @@ public class FirestoreService {
                 db.collection(collection).count().get().get(firestoreQueryTimeout, TimeUnit.SECONDS);
 
         return snapshot.getCount();
+    }
+
+    /**
+     * Increment a numeric field in a document.
+     *
+     * @param collection the name of the collection
+     * @param documentId the ID of the document
+     * @param field      the field to increment
+     * @param value      the value to increment by
+     * @throws Exception if an error occurs during the operation
+     */
+    public void incrementField(String collection, String documentId, String field, long value) throws Exception {
+        Firestore db = getFirestore();
+        DocumentReference docRef = db.collection(collection).document(documentId);
+        ApiFuture<WriteResult> future = docRef.update(field, FieldValue.increment(value));
+        future.get();
+    }
+
+    /**
+     * Add an element to an array field in a document.
+     *
+     * @param collection the name of the collection
+     * @param documentId the ID of the document
+     * @param field      the array field name
+     * @param values     the values to add to the array
+     * @throws Exception if an error occurs during the operation
+     */
+    public void arrayUnion(String collection, String documentId, String field, Object... values) throws Exception {
+        Firestore db = getFirestore();
+        DocumentReference docRef = db.collection(collection).document(documentId);
+        ApiFuture<WriteResult> future = docRef.update(field, FieldValue.arrayUnion(values));
+        future.get();
+    }
+
+    /**
+     * Remove elements from an array field in a document.
+     *
+     * @param collection the name of the collection
+     * @param documentId the ID of the document
+     * @param field      the array field name
+     * @param values     the values to remove from the array
+     * @throws Exception if an error occurs during the operation
+     */
+    public void arrayRemove(String collection, String documentId, String field, Object... values) throws Exception {
+        Firestore db = getFirestore();
+        DocumentReference docRef = db.collection(collection).document(documentId);
+        ApiFuture<WriteResult> future = docRef.update(field, FieldValue.arrayRemove(values));
+        future.get();
     }
 }

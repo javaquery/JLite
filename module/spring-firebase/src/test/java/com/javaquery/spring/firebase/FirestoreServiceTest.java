@@ -1045,7 +1045,8 @@ class FirestoreServiceTest {
         data.put("email", "test@example.com");
         firestoreService.saveOrUpdate(testCollection, docId, data);
 
-        List<Map<String, Object>> documents = firestoreService.getDocuments(testCollection, List.of(docId, docId, docId));
+        List<Map<String, Object>> documents =
+                firestoreService.getDocuments(testCollection, List.of(docId, docId, docId));
 
         assertNotNull(documents);
         // The behavior might return the document once or multiple times depending on implementation
@@ -1342,8 +1343,7 @@ class FirestoreServiceTest {
 
     @Test
     @Order(59)
-    void testGetDocumentsTyped_WithMixedExistentAndNonExistentIds_ShouldReturnOnlyExistentDocuments()
-            throws Exception {
+    void testGetDocumentsTyped_WithMixedExistentAndNonExistentIds_ShouldReturnOnlyExistentDocuments() throws Exception {
         String testCollection = "get-docs-typed-mixed-" + UUID.randomUUID();
         List<Customer> originalCustomers = Customer.fakeData(2);
         String existingDocId1 = "existing-customer1";
@@ -1355,14 +1355,18 @@ class FirestoreServiceTest {
         firestoreService.saveOrUpdate(testCollection, existingDocId2, originalCustomers.get(1));
 
         List<Customer> customers = firestoreService.getDocuments(
-                testCollection, List.of(existingDocId1, nonExistentDocId1, existingDocId2, nonExistentDocId2), Customer.class);
+                testCollection,
+                List.of(existingDocId1, nonExistentDocId1, existingDocId2, nonExistentDocId2),
+                Customer.class);
 
         assertNotNull(customers);
         assertEquals(2, customers.size(), "Should return only the two existing customers");
 
         // Verify retrieved customers match original data
-        List<String> retrievedEmails = customers.stream().map(Customer::getEmail).collect(Collectors.toList());
-        List<String> originalEmails = originalCustomers.stream().map(Customer::getEmail).collect(Collectors.toList());
+        List<String> retrievedEmails =
+                customers.stream().map(Customer::getEmail).collect(Collectors.toList());
+        List<String> originalEmails =
+                originalCustomers.stream().map(Customer::getEmail).collect(Collectors.toList());
         assertTrue(retrievedEmails.containsAll(originalEmails));
 
         firestoreService.deleteDocument(testCollection, existingDocId1);
@@ -1521,9 +1525,12 @@ class FirestoreServiceTest {
         assertEquals(3, customersOrder2.size());
 
         // Verify all customers are retrieved regardless of order
-        List<String> emailsOrder1 = customersOrder1.stream().map(Customer::getEmail).collect(Collectors.toList());
-        List<String> emailsOrder2 = customersOrder2.stream().map(Customer::getEmail).collect(Collectors.toList());
-        List<String> originalEmails = originalCustomers.stream().map(Customer::getEmail).collect(Collectors.toList());
+        List<String> emailsOrder1 =
+                customersOrder1.stream().map(Customer::getEmail).collect(Collectors.toList());
+        List<String> emailsOrder2 =
+                customersOrder2.stream().map(Customer::getEmail).collect(Collectors.toList());
+        List<String> originalEmails =
+                originalCustomers.stream().map(Customer::getEmail).collect(Collectors.toList());
 
         assertTrue(emailsOrder1.containsAll(originalEmails));
         assertTrue(emailsOrder2.containsAll(originalEmails));
@@ -1616,6 +1623,621 @@ class FirestoreServiceTest {
         assertEquals(customer2.getFirstName(), customer3.getFirstName());
         assertEquals(customer1.getEmail(), customer2.getEmail());
         assertEquals(customer2.getEmail(), customer3.getEmail());
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    // ========== incrementField Tests ==========
+
+    @Test
+    @Order(69)
+    void testIncrementField_WithPositiveValue_ShouldIncreaseField() throws Exception {
+        String testCollection = "increment-field-positive-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("points", 100);
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        firestoreService.incrementField(testCollection, docId, "points", 50);
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        assertEquals(150, ((Long) updatedDoc.get("points")).intValue());
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(70)
+    void testIncrementField_WithNegativeValue_ShouldDecreaseField() throws Exception {
+        String testCollection = "increment-field-negative-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("balance", 1000);
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        firestoreService.incrementField(testCollection, docId, "balance", -200);
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        assertEquals(800, ((Long) updatedDoc.get("balance")).intValue());
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(71)
+    void testIncrementField_WithZeroValue_ShouldNotChangeField() throws Exception {
+        String testCollection = "increment-field-zero-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("score", 500);
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        firestoreService.incrementField(testCollection, docId, "score", 0);
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        assertEquals(500, ((Long) updatedDoc.get("score")).intValue());
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(72)
+    void testIncrementField_OnNonExistentField_ShouldInitializeField() throws Exception {
+        String testCollection = "increment-field-new-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        firestoreService.incrementField(testCollection, docId, "newCounter", 10);
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        assertEquals(10, ((Long) updatedDoc.get("newCounter")).intValue());
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(73)
+    void testIncrementField_MultipleIncrements_ShouldAccumulateCorrectly() throws Exception {
+        String testCollection = "increment-field-multiple-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("visits", 0);
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        firestoreService.incrementField(testCollection, docId, "visits", 1);
+        firestoreService.incrementField(testCollection, docId, "visits", 1);
+        firestoreService.incrementField(testCollection, docId, "visits", 1);
+        firestoreService.incrementField(testCollection, docId, "visits", 5);
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        assertEquals(8, ((Long) updatedDoc.get("visits")).intValue());
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(74)
+    void testIncrementField_WithLargeValue_ShouldHandleCorrectly() throws Exception {
+        String testCollection = "increment-field-large-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("bigCounter", 1000000L);
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        firestoreService.incrementField(testCollection, docId, "bigCounter", 500000L);
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        assertEquals(1500000L, ((Long) updatedDoc.get("bigCounter")).longValue());
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(75)
+    void testIncrementField_OnNonExistentDocument_ShouldThrowException() {
+        String testCollection = "increment-field-nonexistent-" + UUID.randomUUID();
+        String nonExistentDocId = "non-existent-doc-" + UUID.randomUUID();
+
+        assertThrows(
+                Exception.class, () -> firestoreService.incrementField(testCollection, nonExistentDocId, "field", 10));
+    }
+
+    @Test
+    @Order(76)
+    void testIncrementField_MixedPositiveAndNegative_ShouldCalculateCorrectly() throws Exception {
+        String testCollection = "increment-field-mixed-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("balance", 100);
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        firestoreService.incrementField(testCollection, docId, "balance", 50);
+        firestoreService.incrementField(testCollection, docId, "balance", -30);
+        firestoreService.incrementField(testCollection, docId, "balance", 20);
+        firestoreService.incrementField(testCollection, docId, "balance", -10);
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        assertEquals(130, ((Long) updatedDoc.get("balance")).intValue());
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    // ========== arrayUnion Tests ==========
+
+    @Test
+    @Order(77)
+    void testArrayUnion_WithSingleElement_ShouldAddToArray() throws Exception {
+        String testCollection = "array-union-single-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("tags", List.of("developer"));
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        firestoreService.arrayUnion(testCollection, docId, "tags", "tester");
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        @SuppressWarnings("unchecked")
+        List<String> tags = (List<String>) updatedDoc.get("tags");
+        assertNotNull(tags);
+        assertEquals(2, tags.size());
+        assertTrue(tags.contains("developer"));
+        assertTrue(tags.contains("tester"));
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(78)
+    void testArrayUnion_WithMultipleElements_ShouldAddAllToArray() throws Exception {
+        String testCollection = "array-union-multiple-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("skills", List.of("Java"));
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        firestoreService.arrayUnion(testCollection, docId, "skills", "Python", "JavaScript", "Go");
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        @SuppressWarnings("unchecked")
+        List<String> skills = (List<String>) updatedDoc.get("skills");
+        assertNotNull(skills);
+        assertEquals(4, skills.size());
+        assertTrue(skills.contains("Java"));
+        assertTrue(skills.contains("Python"));
+        assertTrue(skills.contains("JavaScript"));
+        assertTrue(skills.contains("Go"));
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(79)
+    void testArrayUnion_WithDuplicateElements_ShouldNotAddDuplicates() throws Exception {
+        String testCollection = "array-union-duplicates-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("languages", List.of("English", "Spanish"));
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        // Try to add "English" which already exists
+        firestoreService.arrayUnion(testCollection, docId, "languages", "English", "French");
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        @SuppressWarnings("unchecked")
+        List<String> languages = (List<String>) updatedDoc.get("languages");
+        assertNotNull(languages);
+        assertEquals(3, languages.size()); // Should not duplicate "English"
+        assertTrue(languages.contains("English"));
+        assertTrue(languages.contains("Spanish"));
+        assertTrue(languages.contains("French"));
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(80)
+    void testArrayUnion_OnNonExistentField_ShouldCreateArrayWithElements() throws Exception {
+        String testCollection = "array-union-new-field-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        firestoreService.arrayUnion(testCollection, docId, "newArray", "item1", "item2", "item3");
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        @SuppressWarnings("unchecked")
+        List<String> newArray = (List<String>) updatedDoc.get("newArray");
+        assertNotNull(newArray);
+        assertEquals(3, newArray.size());
+        assertTrue(newArray.contains("item1"));
+        assertTrue(newArray.contains("item2"));
+        assertTrue(newArray.contains("item3"));
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(81)
+    void testArrayUnion_WithEmptyArray_ShouldAddElements() throws Exception {
+        String testCollection = "array-union-empty-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("emptyList", List.of());
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        firestoreService.arrayUnion(testCollection, docId, "emptyList", "first", "second");
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        @SuppressWarnings("unchecked")
+        List<String> emptyList = (List<String>) updatedDoc.get("emptyList");
+        assertNotNull(emptyList);
+        assertEquals(2, emptyList.size());
+        assertTrue(emptyList.contains("first"));
+        assertTrue(emptyList.contains("second"));
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(82)
+    void testArrayUnion_WithDifferentTypes_ShouldAddMixedElements() throws Exception {
+        String testCollection = "array-union-mixed-types-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("mixedArray", List.of("string1"));
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        firestoreService.arrayUnion(testCollection, docId, "mixedArray", "string2", 123, true);
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        @SuppressWarnings("unchecked")
+        List<Object> mixedArray = (List<Object>) updatedDoc.get("mixedArray");
+        assertNotNull(mixedArray);
+        assertEquals(4, mixedArray.size());
+        assertTrue(mixedArray.contains("string1"));
+        assertTrue(mixedArray.contains("string2"));
+        assertTrue(mixedArray.contains(123L));
+        assertTrue(mixedArray.contains(true));
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(83)
+    void testArrayUnion_MultipleOperations_ShouldAccumulateElements() throws Exception {
+        String testCollection = "array-union-multiple-ops-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("items", List.of("item1"));
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        firestoreService.arrayUnion(testCollection, docId, "items", "item2");
+        firestoreService.arrayUnion(testCollection, docId, "items", "item3");
+        firestoreService.arrayUnion(testCollection, docId, "items", "item4", "item5");
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        @SuppressWarnings("unchecked")
+        List<String> items = (List<String>) updatedDoc.get("items");
+        assertNotNull(items);
+        assertEquals(5, items.size());
+        assertTrue(items.containsAll(List.of("item1", "item2", "item3", "item4", "item5")));
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(84)
+    void testArrayUnion_OnNonExistentDocument_ShouldThrowException() {
+        String testCollection = "array-union-nonexistent-" + UUID.randomUUID();
+        String nonExistentDocId = "non-existent-doc-" + UUID.randomUUID();
+
+        assertThrows(
+                Exception.class, () -> firestoreService.arrayUnion(testCollection, nonExistentDocId, "field", "value"));
+    }
+
+    // ========== arrayRemove Tests ==========
+
+    @Test
+    @Order(85)
+    void testArrayRemove_WithSingleElement_ShouldRemoveFromArray() throws Exception {
+        String testCollection = "array-remove-single-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("tags", List.of("developer", "tester", "architect"));
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        firestoreService.arrayRemove(testCollection, docId, "tags", "tester");
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        @SuppressWarnings("unchecked")
+        List<String> tags = (List<String>) updatedDoc.get("tags");
+        assertNotNull(tags);
+        assertEquals(2, tags.size());
+        assertTrue(tags.contains("developer"));
+        assertTrue(tags.contains("architect"));
+        assertFalse(tags.contains("tester"));
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(86)
+    void testArrayRemove_WithMultipleElements_ShouldRemoveAllFromArray() throws Exception {
+        String testCollection = "array-remove-multiple-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("skills", List.of("Java", "Python", "JavaScript", "Go", "Ruby"));
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        firestoreService.arrayRemove(testCollection, docId, "skills", "Python", "Go");
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        @SuppressWarnings("unchecked")
+        List<String> skills = (List<String>) updatedDoc.get("skills");
+        assertNotNull(skills);
+        assertEquals(3, skills.size());
+        assertTrue(skills.contains("Java"));
+        assertTrue(skills.contains("JavaScript"));
+        assertTrue(skills.contains("Ruby"));
+        assertFalse(skills.contains("Python"));
+        assertFalse(skills.contains("Go"));
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(87)
+    void testArrayRemove_WithNonExistentElement_ShouldNotChangeArray() throws Exception {
+        String testCollection = "array-remove-nonexistent-elem-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("languages", List.of("English", "Spanish"));
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        // Try to remove "French" which doesn't exist
+        firestoreService.arrayRemove(testCollection, docId, "languages", "French");
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        @SuppressWarnings("unchecked")
+        List<String> languages = (List<String>) updatedDoc.get("languages");
+        assertNotNull(languages);
+        assertEquals(2, languages.size());
+        assertTrue(languages.contains("English"));
+        assertTrue(languages.contains("Spanish"));
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(88)
+    void testArrayRemove_RemoveAllElements_ShouldLeaveEmptyArray() throws Exception {
+        String testCollection = "array-remove-all-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("items", List.of("item1", "item2", "item3"));
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        firestoreService.arrayRemove(testCollection, docId, "items", "item1", "item2", "item3");
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        @SuppressWarnings("unchecked")
+        List<String> items = (List<String>) updatedDoc.get("items");
+        assertNotNull(items);
+        assertTrue(items.isEmpty());
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(89)
+    void testArrayRemove_WithDuplicatesInArray_ShouldRemoveAllOccurrences() throws Exception {
+        String testCollection = "array-remove-duplicates-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("numbers", List.of(1, 2, 3, 2, 4, 2, 5));
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        firestoreService.arrayRemove(testCollection, docId, "numbers", 2);
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        @SuppressWarnings("unchecked")
+        List<Long> numbers = (List<Long>) updatedDoc.get("numbers");
+        assertNotNull(numbers);
+        assertEquals(4, numbers.size());
+        assertFalse(numbers.contains(2L));
+        assertTrue(numbers.containsAll(List.of(1L, 3L, 4L, 5L)));
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(90)
+    void testArrayRemove_OnEmptyArray_ShouldRemainEmpty() throws Exception {
+        String testCollection = "array-remove-empty-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("emptyList", List.of());
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        firestoreService.arrayRemove(testCollection, docId, "emptyList", "nonexistent");
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        @SuppressWarnings("unchecked")
+        List<String> emptyList = (List<String>) updatedDoc.get("emptyList");
+        assertNotNull(emptyList);
+        assertTrue(emptyList.isEmpty());
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(91)
+    void testArrayRemove_MultipleOperations_ShouldRemoveSequentially() throws Exception {
+        String testCollection = "array-remove-multiple-ops-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("items", List.of("item1", "item2", "item3", "item4", "item5"));
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        firestoreService.arrayRemove(testCollection, docId, "items", "item2");
+        firestoreService.arrayRemove(testCollection, docId, "items", "item4");
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        @SuppressWarnings("unchecked")
+        List<String> items = (List<String>) updatedDoc.get("items");
+        assertNotNull(items);
+        assertEquals(3, items.size());
+        assertTrue(items.containsAll(List.of("item1", "item3", "item5")));
+        assertFalse(items.contains("item2"));
+        assertFalse(items.contains("item4"));
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(92)
+    void testArrayRemove_OnNonExistentDocument_ShouldThrowException() {
+        String testCollection = "array-remove-nonexistent-doc-" + UUID.randomUUID();
+        String nonExistentDocId = "non-existent-doc-" + UUID.randomUUID();
+
+        assertThrows(
+                Exception.class,
+                () -> firestoreService.arrayRemove(testCollection, nonExistentDocId, "field", "value"));
+    }
+
+    // ========== Integration Tests for Multiple Operations ==========
+
+    @Test
+    @Order(93)
+    void testCombinedOperations_IncrementAndArrayUnion_ShouldWorkTogether() throws Exception {
+        String testCollection = "combined-increment-union-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("points", 100);
+        data.put("badges", List.of("beginner"));
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        // Perform combined operations
+        firestoreService.incrementField(testCollection, docId, "points", 50);
+        firestoreService.arrayUnion(testCollection, docId, "badges", "contributor", "expert");
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        assertEquals(150, ((Long) updatedDoc.get("points")).intValue());
+
+        @SuppressWarnings("unchecked")
+        List<String> badges = (List<String>) updatedDoc.get("badges");
+        assertEquals(3, badges.size());
+        assertTrue(badges.containsAll(List.of("beginner", "contributor", "expert")));
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(94)
+    void testCombinedOperations_ArrayUnionAndRemove_ShouldWorkTogether() throws Exception {
+        String testCollection = "combined-union-remove-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("tags", List.of("tag1", "tag2", "tag3"));
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        // Add and remove elements
+        firestoreService.arrayUnion(testCollection, docId, "tags", "tag4", "tag5");
+        firestoreService.arrayRemove(testCollection, docId, "tags", "tag2");
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+        @SuppressWarnings("unchecked")
+        List<String> tags = (List<String>) updatedDoc.get("tags");
+        assertEquals(4, tags.size());
+        assertTrue(tags.containsAll(List.of("tag1", "tag3", "tag4", "tag5")));
+        assertFalse(tags.contains("tag2"));
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(95)
+    void testCombinedOperations_AllThreeOperations_ShouldWorkTogether() throws Exception {
+        String testCollection = "combined-all-ops-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("score", 0);
+        data.put("achievements", List.of("first_login"));
+        data.put("skills", List.of("beginner"));
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        // Perform all three operations
+        firestoreService.incrementField(testCollection, docId, "score", 100);
+        firestoreService.arrayUnion(testCollection, docId, "achievements", "completed_tutorial", "first_win");
+        firestoreService.arrayRemove(testCollection, docId, "skills", "beginner");
+        firestoreService.arrayUnion(testCollection, docId, "skills", "intermediate");
+
+        Map<String, Object> updatedDoc = firestoreService.getDocument(testCollection, docId);
+
+        // Verify increment
+        assertEquals(100, ((Long) updatedDoc.get("score")).intValue());
+
+        // Verify array union
+        @SuppressWarnings("unchecked")
+        List<String> achievements = (List<String>) updatedDoc.get("achievements");
+        assertEquals(3, achievements.size());
+        assertTrue(achievements.containsAll(List.of("first_login", "completed_tutorial", "first_win")));
+
+        // Verify array remove and union
+        @SuppressWarnings("unchecked")
+        List<String> skills = (List<String>) updatedDoc.get("skills");
+        assertEquals(1, skills.size());
+        assertFalse(skills.contains("beginner"));
+        assertTrue(skills.contains("intermediate"));
 
         firestoreService.deleteDocument(testCollection, docId);
     }
