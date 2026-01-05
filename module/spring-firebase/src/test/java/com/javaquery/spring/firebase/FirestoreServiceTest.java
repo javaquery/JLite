@@ -1266,4 +1266,357 @@ class FirestoreServiceTest {
         firestoreService.deleteDocument(testCollection, docId1);
         firestoreService.deleteDocument(testCollection, docId2);
     }
+
+    @Test
+    @Order(56)
+    void testGetDocumentsTyped_WithSingleDocumentId_ShouldReturnOneTypedDocument() throws Exception {
+        String testCollection = "get-docs-typed-single-" + UUID.randomUUID();
+        String docId = "customer1";
+        Customer customer = Customer.fakeData(1).get(0);
+        firestoreService.saveOrUpdate(testCollection, docId, customer);
+
+        List<Customer> customers = firestoreService.getDocuments(testCollection, List.of(docId), Customer.class);
+
+        assertNotNull(customers);
+        assertEquals(1, customers.size(), "Should return exactly one customer");
+        Customer retrievedCustomer = customers.get(0);
+        assertNotNull(retrievedCustomer);
+        assertEquals(customer.getFirstName(), retrievedCustomer.getFirstName());
+        assertEquals(customer.getEmail(), retrievedCustomer.getEmail());
+        assertEquals(customer.getAge(), retrievedCustomer.getAge());
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(57)
+    void testGetDocumentsTyped_WithMultipleDocumentIds_ShouldReturnAllTypedDocuments() throws Exception {
+        String testCollection = "get-docs-typed-multiple-" + UUID.randomUUID();
+        List<Customer> originalCustomers = Customer.fakeData(3);
+        String docId1 = "customer1";
+        String docId2 = "customer2";
+        String docId3 = "customer3";
+
+        firestoreService.saveOrUpdate(testCollection, docId1, originalCustomers.get(0));
+        firestoreService.saveOrUpdate(testCollection, docId2, originalCustomers.get(1));
+        firestoreService.saveOrUpdate(testCollection, docId3, originalCustomers.get(2));
+
+        List<Customer> customers =
+                firestoreService.getDocuments(testCollection, List.of(docId1, docId2, docId3), Customer.class);
+
+        assertNotNull(customers);
+        assertEquals(3, customers.size(), "Should return all three customers");
+
+        // Verify all customers are properly typed and have data
+        for (Customer customer : customers) {
+            assertNotNull(customer);
+            assertNotNull(customer.getFirstName());
+            assertNotNull(customer.getEmail());
+            assertTrue(customer.getAge() > 0);
+        }
+
+        // Verify all original customer names are present
+        List<String> retrievedFirstNames =
+                customers.stream().map(Customer::getFirstName).collect(Collectors.toList());
+        List<String> originalFirstNames =
+                originalCustomers.stream().map(Customer::getFirstName).collect(Collectors.toList());
+        assertTrue(retrievedFirstNames.containsAll(originalFirstNames));
+
+        firestoreService.deleteDocument(testCollection, docId1);
+        firestoreService.deleteDocument(testCollection, docId2);
+        firestoreService.deleteDocument(testCollection, docId3);
+    }
+
+    @Test
+    @Order(58)
+    void testGetDocumentsTyped_WithNonExistentDocumentId_ShouldReturnEmptyList() throws Exception {
+        String testCollection = "get-docs-typed-nonexistent-" + UUID.randomUUID();
+        String nonExistentDocId = "non-existent-doc-" + UUID.randomUUID();
+
+        List<Customer> customers =
+                firestoreService.getDocuments(testCollection, List.of(nonExistentDocId), Customer.class);
+
+        assertNotNull(customers);
+        assertTrue(customers.isEmpty(), "Should return empty list for non-existent document");
+    }
+
+    @Test
+    @Order(59)
+    void testGetDocumentsTyped_WithMixedExistentAndNonExistentIds_ShouldReturnOnlyExistentDocuments()
+            throws Exception {
+        String testCollection = "get-docs-typed-mixed-" + UUID.randomUUID();
+        List<Customer> originalCustomers = Customer.fakeData(2);
+        String existingDocId1 = "existing-customer1";
+        String existingDocId2 = "existing-customer2";
+        String nonExistentDocId1 = "non-existent-customer1";
+        String nonExistentDocId2 = "non-existent-customer2";
+
+        firestoreService.saveOrUpdate(testCollection, existingDocId1, originalCustomers.get(0));
+        firestoreService.saveOrUpdate(testCollection, existingDocId2, originalCustomers.get(1));
+
+        List<Customer> customers = firestoreService.getDocuments(
+                testCollection, List.of(existingDocId1, nonExistentDocId1, existingDocId2, nonExistentDocId2), Customer.class);
+
+        assertNotNull(customers);
+        assertEquals(2, customers.size(), "Should return only the two existing customers");
+
+        // Verify retrieved customers match original data
+        List<String> retrievedEmails = customers.stream().map(Customer::getEmail).collect(Collectors.toList());
+        List<String> originalEmails = originalCustomers.stream().map(Customer::getEmail).collect(Collectors.toList());
+        assertTrue(retrievedEmails.containsAll(originalEmails));
+
+        firestoreService.deleteDocument(testCollection, existingDocId1);
+        firestoreService.deleteDocument(testCollection, existingDocId2);
+    }
+
+    @Test
+    @Order(60)
+    void testGetDocumentsTyped_WithEmptyDocumentIdsList_ShouldReturnEmptyList() throws Exception {
+        String testCollection = "get-docs-typed-empty-list-" + UUID.randomUUID();
+
+        List<Customer> customers = firestoreService.getDocuments(testCollection, List.of(), Customer.class);
+
+        assertNotNull(customers);
+        assertTrue(customers.isEmpty(), "Should return empty list for empty document IDs list");
+    }
+
+    @Test
+    @Order(61)
+    void testGetDocumentsTyped_TypeSafety_ShouldReturnCorrectType() throws Exception {
+        String testCollection = "get-docs-typed-type-safety-" + UUID.randomUUID();
+        String docId = "customer1";
+        Customer originalCustomer = Customer.fakeData(1).get(0);
+        firestoreService.saveOrUpdate(testCollection, docId, originalCustomer);
+
+        List<Customer> customers = firestoreService.getDocuments(testCollection, List.of(docId), Customer.class);
+
+        assertNotNull(customers);
+        assertEquals(1, customers.size());
+
+        // Verify type safety - should be able to call Customer-specific methods
+        Customer customer = customers.get(0);
+        assertNotNull(customer.getFirstName());
+        assertNotNull(customer.getLastName());
+        assertNotNull(customer.getEmail());
+        assertTrue(customer.getAge() > 0);
+
+        // Verify instance type
+        assertTrue(customer instanceof Customer, "Object should be instance of Customer class");
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(62)
+    void testGetDocumentsTyped_WithPartialData_ShouldHandleNullFields() throws Exception {
+        String testCollection = "get-docs-typed-partial-" + UUID.randomUUID();
+        String docId = "partial-customer";
+
+        // Create a document with only some fields
+        Map<String, Object> partialData = new HashMap<>();
+        partialData.put("firstName", "John");
+        partialData.put("email", "john@example.com");
+        // Missing: lastName, age, and other fields
+        firestoreService.saveOrUpdate(testCollection, docId, partialData);
+
+        List<Customer> customers = firestoreService.getDocuments(testCollection, List.of(docId), Customer.class);
+
+        assertNotNull(customers);
+        assertEquals(1, customers.size());
+
+        Customer customer = customers.get(0);
+        assertNotNull(customer);
+        assertEquals("John", customer.getFirstName());
+        assertEquals("john@example.com", customer.getEmail());
+        // Missing fields should be null or default values
+        // Note: behavior depends on Customer class implementation
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(63)
+    void testGetDocumentsTyped_WithLargeNumberOfDocuments_ShouldReturnAllTypedDocuments() throws Exception {
+        String testCollection = "get-docs-typed-large-" + UUID.randomUUID();
+        int numDocs = 20;
+        List<Customer> originalCustomers = Customer.fakeData(numDocs);
+        List<String> docIds = new java.util.ArrayList<>();
+
+        for (int i = 0; i < numDocs; i++) {
+            String docId = "customer-" + i;
+            docIds.add(docId);
+            firestoreService.saveOrUpdate(testCollection, docId, originalCustomers.get(i));
+        }
+
+        List<Customer> customers = firestoreService.getDocuments(testCollection, docIds, Customer.class);
+
+        assertNotNull(customers);
+        assertEquals(numDocs, customers.size(), "Should return all " + numDocs + " customers");
+
+        // Verify all are proper Customer objects with data
+        for (Customer customer : customers) {
+            assertNotNull(customer);
+            assertNotNull(customer.getFirstName());
+            assertNotNull(customer.getEmail());
+            assertTrue(customer.getAge() > 0);
+        }
+
+        for (String docId : docIds) {
+            firestoreService.deleteDocument(testCollection, docId);
+        }
+    }
+
+    @Test
+    @Order(64)
+    void testGetDocumentsTyped_AfterUpdate_ShouldReturnUpdatedTypedData() throws Exception {
+        String testCollection = "get-docs-typed-updated-" + UUID.randomUUID();
+        String docId = "customer-to-update";
+
+        // Create original customer
+        Customer originalCustomer = Customer.fakeData(1).get(0);
+        firestoreService.saveOrUpdate(testCollection, docId, originalCustomer);
+
+        // Create updated customer with different data
+        Customer updatedCustomer = Customer.fakeData(1).get(0);
+        updatedCustomer.setFirstName("UpdatedFirstName");
+        updatedCustomer.setEmail("updated@example.com");
+        firestoreService.saveOrUpdate(testCollection, docId, updatedCustomer);
+
+        List<Customer> customers = firestoreService.getDocuments(testCollection, List.of(docId), Customer.class);
+
+        assertNotNull(customers);
+        assertEquals(1, customers.size());
+
+        Customer retrievedCustomer = customers.get(0);
+        assertEquals("UpdatedFirstName", retrievedCustomer.getFirstName());
+        assertEquals("updated@example.com", retrievedCustomer.getEmail());
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(65)
+    void testGetDocumentsTyped_VerifyOrderIndependence_ShouldReturnAllTypedDocuments() throws Exception {
+        String testCollection = "get-docs-typed-order-" + UUID.randomUUID();
+        List<Customer> originalCustomers = Customer.fakeData(3);
+        String docId1 = "customer-a";
+        String docId2 = "customer-b";
+        String docId3 = "customer-c";
+
+        firestoreService.saveOrUpdate(testCollection, docId1, originalCustomers.get(0));
+        firestoreService.saveOrUpdate(testCollection, docId2, originalCustomers.get(1));
+        firestoreService.saveOrUpdate(testCollection, docId3, originalCustomers.get(2));
+
+        // Request in one order
+        List<Customer> customersOrder1 =
+                firestoreService.getDocuments(testCollection, List.of(docId1, docId2, docId3), Customer.class);
+
+        // Request in different order
+        List<Customer> customersOrder2 =
+                firestoreService.getDocuments(testCollection, List.of(docId3, docId1, docId2), Customer.class);
+
+        assertNotNull(customersOrder1);
+        assertNotNull(customersOrder2);
+        assertEquals(3, customersOrder1.size());
+        assertEquals(3, customersOrder2.size());
+
+        // Verify all customers are retrieved regardless of order
+        List<String> emailsOrder1 = customersOrder1.stream().map(Customer::getEmail).collect(Collectors.toList());
+        List<String> emailsOrder2 = customersOrder2.stream().map(Customer::getEmail).collect(Collectors.toList());
+        List<String> originalEmails = originalCustomers.stream().map(Customer::getEmail).collect(Collectors.toList());
+
+        assertTrue(emailsOrder1.containsAll(originalEmails));
+        assertTrue(emailsOrder2.containsAll(originalEmails));
+
+        firestoreService.deleteDocument(testCollection, docId1);
+        firestoreService.deleteDocument(testCollection, docId2);
+        firestoreService.deleteDocument(testCollection, docId3);
+    }
+
+    @Test
+    @Order(66)
+    void testGetDocumentsTyped_CompareWithMapBasedVersion_ShouldReturnEquivalentData() throws Exception {
+        String testCollection = "get-docs-typed-compare-" + UUID.randomUUID();
+        String docId = "customer1";
+        Customer originalCustomer = Customer.fakeData(1).get(0);
+        firestoreService.saveOrUpdate(testCollection, docId, originalCustomer);
+
+        // Get using typed version
+        List<Customer> typedCustomers = firestoreService.getDocuments(testCollection, List.of(docId), Customer.class);
+
+        // Get using map-based version
+        List<Map<String, Object>> mapCustomers = firestoreService.getDocuments(testCollection, List.of(docId));
+
+        assertNotNull(typedCustomers);
+        assertNotNull(mapCustomers);
+        assertEquals(1, typedCustomers.size());
+        assertEquals(1, mapCustomers.size());
+
+        // Compare data
+        Customer typedCustomer = typedCustomers.get(0);
+        Map<String, Object> mapCustomer = mapCustomers.get(0);
+
+        assertEquals(typedCustomer.getFirstName(), mapCustomer.get("firstName"));
+        assertEquals(typedCustomer.getEmail(), mapCustomer.get("email"));
+        assertEquals(typedCustomer.getAge(), ((Long) mapCustomer.get("age")).intValue());
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(67)
+    void testGetDocumentsTyped_WithDuplicateIds_ShouldHandleCorrectly() throws Exception {
+        String testCollection = "get-docs-typed-duplicates-" + UUID.randomUUID();
+        String docId = "customer1";
+        Customer customer = Customer.fakeData(1).get(0);
+        firestoreService.saveOrUpdate(testCollection, docId, customer);
+
+        List<Customer> customers =
+                firestoreService.getDocuments(testCollection, List.of(docId, docId, docId), Customer.class);
+
+        assertNotNull(customers);
+        assertFalse(customers.isEmpty(), "Should return at least one customer");
+
+        // Verify the customer data is correct
+        Customer retrievedCustomer = customers.get(0);
+        assertNotNull(retrievedCustomer);
+        assertEquals(customer.getFirstName(), retrievedCustomer.getFirstName());
+        assertEquals(customer.getEmail(), retrievedCustomer.getEmail());
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(68)
+    void testGetDocumentsTyped_MultipleCallsConsistency_ShouldReturnSameData() throws Exception {
+        String testCollection = "get-docs-typed-consistency-" + UUID.randomUUID();
+        String docId = "customer1";
+        Customer customer = Customer.fakeData(1).get(0);
+        firestoreService.saveOrUpdate(testCollection, docId, customer);
+
+        // Make multiple calls
+        List<Customer> customers1 = firestoreService.getDocuments(testCollection, List.of(docId), Customer.class);
+        List<Customer> customers2 = firestoreService.getDocuments(testCollection, List.of(docId), Customer.class);
+        List<Customer> customers3 = firestoreService.getDocuments(testCollection, List.of(docId), Customer.class);
+
+        // All should return the same data
+        assertNotNull(customers1);
+        assertNotNull(customers2);
+        assertNotNull(customers3);
+
+        assertEquals(1, customers1.size());
+        assertEquals(1, customers2.size());
+        assertEquals(1, customers3.size());
+
+        Customer customer1 = customers1.get(0);
+        Customer customer2 = customers2.get(0);
+        Customer customer3 = customers3.get(0);
+
+        assertEquals(customer1.getFirstName(), customer2.getFirstName());
+        assertEquals(customer2.getFirstName(), customer3.getFirstName());
+        assertEquals(customer1.getEmail(), customer2.getEmail());
+        assertEquals(customer2.getEmail(), customer3.getEmail());
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
 }

@@ -172,6 +172,29 @@ public class FirestoreService {
     }
 
     /**
+     * Retrieve multiple documents from Firestore and map them to a specific class type.
+     *
+     * @param collection  the name of the collection
+     * @param documentIds a collection of document IDs
+     * @param valueType   the class type to map the documents to
+     * @param <T>         the type parameter
+     * @return a list of instances of the specified class type containing the documents' data
+     * @throws Exception if an error occurs during the operation
+     */
+    public <T> List<T> getDocuments(String collection, Collection<String> documentIds, Class<T> valueType) throws Exception {
+        Firestore db = getFirestore();
+
+        ApiFuture<List<DocumentSnapshot>> future = db.getAll(documentIds.stream()
+                .map(id -> db.collection(collection).document(id)).toArray(DocumentReference[]::new));
+        List<DocumentSnapshot> documents = future.get(firestoreQueryTimeout, TimeUnit.SECONDS);
+
+        return documents.stream()
+                .filter(DocumentSnapshot::exists)
+                .map(doc -> doc.toObject(valueType))
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Retrieve a document from Firestore.
      *
      * @param collection the name of the collection
