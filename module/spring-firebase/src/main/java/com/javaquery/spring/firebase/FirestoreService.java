@@ -4,6 +4,8 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import com.javaquery.util.Is;
+
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -149,6 +151,27 @@ public class FirestoreService {
     }
 
     /**
+     * Retrieve multiple documents from Firestore.
+     *
+     * @param collection  the name of the collection
+     * @param documentIds a collection of document IDs
+     * @return a list of maps, each containing a document's data
+     * @throws Exception if an error occurs during the operation
+     */
+    public List<Map<String, Object>> getDocuments(String collection, Collection<String> documentIds) throws Exception {
+        Firestore db = getFirestore();
+
+        ApiFuture<List<DocumentSnapshot>> future = db.getAll(documentIds.stream()
+                .map(id -> db.collection(collection).document(id)).toArray(DocumentReference[]::new));
+        List<DocumentSnapshot> documents = future.get(firestoreQueryTimeout, TimeUnit.SECONDS);
+
+        return documents.stream()
+                .filter(DocumentSnapshot::exists)
+                .map(DocumentSnapshot::getData)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Retrieve a document from Firestore.
      *
      * @param collection the name of the collection
@@ -157,14 +180,11 @@ public class FirestoreService {
      * @throws Exception if an error occurs during the operation
      */
     public Map<String, Object> getDocument(String collection, String documentId) throws Exception {
-        Firestore db = getFirestore();
-        DocumentReference docRef = db.collection(collection).document(documentId);
-        ApiFuture<DocumentSnapshot> future = docRef.get();
-        DocumentSnapshot document = future.get(firestoreQueryTimeout, TimeUnit.SECONDS);
-        if (document.exists()) {
-            return document.getData();
-        } else {
+        List<Map<String, Object>> documents = getDocuments(collection, List.of(documentId));
+        if (documents.isEmpty()) {
             throw new RuntimeException("Document not found");
+        } else {
+            return documents.get(0);
         }
     }
 
@@ -200,7 +220,7 @@ public class FirestoreService {
      * @return a list of maps, each containing a document's data
      * @throws Exception if an error occurs during the operation
      */
-    public List<Map<String, Object>> listDocuments(String collectionName, List<String> fields, int limit, int offSet)
+    public List<Map<String, Object>> listDocuments(String collectionName, Collection<String> fields, int limit, int offSet)
             throws Exception {
         Firestore db = getFirestore();
         CollectionReference collectionRef = db.collection(collectionName);
@@ -231,7 +251,7 @@ public class FirestoreService {
      * @return a list of maps, each containing a document's data
      * @throws Exception if an error occurs during the operation
      */
-    public List<Map<String, Object>> listDocuments(String collectionName, List<String> fields) throws Exception {
+    public List<Map<String, Object>> listDocuments(String collectionName, Collection<String> fields) throws Exception {
         return listDocuments(collectionName, fields, firestorePageSize, -1);
     }
 

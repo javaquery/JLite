@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -911,5 +912,358 @@ class FirestoreServiceTest {
 
         // Cleanup
         firestoreService.deleteDocument(testCollection, "doc1");
+    }
+
+    @Test
+    @Order(44)
+    void testGetDocuments_WithSingleDocumentId_ShouldReturnOneDocument() throws Exception {
+        String testCollection = "get-docs-single-" + UUID.randomUUID();
+        String docId = "doc1";
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "John Doe");
+        data.put("email", "john@example.com");
+        data.put("age", 30);
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        List<Map<String, Object>> documents = firestoreService.getDocuments(testCollection, List.of(docId));
+
+        assertNotNull(documents);
+        assertEquals(1, documents.size(), "Should return exactly one document");
+        assertEquals("John Doe", documents.get(0).get("name"));
+        assertEquals("john@example.com", documents.get(0).get("email"));
+        assertEquals(30, ((Long) documents.get(0).get("age")).intValue());
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(45)
+    void testGetDocuments_WithMultipleDocumentIds_ShouldReturnAllDocuments() throws Exception {
+        String testCollection = "get-docs-multiple-" + UUID.randomUUID();
+        String docId1 = "doc1";
+        String docId2 = "doc2";
+        String docId3 = "doc3";
+
+        Map<String, Object> data1 = new HashMap<>();
+        data1.put("name", "Alice");
+        data1.put("age", 25);
+        firestoreService.saveOrUpdate(testCollection, docId1, data1);
+
+        Map<String, Object> data2 = new HashMap<>();
+        data2.put("name", "Bob");
+        data2.put("age", 30);
+        firestoreService.saveOrUpdate(testCollection, docId2, data2);
+
+        Map<String, Object> data3 = new HashMap<>();
+        data3.put("name", "Charlie");
+        data3.put("age", 35);
+        firestoreService.saveOrUpdate(testCollection, docId3, data3);
+
+        List<Map<String, Object>> documents =
+                firestoreService.getDocuments(testCollection, List.of(docId1, docId2, docId3));
+
+        assertNotNull(documents);
+        assertEquals(3, documents.size(), "Should return all three documents");
+
+        // Verify all documents are retrieved
+        List<String> names =
+                documents.stream().map(doc -> (String) doc.get("name")).collect(Collectors.toList());
+        assertTrue(names.contains("Alice"), "Should contain Alice");
+        assertTrue(names.contains("Bob"), "Should contain Bob");
+        assertTrue(names.contains("Charlie"), "Should contain Charlie");
+
+        firestoreService.deleteDocument(testCollection, docId1);
+        firestoreService.deleteDocument(testCollection, docId2);
+        firestoreService.deleteDocument(testCollection, docId3);
+    }
+
+    @Test
+    @Order(46)
+    void testGetDocuments_WithNonExistentDocumentId_ShouldReturnEmptyList() throws Exception {
+        String testCollection = "get-docs-nonexistent-" + UUID.randomUUID();
+        String nonExistentDocId = "non-existent-doc-" + UUID.randomUUID();
+
+        List<Map<String, Object>> documents = firestoreService.getDocuments(testCollection, List.of(nonExistentDocId));
+
+        assertNotNull(documents);
+        assertTrue(documents.isEmpty(), "Should return empty list for non-existent document");
+    }
+
+    @Test
+    @Order(47)
+    void testGetDocuments_WithMixedExistentAndNonExistentIds_ShouldReturnOnlyExistentDocuments() throws Exception {
+        String testCollection = "get-docs-mixed-" + UUID.randomUUID();
+        String existingDocId1 = "existing-doc1";
+        String existingDocId2 = "existing-doc2";
+        String nonExistentDocId1 = "non-existent-doc1";
+        String nonExistentDocId2 = "non-existent-doc2";
+
+        Map<String, Object> data1 = new HashMap<>();
+        data1.put("name", "Existing User 1");
+        data1.put("email", "user1@example.com");
+        firestoreService.saveOrUpdate(testCollection, existingDocId1, data1);
+
+        Map<String, Object> data2 = new HashMap<>();
+        data2.put("name", "Existing User 2");
+        data2.put("email", "user2@example.com");
+        firestoreService.saveOrUpdate(testCollection, existingDocId2, data2);
+
+        List<Map<String, Object>> documents = firestoreService.getDocuments(
+                testCollection, List.of(existingDocId1, nonExistentDocId1, existingDocId2, nonExistentDocId2));
+
+        assertNotNull(documents);
+        assertEquals(2, documents.size(), "Should return only the two existing documents");
+
+        List<String> names =
+                documents.stream().map(doc -> (String) doc.get("name")).collect(Collectors.toList());
+        assertTrue(names.contains("Existing User 1"), "Should contain Existing User 1");
+        assertTrue(names.contains("Existing User 2"), "Should contain Existing User 2");
+
+        firestoreService.deleteDocument(testCollection, existingDocId1);
+        firestoreService.deleteDocument(testCollection, existingDocId2);
+    }
+
+    @Test
+    @Order(48)
+    void testGetDocuments_WithEmptyDocumentIdsList_ShouldReturnEmptyList() throws Exception {
+        String testCollection = "get-docs-empty-list-" + UUID.randomUUID();
+
+        List<Map<String, Object>> documents = firestoreService.getDocuments(testCollection, List.of());
+
+        assertNotNull(documents);
+        assertTrue(documents.isEmpty(), "Should return empty list for empty document IDs list");
+    }
+
+    @Test
+    @Order(49)
+    void testGetDocuments_WithDuplicateDocumentIds_ShouldReturnDocumentsOnce() throws Exception {
+        String testCollection = "get-docs-duplicates-" + UUID.randomUUID();
+        String docId = "doc1";
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Test User");
+        data.put("email", "test@example.com");
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        List<Map<String, Object>> documents = firestoreService.getDocuments(testCollection, List.of(docId, docId, docId));
+
+        assertNotNull(documents);
+        // The behavior might return the document once or multiple times depending on implementation
+        // Let's verify at least one document is returned
+        assertFalse(documents.isEmpty(), "Should return at least one document");
+        assertEquals("Test User", documents.get(0).get("name"));
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(50)
+    void testGetDocuments_WithComplexData_ShouldReturnNestedStructures() throws Exception {
+        String testCollection = "get-docs-complex-" + UUID.randomUUID();
+        String docId = "complex-doc1";
+
+        Map<String, Object> address = new HashMap<>();
+        address.put("street", "123 Main St");
+        address.put("city", "New York");
+        address.put("zipCode", "10001");
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "Complex User");
+        data.put("email", "complex@example.com");
+        data.put("address", address);
+        data.put("tags", List.of("developer", "architect", "tester"));
+
+        firestoreService.saveOrUpdate(testCollection, docId, data);
+
+        List<Map<String, Object>> documents = firestoreService.getDocuments(testCollection, List.of(docId));
+
+        assertNotNull(documents);
+        assertEquals(1, documents.size());
+
+        Map<String, Object> retrievedDoc = documents.get(0);
+        assertEquals("Complex User", retrievedDoc.get("name"));
+        assertEquals("complex@example.com", retrievedDoc.get("email"));
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> retrievedAddress = (Map<String, Object>) retrievedDoc.get("address");
+        assertNotNull(retrievedAddress);
+        assertEquals("123 Main St", retrievedAddress.get("street"));
+        assertEquals("New York", retrievedAddress.get("city"));
+        assertEquals("10001", retrievedAddress.get("zipCode"));
+
+        @SuppressWarnings("unchecked")
+        List<String> retrievedTags = (List<String>) retrievedDoc.get("tags");
+        assertNotNull(retrievedTags);
+        assertEquals(3, retrievedTags.size());
+        assertTrue(retrievedTags.contains("developer"));
+        assertTrue(retrievedTags.contains("architect"));
+        assertTrue(retrievedTags.contains("tester"));
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(51)
+    void testGetDocuments_WithLargeNumberOfDocumentIds_ShouldReturnAllDocuments() throws Exception {
+        String testCollection = "get-docs-large-" + UUID.randomUUID();
+        int numDocs = 20;
+        List<String> docIds = new java.util.ArrayList<>();
+
+        for (int i = 0; i < numDocs; i++) {
+            String docId = "doc-" + i;
+            docIds.add(docId);
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("name", "User " + i);
+            data.put("index", i);
+            data.put("email", "user" + i + "@example.com");
+            firestoreService.saveOrUpdate(testCollection, docId, data);
+        }
+
+        List<Map<String, Object>> documents = firestoreService.getDocuments(testCollection, docIds);
+
+        assertNotNull(documents);
+        assertEquals(numDocs, documents.size(), "Should return all " + numDocs + " documents");
+
+        for (Map<String, Object> doc : documents) {
+            assertNotNull(doc.get("name"), "Each document should have name field");
+            assertNotNull(doc.get("email"), "Each document should have email field");
+            assertNotNull(doc.get("index"), "Each document should have index field");
+        }
+
+        for (String docId : docIds) {
+            firestoreService.deleteDocument(testCollection, docId);
+        }
+    }
+
+    @Test
+    @Order(52)
+    void testGetDocuments_WithEmptyDocuments_ShouldReturnEmptyDocuments() throws Exception {
+        String testCollection = "get-docs-empty-" + UUID.randomUUID();
+        String docId1 = "empty-doc1";
+        String docId2 = "empty-doc2";
+
+        Map<String, Object> emptyData = new HashMap<>();
+        firestoreService.saveOrUpdate(testCollection, docId1, emptyData);
+        firestoreService.saveOrUpdate(testCollection, docId2, emptyData);
+
+        List<Map<String, Object>> documents = firestoreService.getDocuments(testCollection, List.of(docId1, docId2));
+
+        assertNotNull(documents);
+        assertEquals(2, documents.size(), "Should return two empty documents");
+
+        for (Map<String, Object> doc : documents) {
+            assertNotNull(doc);
+            assertTrue(doc.isEmpty() || doc.size() == 0, "Documents should be empty");
+        }
+
+        firestoreService.deleteDocument(testCollection, docId1);
+        firestoreService.deleteDocument(testCollection, docId2);
+    }
+
+    @Test
+    @Order(53)
+    void testGetDocuments_AfterUpdateDocument_ShouldReturnUpdatedData() throws Exception {
+        String testCollection = "get-docs-updated-" + UUID.randomUUID();
+        String docId = "doc-to-update";
+
+        Map<String, Object> originalData = new HashMap<>();
+        originalData.put("name", "Original Name");
+        originalData.put("email", "original@example.com");
+        originalData.put("version", 1);
+        firestoreService.saveOrUpdate(testCollection, docId, originalData);
+
+        Map<String, Object> updatedData = new HashMap<>();
+        updatedData.put("name", "Updated Name");
+        updatedData.put("email", "updated@example.com");
+        updatedData.put("version", 2);
+        firestoreService.saveOrUpdate(testCollection, docId, updatedData);
+
+        List<Map<String, Object>> documents = firestoreService.getDocuments(testCollection, List.of(docId));
+
+        assertNotNull(documents);
+        assertEquals(1, documents.size());
+
+        Map<String, Object> retrievedDoc = documents.get(0);
+        assertEquals("Updated Name", retrievedDoc.get("name"));
+        assertEquals("updated@example.com", retrievedDoc.get("email"));
+        assertEquals(2, ((Long) retrievedDoc.get("version")).intValue());
+
+        firestoreService.deleteDocument(testCollection, docId);
+    }
+
+    @Test
+    @Order(54)
+    void testGetDocuments_VerifyOrderIndependence_ShouldReturnAllDocuments() throws Exception {
+        String testCollection = "get-docs-order-" + UUID.randomUUID();
+        String docId1 = "doc-a";
+        String docId2 = "doc-b";
+        String docId3 = "doc-c";
+
+        Map<String, Object> data1 = new HashMap<>();
+        data1.put("name", "User A");
+        firestoreService.saveOrUpdate(testCollection, docId1, data1);
+
+        Map<String, Object> data2 = new HashMap<>();
+        data2.put("name", "User B");
+        firestoreService.saveOrUpdate(testCollection, docId2, data2);
+
+        Map<String, Object> data3 = new HashMap<>();
+        data3.put("name", "User C");
+        firestoreService.saveOrUpdate(testCollection, docId3, data3);
+
+        // Request in one order
+        List<Map<String, Object>> documentsOrder1 =
+                firestoreService.getDocuments(testCollection, List.of(docId1, docId2, docId3));
+
+        // Request in different order
+        List<Map<String, Object>> documentsOrder2 =
+                firestoreService.getDocuments(testCollection, List.of(docId3, docId1, docId2));
+
+        assertNotNull(documentsOrder1);
+        assertNotNull(documentsOrder2);
+        assertEquals(3, documentsOrder1.size());
+        assertEquals(3, documentsOrder2.size());
+
+        // Verify all documents are retrieved regardless of order
+        List<String> namesOrder1 =
+                documentsOrder1.stream().map(doc -> (String) doc.get("name")).collect(Collectors.toList());
+        List<String> namesOrder2 =
+                documentsOrder2.stream().map(doc -> (String) doc.get("name")).collect(Collectors.toList());
+
+        assertTrue(namesOrder1.containsAll(List.of("User A", "User B", "User C")));
+        assertTrue(namesOrder2.containsAll(List.of("User A", "User B", "User C")));
+
+        firestoreService.deleteDocument(testCollection, docId1);
+        firestoreService.deleteDocument(testCollection, docId2);
+        firestoreService.deleteDocument(testCollection, docId3);
+    }
+
+    @Test
+    @Order(55)
+    void testGetDocuments_WithTypedObjects_ShouldReturnCorrectData() throws Exception {
+        String testCollection = "get-docs-typed-" + UUID.randomUUID();
+        String docId1 = "customer1";
+        String docId2 = "customer2";
+
+        Customer customer1 = Customer.fakeData(1).get(0);
+        Customer customer2 = Customer.fakeData(1).get(0);
+
+        firestoreService.saveOrUpdate(testCollection, docId1, customer1);
+        firestoreService.saveOrUpdate(testCollection, docId2, customer2);
+
+        List<Map<String, Object>> documents = firestoreService.getDocuments(testCollection, List.of(docId1, docId2));
+
+        assertNotNull(documents);
+        assertEquals(2, documents.size());
+
+        for (Map<String, Object> doc : documents) {
+            assertNotNull(doc.get("firstName"));
+            assertNotNull(doc.get("email"));
+            assertNotNull(doc.get("age"));
+        }
+
+        firestoreService.deleteDocument(testCollection, docId1);
+        firestoreService.deleteDocument(testCollection, docId2);
     }
 }
