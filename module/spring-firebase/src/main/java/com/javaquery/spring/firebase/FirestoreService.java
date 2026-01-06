@@ -27,6 +27,11 @@ public class FirestoreService {
     @Value("${firebase.firestore.pageSize:50}")
     private int firestorePageSize;
 
+    /**
+     * Get the Firestore instance.
+     *
+     * @return the Firestore instance
+     */
     private Firestore getFirestore() {
         return FirestoreClient.getFirestore();
     }

@@ -3,7 +3,9 @@ package com.javaquery.spring.firebase;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.javaquery.util.Is;
 import javax.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -12,6 +14,9 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class FirebaseConfiguration {
+
+    @Value("${firebase.database.url:}")
+    private String databaseUrl;
 
     private final GoogleCredentials googleCredentials;
 
@@ -23,6 +28,9 @@ public class FirebaseConfiguration {
     public void initialize() {
         if (FirebaseApp.getApps().isEmpty()) {
             FirebaseOptions.Builder optionsBuilder = FirebaseOptions.builder().setCredentials(googleCredentials);
+            if (Is.nonNullNonEmpty(databaseUrl)) {
+                optionsBuilder.setDatabaseUrl(databaseUrl);
+            }
             FirebaseApp.initializeApp(optionsBuilder.build());
         }
     }

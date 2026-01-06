@@ -4,3 +4,5 @@ firebase:
   firestore:
     queryTimeout: 5
     pageSize: 20
+  database:
+    url: ''
