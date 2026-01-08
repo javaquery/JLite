@@ -34,6 +34,9 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 public class S3Service {
     private static final Logger LOGGER = LoggerFactory.getLogger(S3Service.class);
 
+    @Value("${aws.s3.region:us-east-1}")
+    private String defaultRegion;
+
     @Value("${aws.signature.duration:5}")
     private int signatureDuration;
 
@@ -41,6 +44,17 @@ public class S3Service {
 
     public S3Service(AwsCredentialsProvider awsCredentialsProvider) {
         this.awsCredentialsProvider = awsCredentialsProvider;
+    }
+
+    /**
+     * Generate a presigned URL for uploading an object to S3 using the default region.
+     *
+     * @param bucketName The name of the S3 bucket.
+     * @param objectKey  The key (path) of the object to be uploaded.
+     * @return A presigned URL as a String.
+     */
+    public String getPutPresignedUrl(String bucketName, String objectKey) {
+        return getPutPresignedUrl(Region.of(defaultRegion), bucketName, objectKey);
     }
 
     /**
@@ -67,6 +81,17 @@ public class S3Service {
             PresignedPutObjectRequest presignedRequest = preSigner.presignPutObject(presignRequest);
             return presignedRequest.url().toString();
         }
+    }
+
+    /**
+     * Generate a presigned URL for downloading an object from S3 using the default region.
+     *
+     * @param bucketName The name of the S3 bucket.
+     * @param objectKey  The key (path) of the object to be downloaded.
+     * @return A presigned URL as a String.
+     */
+    public String getGetPresignedUrl(String bucketName, String objectKey) {
+        return getGetPresignedUrl(Region.of(defaultRegion), bucketName, objectKey);
     }
 
     /**
@@ -150,6 +175,17 @@ public class S3Service {
     }
 
     /**
+     * Download an object from S3 to a temporary file using the default region.
+     *
+     * @param bucketName The name of the S3 bucket.
+     * @param objectKey  The key (path) of the object to be downloaded.
+     * @return The file path of the downloaded object.
+     */
+    public String downloadObject(String bucketName, String objectKey) {
+        return downloadObject(Region.of(defaultRegion), bucketName, objectKey);
+    }
+
+    /**
      * Download an object from S3 to a temporary file.
      *
      * @param region     The AWS region where the S3 bucket is located.
@@ -173,6 +209,16 @@ public class S3Service {
             response.join();
             return downloadFilePath;
         }
+    }
+
+    /**
+     * Delete a single object from an S3 bucket using the default region.
+     *
+     * @param bucketName The name of the S3 bucket.
+     * @param objectKey  The key (path) of the object to be deleted.
+     */
+    public void deleteObject(String bucketName, String objectKey) {
+        deleteObjects(Region.of(defaultRegion), bucketName, List.of(objectKey));
     }
 
     /**
