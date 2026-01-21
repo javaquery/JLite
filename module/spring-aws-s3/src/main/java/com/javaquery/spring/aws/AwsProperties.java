@@ -2,13 +2,13 @@ package com.javaquery.spring.aws;
 
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author vicky.thakor
  * @since 1.0.0
  */
-@Component
+@Configuration
 @ConfigurationProperties(prefix = "aws")
 @Getter
 public class AwsProperties {
