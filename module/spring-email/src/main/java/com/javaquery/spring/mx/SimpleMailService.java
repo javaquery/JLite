@@ -12,6 +12,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
 /**
+ * Simple implementation of MailService using JavaMailSender.
+ *
  * @author vicky.thakor
  * @since 1.0.0
  */
@@ -24,6 +26,11 @@ public class SimpleMailService implements MailService {
 
     private final JavaMailSender emailSender;
 
+    /**
+     * Constructor to initialize SimpleMailService with JavaMailSender.
+     *
+     * @param emailSender the JavaMailSender instance used to send emails
+     */
     public SimpleMailService(JavaMailSender emailSender) {
         this.emailSender = emailSender;
     }

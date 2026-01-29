@@ -1,6 +1,8 @@
 package com.javaquery.spring.mx;
 
 /**
+ * Mail service interface for sending emails.
+ *
  * @author vicky.thakor
  * @since 1.0.0
  */
