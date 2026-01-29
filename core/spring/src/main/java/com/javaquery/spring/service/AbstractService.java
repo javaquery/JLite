@@ -21,6 +21,12 @@ public abstract class AbstractService<T, ID> implements IAbstractService<T, ID> 
     protected final JpaSpecificationExecutor<T> specificationExecutor;
     protected final ApplicationEventPublisher applicationEventPublisher;
 
+    /**
+     * Constructor to initialize the repository and event publisher.
+     *
+     * @param repository the JPA repository for the entity
+     * @param applicationEventPublisher the application event publisher
+     */
     public AbstractService(JpaRepository<T, ID> repository, ApplicationEventPublisher applicationEventPublisher) {
         this.repository = repository;
         this.applicationEventPublisher = applicationEventPublisher;

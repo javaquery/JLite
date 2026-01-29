@@ -3,6 +3,7 @@ package com.javaquery.spring.repository;
 import org.springframework.data.jpa.domain.Specification;
 
 /**
+ * AbstractSpecification interface providing default methods for common specifications.
  * @author vicky.thakor
  * @since 1.0.0
  */

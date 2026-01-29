@@ -15,6 +15,12 @@ public class ObjectMapperService {
     private final ObjectMapper objectMapper;
     private final ObjectMapper snakeCaseObjectMapper;
 
+    /**
+     * Constructor for ObjectMapperService.
+     *
+     * @param objectMapper          the default ObjectMapper
+     * @param snakeCaseObjectMapper the ObjectMapper configured for snake_case
+     */
     public ObjectMapperService(
             ObjectMapper objectMapper, @Qualifier("snakeCaseObjectMapper") ObjectMapper snakeCaseObjectMapper) {
         this.objectMapper = objectMapper;

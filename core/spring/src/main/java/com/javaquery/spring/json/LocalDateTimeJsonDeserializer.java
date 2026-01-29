@@ -12,6 +12,7 @@ import java.time.format.DateTimeParseException;
 import org.springframework.boot.jackson.JsonComponent;
 
 /**
+ * Custom JSON deserializer for LocalDateTime that handles multiple date formats.
  * @author vicky.thakor
  * @since 1.0.0
  */
