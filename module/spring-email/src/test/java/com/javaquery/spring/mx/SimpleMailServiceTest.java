@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
+import com.javaquery.spring.mx.config.MailServiceAutoConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,18 +19,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
- * Integration test for SimpleMailService using Spring Boot context
+ * Integration test for SimpleMailService using Spring Boot auto-configuration.
+ * This test verifies that the MailService is properly auto-configured and functional.
  *
  * @author vicky.thakor
  * @since 1.0.0
  */
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = TestConfiguration.class)
+@SpringBootTest(classes = {MailSenderAutoConfiguration.class, MailServiceAutoConfiguration.class})
 @ActiveProfiles("test")
 public class SimpleMailServiceTest {
 

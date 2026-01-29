@@ -39,6 +39,8 @@ dependencies {
 </dependency>
 ```
 
+> **✨ Auto-Configuration**: This module uses Spring Boot auto-configuration. Simply add the dependency and the `MailService` bean will be automatically available for injection - no manual configuration or component scanning required!
+
 ## Configuration
 
 Add mail configuration to your `application.yml` or `application.properties`:

@@ -10,13 +10,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.stereotype.Service;
 
 /**
  * @author vicky.thakor
  * @since 1.0.0
  */
-@Service
 public class SimpleMailService implements MailService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleMailService.class);

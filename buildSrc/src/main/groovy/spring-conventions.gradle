@@ -18,5 +18,9 @@ dependencies {
     compileOnly "org.springframework.boot:spring-boot-starter-data-jpa"
     compileOnly "com.fasterxml.jackson.core:jackson-databind"
 
+    // For creating custom Spring Boot starters
+    compileOnly "org.springframework.boot:spring-boot-autoconfigure"
+    annotationProcessor "org.springframework.boot:spring-boot-autoconfigure-processor"
+
     testImplementation "org.springframework.boot:spring-boot-starter-test"
 }
