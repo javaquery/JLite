@@ -1,16 +1,18 @@
 package com.javaquery.spring.aws;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 /**
+ * AWS configuration properties.
+ *
  * @author vicky.thakor
  * @since 1.0.0
  */
-@Configuration
 @ConfigurationProperties(prefix = "aws")
 @Getter
+@Setter
 public class AwsProperties {
     private String accessKeyId;
     private String secretAccessKey;

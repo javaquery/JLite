@@ -12,4 +12,6 @@ dependencies {
     compileOnly "software.amazon.awssdk:s3:${awsS3Version}"
 
     api project(':core:util')
+
+    testImplementation "software.amazon.awssdk:s3:${awsS3Version}"
 }

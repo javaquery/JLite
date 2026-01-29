@@ -12,10 +12,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -27,12 +25,14 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 /**
+ * Service for interacting with AWS S3.
+ * Provides methods for uploading, downloading, deleting, copying, and moving objects in S3.
+ *
  * @author vicky.thakor
  * @since 2026-01-01
  */
-@Component
+@Slf4j
 public class S3Service {
-    private static final Logger LOGGER = LoggerFactory.getLogger(S3Service.class);
 
     @Value("${aws.s3.region:us-east-1}")
     private String defaultRegion;
@@ -42,6 +42,11 @@ public class S3Service {
 
     private final AwsCredentialsProvider awsCredentialsProvider;
 
+    /**
+     * Constructor to initialize S3Service with AWS credentials provider.
+     *
+     * @param awsCredentialsProvider the AWS credentials provider
+     */
     public S3Service(AwsCredentialsProvider awsCredentialsProvider) {
         this.awsCredentialsProvider = awsCredentialsProvider;
     }
@@ -250,12 +255,12 @@ public class S3Service {
 
             response.whenComplete((deleteObjectsResponse, ex) -> {
                 if (deleteObjectsResponse == null) {
-                    LOGGER.error(ex.getMessage(), ex);
+                    log.error(ex.getMessage(), ex);
                 } else {
                     List<S3Error> errors = deleteObjectsResponse.errors();
                     if (Is.nonNullNonEmpty(errors)) {
                         for (S3Error error : errors) {
-                            LOGGER.error(
+                            log.error(
                                     "Failed to delete object: {} - Code: {}, Message: {}",
                                     error.key(),
                                     error.code(),
@@ -300,7 +305,7 @@ public class S3Service {
 
             response.whenComplete((copyObjectResponse, ex) -> {
                 if (copyObjectResponse == null) {
-                    LOGGER.error(ex.getMessage(), ex);
+                    log.error(ex.getMessage(), ex);
                 }
             });
             return response.thenApply(CopyObjectResponse::copyObjectResult).thenApply(Object::toString);
@@ -342,7 +347,7 @@ public class S3Service {
             if (copyRes != null) {
                 deleteObjects(region, sourceBucketName, List.of(sourceKey));
             } else {
-                LOGGER.error(ex.getMessage(), ex);
+                log.error(ex.getMessage(), ex);
             }
         });
         response.join();

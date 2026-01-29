@@ -21,10 +21,20 @@ public class AmazonWebServices {
 
     private final AwsProperties awsProperties;
 
+    /**
+     * Constructor to initialize AwsProperties.
+     *
+     * @param awsProperties the AWS properties
+     */
     public AmazonWebServices(AwsProperties awsProperties) {
         this.awsProperties = awsProperties;
     }
 
+    /**
+     * Creates an AwsCredentialsProvider bean based on the provided AWS properties.
+     *
+     * @return AwsCredentialsProvider instance
+     */
     @Bean
     public AwsCredentialsProvider awsCredentialsProvider() {
         if (Is.nullOrEmpty(awsProperties.getAccessKeyId()) || Is.nullOrEmpty(awsProperties.getSecretAccessKey())) {

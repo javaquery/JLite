@@ -1,3 +1,5 @@
 dependencies {
     compileOnly "software.amazon.awssdk:auth:${awsAuthVersion}"
+
+    testImplementation "software.amazon.awssdk:auth:${awsAuthVersion}"
 }

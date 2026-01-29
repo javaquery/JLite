@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.javaquery.spring.aws.config.AwsS3AutoConfiguration
