@@ -12,13 +12,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 /**
+ * Service class for interacting with Firebase Firestore.
+ * Provides common CRUD operations and query methods for Firestore management.
+ *
  * @author vicky.thakor
  * @since 1.0.0
  */
-@Service
 public class FirestoreService {
 
     @Value("${firebase.firestore.queryTimeout:10}")

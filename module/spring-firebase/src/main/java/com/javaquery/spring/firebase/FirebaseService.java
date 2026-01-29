@@ -10,7 +10,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 /**
  * Service class for interacting with Firebase Realtime Database.
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
  * @author vicky.thakor
  * @since 1.0.0
  */
-@Service
 public class FirebaseService {
 
     @Value("${firebase.database.queryTimeout:10}")
