@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * Firebase configuration for initializing FirebaseApp
+ *
  * @author vicky.thakor
  * @since 1.0.0
  */
@@ -20,10 +22,18 @@ public class FirebaseConfiguration {
 
     private final GoogleCredentials googleCredentials;
 
+    /**
+     * Constructor to inject GoogleCredentials
+     *
+     * @param googleCredentials the Google credentials for Firebase
+     */
     public FirebaseConfiguration(GoogleCredentials googleCredentials) {
         this.googleCredentials = googleCredentials;
     }
 
+    /**
+     * Initialize FirebaseApp if not already initialized
+     */
     @PostConstruct
     public void initialize() {
         if (FirebaseApp.getApps().isEmpty()) {
