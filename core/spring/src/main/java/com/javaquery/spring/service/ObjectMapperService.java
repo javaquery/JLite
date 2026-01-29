@@ -3,13 +3,13 @@ package com.javaquery.spring.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
 
 /**
+ * Service for Jackson ObjectMapper operations with support for both camelCase and snake_case JSON formats.
+ *
  * @author vicky.thakor
  * @since 1.0.1
  */
-@Service
 public class ObjectMapperService {
 
     private final ObjectMapper objectMapper;
