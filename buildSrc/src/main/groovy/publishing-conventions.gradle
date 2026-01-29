@@ -118,3 +118,12 @@ signing {
 
     sign publishing.publications.mavenJava
 }
+
+// Clean build directory before publishing
+tasks.withType(PublishToMavenRepository).configureEach {
+    dependsOn clean
+}
+
+tasks.withType(PublishToMavenLocal).configureEach {
+    dependsOn clean
+}
