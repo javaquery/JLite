@@ -7,6 +7,7 @@ import lombok.Getter;
  * Generic class to hold paginated data along with pagination metadata.
  * @author vicky.thakor
  * @since 1.0.0
+ * @param <T> the type of data contained in the page
  */
 @Getter
 public class PageData<T> {

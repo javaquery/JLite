@@ -6,6 +6,7 @@ import org.springframework.data.jpa.domain.Specification;
  * AbstractSpecification interface providing default methods for common specifications.
  * @author vicky.thakor
  * @since 1.0.0
+ * @param <T> the entity type
  */
 public interface AbstractSpecification<T> {
 

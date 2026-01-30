@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * Auto-configuration for Spring utilities.
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.Bean;
  * @author vicky.thakor
  * @since 1.0.1
  */
+@Configuration
 @AutoConfiguration
 @ConditionalOnClass(ObjectMapper.class)
 public class SpringUtilAutoConfiguration {

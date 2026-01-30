@@ -10,6 +10,8 @@ import org.springframework.data.jpa.domain.Specification;
  * Abstract service interface providing common CRUD operations.
  * @author javaquery
  * @since 1.0.0
+ * @param <T>  the entity type
+ * @param <ID> the type of the entity's identifier
  */
 public interface IAbstractService<T, ID> {
 
@@ -26,6 +28,7 @@ public interface IAbstractService<T, ID> {
     /**
      * Saves all given entities.
      *
+     * @param <S> the type of the entity
      * @param entities the entities to save
      * @return the saved entities
      */

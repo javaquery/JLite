@@ -14,11 +14,22 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  *
  * @author vicky.thakor
  * @since 1.0.0
+ * @param <T>  the entity type
+ * @param <ID> the type of the entity's identifier
  */
 public abstract class AbstractService<T, ID> implements IAbstractService<T, ID> {
 
+    /**
+     * The JPA repository for the entity.
+     */
     protected final JpaRepository<T, ID> repository;
+    /**
+     * The JPA specification executor for the entity.
+     */
     protected final JpaSpecificationExecutor<T> specificationExecutor;
+    /**
+     * The application event publisher.
+     */
     protected final ApplicationEventPublisher applicationEventPublisher;
 
     /**

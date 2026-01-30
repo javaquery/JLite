@@ -2,6 +2,8 @@
 
 A collection of utility classes and abstractions for Spring Boot projects, providing common patterns for service layers, repository specifications, and JSON deserialization.
 
+> **✨ Spring Boot 2.7.x & 3.x Compatible** | **☕ Java 11+ (Spring Boot 2) / Java 17+ (Spring Boot 3)**
+
 ## Features
 
 - 🎯 **Abstract Service Layer** - Base implementation for CRUD operations with Spring Data JPA
@@ -10,6 +12,7 @@ A collection of utility classes and abstractions for Spring Boot projects, provi
 - 📅 **JSON Deserializers** - Custom deserializers for LocalDateTime and String trimming
 - ⚡ **Event Publishing** - Built-in support for Spring ApplicationEventPublisher
 - 🛡️ **Exception Handling** - Flexible error handling with supplier-based exceptions
+- 🚀 **Auto-Configuration** - Automatic ObjectMapperService bean registration
 
 ## Installation
 
@@ -17,7 +20,7 @@ A collection of utility classes and abstractions for Spring Boot projects, provi
 
 ```gradle
 dependencies {
-    implementation 'com.javaquery:spring:1.0.0'
+    implementation 'com.javaquery:spring:1.0.2'
 }
 ```
 
@@ -27,7 +30,7 @@ dependencies {
 <dependency>
     <groupId>com.javaquery</groupId>
     <artifactId>spring</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
@@ -332,12 +335,22 @@ Immutable wrapper for paginated results.
 - `int pageSize` - Number of elements per page
 - `List<T> data` - The actual data for this page
 
+## Version Compatibility
+
+| Module Version | Spring Boot | Java | Status |
+|----------------|-------------|------|--------|
+| 1.0.2 | 3.0.x - 3.5.x | 17+ | ✅ Verified |
+| 1.0.2 | 2.7.x | 11+ | ✅ Maintained |
+| 1.0.1 | 2.7.x | 11+ | ✅ Still Works |
+| 1.0.0 | 2.7.x | 11+ | ✅ Still Works |
+
 ## Requirements
 
-- Java 11 or higher
-- Spring Boot 2.x, 3.x, etc...
-- Spring Data JPA
-- Lombok (for PageData)
+- **Java**: 11+ (Spring Boot 2.7.x) or 17+ (Spring Boot 3.x)
+- **Spring Boot**: 2.7.x or 3.0.x+
+- **Spring Data JPA**: Required for AbstractService and repository features
+- **Jackson**: Required for ObjectMapperService and JSON deserializers
+- **Lombok**: Required for PageData
 
 ## License
 
