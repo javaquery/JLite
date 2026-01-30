@@ -86,13 +86,23 @@ publishing {
 
     repositories {
         maven {
-            url = layout.buildDirectory.dir('staging-deploy')
+            name = 'sonatype'
+            url = layout.buildDirectory.dir('sonatype-deploy')
         }
+        mavenLocal()
     }
 }
 
 signing {
-    required { gradle.taskGraph.hasTask('publish') && !version.endsWith('SNAPSHOT') }
+    // Require signing when publishing to sonatype
+    required {
+        gradle.taskGraph.allTasks.any { task ->
+            task.name.contains('SonatypeRepository')
+        }
+    }
+
+    // Flag to track if signing is configured
+    def signingConfigured = false
 
     // Try in-memory keys first (modern approach)
     def signingKey = findProperty('signingKey') ?: System.getenv('SIGNING_KEY')
@@ -101,22 +111,112 @@ signing {
     if (signingKey && signingPassword) {
         // In-memory key (no secring file needed)
         useInMemoryPgpKeys(signingKey, signingPassword)
+        signingConfigured = true
+        logger.info("Using in-memory keys for signing")
     } else {
-        // Fallback to traditional file-based signing
+        // Check for traditional file-based signing
+        def secretKeyRingFile = findProperty('signing.secretKeyRingFile')
         def keyId = findProperty('signing.keyId')
         def password = findProperty('signing.password')
-        def secretKeyRingFile = findProperty('signing.secretKeyRingFile')
 
-        if (secretKeyRingFile) {
-            // Gradle will automatically use these properties
-            // No additional configuration needed
+        if (secretKeyRingFile && keyId && password) {
+            // Convert to string and normalize the path
+            def keyRingPath = secretKeyRingFile.toString()
+            // Create File object and check existence
+            def keyRingFile = new File(keyRingPath)
+            logger.lifecycle("Checking for secret key ring file at: {}", keyRingFile.absolutePath)
+
+            if (keyRingFile.exists()) {
+                // Gradle will automatically use signing.keyId, signing.password, signing.secretKeyRingFile properties
+                signingConfigured = true
+                logger.lifecycle("✓ Using file-based signing with key ring: {}", keyRingFile.absolutePath)
+            } else {
+                logger.warn("✗ Secret key ring file not found at: {}", keyRingFile.absolutePath)
+                logger.warn("  Please verify the path in gradle.properties")
+            }
         } else {
-            // Use GPG agent
-            useGpgCmd()
+            if (!secretKeyRingFile) logger.warn("  signing.secretKeyRingFile is not set")
+            if (!keyId) logger.warn("  signing.keyId is not set")
+            if (!password) logger.warn("  signing.password is not set")
+        }
+
+        // Only try GPG if no other signing method is configured
+        if (!signingConfigured) {
+            try {
+                def gpgCheck = "gpg --version".execute()
+                gpgCheck.waitFor()
+                if (gpgCheck.exitValue() == 0) {
+                    useGpgCmd()
+                    signingConfigured = true
+                    logger.info("Using GPG agent for signing")
+                }
+            } catch (Exception e) {
+                // GPG not available
+                logger.warn("GPG not available: {}", e.message)
+            }
         }
     }
 
+    // Store the signing status for later use
+    project.ext.signingConfigured = signingConfigured
+
     sign publishing.publications.mavenJava
+}
+
+// Skip signing only when publishing to mavenLocal
+// For sonatype, verify signing is configured
+gradle.taskGraph.whenReady { taskGraph ->
+    def isPublishingToMavenLocal = taskGraph.allTasks.any { task ->
+        task.name == 'publishToMavenLocal' ||
+        task.name.contains('publishMavenJavaPublicationToMavenLocal')
+    }
+
+    def sonatypePublishTasks = taskGraph.allTasks.findAll { task ->
+        task.name.contains('publishMavenJavaPublicationToSonatypeRepository')
+    }
+
+    // Always skip signing for mavenLocal
+    if (isPublishingToMavenLocal) {
+        tasks.withType(Sign).configureEach {
+            enabled = false
+        }
+    }
+
+    // For sonatype, check if this specific project has signing configured
+    def thisProjectPublishingToSonatype = sonatypePublishTasks.any { task ->
+        task.project == project
+    }
+
+    // Only fail if THIS project is being published to sonatype AND signing is not configured
+    if (thisProjectPublishingToSonatype && project.ext.has('signingConfigured') && !project.ext.signingConfigured) {
+        throw new GradleException("""
+            |
+            |================================================================================
+            |ERROR: Signing is required for Sonatype publishing but no signing credentials 
+            |       are configured!
+            |================================================================================
+            |
+            |To publish to Sonatype, you must configure signing credentials using one of:
+            |
+            |1. In-memory keys (recommended for CI/CD):
+            |   export SIGNING_KEY="\$(cat private-key.asc)"
+            |   export SIGNING_PASSWORD="your-password"
+            |
+            |2. File-based signing (gradle.properties):
+            |   signing.keyId=YOUR_KEY_ID
+            |   signing.password=YOUR_KEY_PASSWORD
+            |   signing.secretKeyRingFile=/path/to/secring.gpg
+            |
+            |3. Install and configure GPG:
+            |   Install GPG from https://gnupg.org/download/
+            |   Then run: gpg --version (to verify)
+            |
+            |For local testing without signing, use:
+            |   ./gradlew publishToMavenLocal
+            |
+            |================================================================================
+            """.stripMargin())
+    }
 }
 
 // Clean build directory before publishing

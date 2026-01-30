@@ -5,6 +5,46 @@ All notable changes to the module:spring-aws-s3 module will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-01-30
+
+### Added
+
+#### Spring Boot 3 Compatibility
+- **Spring Boot 3.x Support** - Full compatibility with Spring Boot 3.0.x through 3.5.x
+  - Works seamlessly with Spring Boot 3.5.7
+  - No code changes required from Spring Boot 2.x
+  - Dual auto-configuration registration system
+  - Compatible with Jakarta EE namespace (no javax dependencies)
+  - Verified with Spring Boot 3.0.x, 3.1.x, 3.2.x, 3.3.x, 3.4.x, and 3.5.x
+- **Enhanced Auto-Configuration**
+  - Added `@Configuration` annotation alongside `@AutoConfiguration` for broader compatibility
+  - Ensures bean detection across all Spring Boot versions
+  - Improved IDE support and recognition
+- **Dual Registration System**
+  - Created `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` for Spring Boot 2.7+/3.x
+  - Maintained `META-INF/spring.factories` for Spring Boot 2.x backward compatibility
+  - Automatic selection of appropriate registration mechanism
+
+### Changed
+
+#### Compatibility
+- **Version Support Expanded**
+  - Spring Boot 2.7.x (Java 11+) - ✅ Maintained
+  - Spring Boot 3.0.x - 3.5.x (Java 17+) - ✅ Added
+  - AWS SDK S3 2.41.10 - ✅ Maintained
+  - No breaking changes to existing API
+
+### Technical Details
+
+#### Auto-Configuration Enhancement
+- Added `org.springframework.context.annotation.Configuration` import
+- Enhanced `AwsS3AutoConfiguration` with dual annotation strategy:
+  ```java
+  @Configuration      // Spring Boot 2.x compatibility
+  @AutoConfiguration  // Spring Boot 2.7+/3.x compatibility
+  ```
+- Ensures maximum compatibility across all Spring Boot versions
+
 ## [1.0.0] - 2026-01-29
 
 ### Added
@@ -336,17 +376,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Version History
 
 ### Release Schedule
+- **1.0.1** - January 30, 2026 - Spring Boot 3.x compatibility and enhanced documentation
 - **1.0.0** - January 29, 2026 - Initial stable release with auto-configuration
 
 ### Compatibility Matrix
 
 | Module Version | Spring Boot | Java | AWS SDK S3 | Status |
 |----------------|-------------|------|------------|--------|
+| 1.0.1 | 3.0.x - 3.5.x | 17+ | 2.41.10 | ✅ Stable |
+| 1.0.1 | 2.7.x | 11+ | 2.41.10 | ✅ Stable |
 | 1.0.0 | 2.7.x | 11+ | 2.41.10 | ✅ Stable |
 
 ### Future Roadmap
 
-#### Version 1.1.0 (Planned)
+#### Version 1.2.0 (Planned)
+- **Enhanced Spring Boot 3.x Features**
+  - Native compilation support with GraalVM
+  - Spring Boot 3 specific optimizations
+  - AOT (Ahead-of-Time) compilation compatibility
 - **Multipart Upload Support**
   - Large file uploads (>5GB)
   - Automatic part size calculation
@@ -366,12 +413,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Pagination support
   - Prefix filtering
   - Delimiter support
-
-#### Version 1.2.0 (Planned)
-- **Spring Boot 3.x Support**
-  - Update auto-configuration registration
-  - Jakarta EE namespace migration
-  - Native compilation support
 - **Enhanced Metadata**
   - Custom metadata retrieval
   - Metadata update operations
@@ -412,6 +453,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Cost estimation
 
 ### Upgrade Guides
+
+#### From 1.0.0 to 1.0.1
+This is a **non-breaking update** that adds Spring Boot 3 support:
+
+1. **Update Dependency**
+   ```gradle
+   implementation 'com.javaquery:spring-aws-s3:1.0.1'
+   ```
+
+2. **No Code Changes Required**
+   - All existing code continues to work
+   - Same API, same configuration
+   - Auto-configuration remains unchanged
+
+3. **Spring Boot 3 Users**
+   - Works with Spring Boot 3.0.x through 3.5.x
+   - Requires Java 17+ (Spring Boot 3 requirement)
+   - See [QUICKSTART_SPRING_BOOT_3.md](QUICKSTART_SPRING_BOOT_3.md) for details
+
+4. **Migrating to Spring Boot 3**
+   - See [MIGRATION_CHECKLIST_SPRING_BOOT_3.md](MIGRATION_CHECKLIST_SPRING_BOOT_3.md)
+   - Follow step-by-step migration guide
+   - No changes needed for spring-aws-s3 module
 
 #### From Pre-Release to 1.0.0
 If you were using development versions:

@@ -674,6 +674,7 @@ public class MyApplication {
 
 | Module Version | Spring Boot | Java | AWS SDK S3 | Status |
 |----------------|-------------|------|------------|--------|
+| 1.0.0 | 3.0.x - 3.5.x | 17+ | 2.41.10 | ✅ Stable |
 | 1.0.0 | 2.7.x | 11+ | 2.41.10 | ✅ Stable |
 
 ## Dependencies
