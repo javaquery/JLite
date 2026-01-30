@@ -2,6 +2,8 @@
 
 A lightweight and easy-to-use Spring Boot email module that simplifies sending emails with support for HTML content, attachments, multiple recipients, and more. Built on top of Spring Boot's mail starter.
 
+> **✨ Spring Boot 2.7.x & 3.x Compatible** | **☕ Java 11+ (Spring Boot 2) / Java 17+ (Spring Boot 3)**
+
 ## Features
 
 - 📧 **Simple API** - Clean and intuitive builder pattern for email composition
@@ -20,7 +22,7 @@ A lightweight and easy-to-use Spring Boot email module that simplifies sending e
 
 ```gradle
 dependencies {
-    implementation 'com.javaquery:spring-email:1.0.0'
+    implementation 'com.javaquery:spring-email:1.0.1'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 ```
@@ -31,7 +33,7 @@ dependencies {
 <dependency>
     <groupId>com.javaquery</groupId>
     <artifactId>spring-email</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 <dependency>
     <groupId>org.springframework.boot</groupId>

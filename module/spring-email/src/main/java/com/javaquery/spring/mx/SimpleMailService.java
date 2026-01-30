@@ -3,7 +3,6 @@ package com.javaquery.spring.mx;
 import com.javaquery.util.Is;
 import com.javaquery.util.Strings;
 import com.javaquery.util.collection.Arrays;
-import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +62,8 @@ public class SimpleMailService implements MailService {
                 Is.nonNullNonEmpty(eMailPayload.getReplyTo(), () -> {
                     try {
                         mimeMessageHelper.setReplyTo(eMailPayload.getReplyTo());
-                    } catch (MessagingException e) {
+                    } catch (Exception e) {
+                        // using Exception instead of MessagingException to avoid spring jakarta.* migration issues
                         throw new RuntimeException(e);
                     }
                 });
@@ -72,7 +72,8 @@ public class SimpleMailService implements MailService {
                     String[] toArray = Arrays.toArray(eMailPayload.getTo(), new String[0]);
                     try {
                         mimeMessageHelper.setTo(toArray);
-                    } catch (MessagingException e) {
+                    } catch (Exception e) {
+                        // using Exception instead of MessagingException to avoid spring jakarta.* migration issues
                         throw new RuntimeException(e);
                     }
                 });
@@ -81,7 +82,8 @@ public class SimpleMailService implements MailService {
                     String[] ccArray = Arrays.toArray(eMailPayload.getCc(), new String[0]);
                     try {
                         mimeMessageHelper.setCc(ccArray);
-                    } catch (MessagingException e) {
+                    } catch (Exception e) {
+                        // using Exception instead of MessagingException to avoid spring jakarta.* migration issues
                         throw new RuntimeException(e);
                     }
                 });
@@ -90,7 +92,8 @@ public class SimpleMailService implements MailService {
                     String[] bccArray = Arrays.toArray(eMailPayload.getBcc(), new String[0]);
                     try {
                         mimeMessageHelper.setBcc(bccArray);
-                    } catch (MessagingException e) {
+                    } catch (Exception e) {
+                        // using Exception instead of MessagingException to avoid spring jakarta.* migration issues
                         throw new RuntimeException(e);
                     }
                 });
@@ -102,7 +105,8 @@ public class SimpleMailService implements MailService {
                     for (var attachment : eMailPayload.getAttachments()) {
                         try {
                             mimeMessageHelper.addAttachment(attachment.getName(), attachment);
-                        } catch (MessagingException e) {
+                        } catch (Exception e) {
+                            // using Exception instead of MessagingException to avoid spring jakarta.* migration issues
                             throw new RuntimeException(e);
                         }
                     }
