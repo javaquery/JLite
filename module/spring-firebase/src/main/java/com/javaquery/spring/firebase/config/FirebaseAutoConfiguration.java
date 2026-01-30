@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Import;
  * @author vicky.thakor
  * @since 1.0.0
  */
+@Configuration
 @AutoConfiguration
 @ConditionalOnClass(FirebaseApp.class)
 @Import({GoogleCloudPlatform.class, FirebaseConfiguration.class})

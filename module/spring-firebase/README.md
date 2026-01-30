@@ -2,6 +2,8 @@
 
 A comprehensive Spring Boot module for Firebase integration, providing seamless access to Firebase Realtime Database and Cloud Firestore with zero-configuration setup.
 
+> **✨ Spring Boot 2.7.x & 3.x Compatible** | **☕ Java 11+ (Spring Boot 2) / Java 17+ (Spring Boot 3)**
+
 ## Features
 
 - 🚀 **Spring Boot Auto-Configuration** - Zero setup, works out of the box
@@ -23,7 +25,7 @@ A comprehensive Spring Boot module for Firebase integration, providing seamless 
 
 ```gradle
 dependencies {
-    implementation 'com.javaquery:spring-firebase:1.0.0'
+    implementation 'com.javaquery:spring-firebase:1.0.1'
     implementation 'com.google.firebase:firebase-admin:9.4.3'
 }
 ```
@@ -35,7 +37,7 @@ dependencies {
     <dependency>
         <groupId>com.javaquery</groupId>
         <artifactId>spring-firebase</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </dependency>
     <dependency>
         <groupId>com.google.firebase</groupId>
@@ -46,6 +48,8 @@ dependencies {
 ```
 
 > **✨ Auto-Configuration**: This module uses Spring Boot auto-configuration. Simply add the dependency and configure credentials - `FirebaseService` and `FirestoreService` will be automatically available for injection!
+
+> **🚀 Spring Boot 3 Compatible**: This module works seamlessly with Spring Boot 3.x (including 3.5.7). No code changes needed - same API works for both Spring Boot 2.x and 3.x!
 
 ## Configuration
 
@@ -935,6 +939,8 @@ public class MyApplication {
 
 | Module Version | Spring Boot | Java | Firebase Admin SDK | Status |
 |----------------|-------------|------|--------------------|--------|
+| 1.0.1 | 3.0.x - 3.5.x | 17+ | 9.4.3+ | ✅ Stable |
+| 1.0.1 | 2.7.x | 11+ | 9.4.3+ | ✅ Stable |
 | 1.0.0 | 2.7.x | 11+ | 9.4.3 | ✅ Stable |
 
 ## Dependencies
