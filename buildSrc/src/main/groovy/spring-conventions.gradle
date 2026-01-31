@@ -23,4 +23,5 @@ dependencies {
     annotationProcessor "org.springframework.boot:spring-boot-autoconfigure-processor"
 
     testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.junit.platform:junit-platform-suite-engine:${junitPlatformSuiteEngineVersion}"
 }

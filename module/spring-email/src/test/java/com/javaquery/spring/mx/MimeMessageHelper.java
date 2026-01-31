@@ -1,11 +1,11 @@
 package com.javaquery.spring.mx;
 
+import jakarta.mail.BodyPart;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Part;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 import java.io.IOException;
-import javax.mail.BodyPart;
-import javax.mail.MessagingException;
-import javax.mail.Part;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 
 /**
  * @author vicky.thakor

@@ -5,59 +5,65 @@ All notable changes to the module:spring-email module will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.1] - 2026-01-30
-Note: This release is on hold, pending resolution of Spring Boot 3 compatibility issues.
-
-### Added
-
-#### Spring Boot 3 Compatibility
-- **Spring Boot 3.x Support** - Full compatibility with Spring Boot 3.0.x through 3.5.x
-  - Works seamlessly with Spring Boot 3.5.7
-  - No code changes required from Spring Boot 2.x
-  - Dual auto-configuration registration system
-  - Compatible with Jakarta EE namespace (no javax dependencies)
-  - Verified with Spring Boot 3.0.x, 3.1.x, 3.2.x, 3.3.x, 3.4.x, and 3.5.x
-- **Enhanced Auto-Configuration**
-  - Added `@Configuration` annotation alongside `@AutoConfiguration` for broader compatibility
-  - Ensures bean detection across all Spring Boot versions
-  - Improved IDE support and recognition
-- **Dual Registration System**
-  - Created `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` for Spring Boot 2.7+/3.x
-  - Maintained `META-INF/spring.factories` for Spring Boot 2.x backward compatibility
-  - Automatic selection of appropriate registration mechanism
+## [1.0.1] - 2026-01-31
 
 ### Changed
 
-#### Compatibility
-- **Version Support Expanded**
-  - Spring Boot 2.7.x (Java 11+) - ✅ Maintained
-  - Spring Boot 3.0.x - 3.5.x (Java 17+) - ✅ Added
-  - No breaking changes to existing API
+#### Breaking Change - Spring Boot 3.x Minimum Requirement
+- **Spring Boot 3.x+ Only** - This library now requires Spring Boot 3.0.x or above
+  - ⚠️ **Breaking Change**: Dropped Spring Boot 2.x support
+  - Migrated from `javax.*` to `jakarta.*` namespace
+  - Requires Java 17 or higher
+  - Compatible with Spring Boot 3.0.x, 3.1.x, 3.2.x, 3.3.x, 3.4.x, and 3.5.x
+  - Tested and verified with Spring Boot 3.5.10
+
+#### Jakarta EE Migration
+- **Jakarta Namespace** - Fully migrated to Jakarta EE standards
+  - Uses `jakarta.mail.*` instead of `javax.mail.*`
+  - Compatible with Jakarta Mail API
+  - No backward compatibility with javax namespace
+  - Ensures compliance with modern Java EE standards
 
 ### Technical Details
 
-#### Auto-Configuration Enhancement
-- Added `org.springframework.context.annotation.Configuration` import
-- Enhanced `MailServiceAutoConfiguration` with dual annotation strategy:
-  ```java
-  @Configuration      // Spring Boot 2.x compatibility
-  @AutoConfiguration  // Spring Boot 2.7+/3.x compatibility
-  ```
-- Ensures maximum compatibility across all Spring Boot versions
+#### Dependency Requirements
+- **Minimum Versions**
+  - Java 17 or higher (required by Spring Boot 3.x)
+  - Spring Boot 3.0.x or higher
+  - Jakarta Mail API (provided via spring-boot-starter-mail)
+
+#### Auto-Configuration
+- Auto-configuration remains fully functional
+- Uses `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`
+- `@AutoConfiguration` annotation for Spring Boot 3.x compatibility
+- Conditional bean registration with `@ConditionalOnClass` and `@ConditionalOnMissingBean`
 
 #### Build Verification
-- Verified compilation with Spring Boot 2.7.18
-- Verified no `javax.*` dependencies (Spring Boot 3 ready)
+- Verified compilation with Spring Boot 3.x dependencies
+- Verified Jakarta namespace usage (`jakarta.*` imports)
 - All tests passing
 - Clean build with no errors
-- JAR includes both auto-configuration registration files
+- Compatible with Spring Framework 6.x
+
+### Migration Guide
+
+#### For Spring Boot 2.x Users
+If you are using Spring Boot 2.x, you have two options:
+1. **Stay on version 1.0.0** - Use `com.javaquery:spring-email:1.0.0` for Spring Boot 2.x support
+2. **Upgrade to Spring Boot 3.x** - Upgrade your application to Spring Boot 3.x to use version 1.0.1
+
+#### Upgrade Steps
+1. Ensure your application uses Spring Boot 3.0.x or higher
+2. Ensure your application uses Java 17 or higher
+3. Update dependency to version 1.0.1
+4. No code changes required in your application - API remains the same
 
 ### Notes
 
-- **No Breaking Changes**: Existing Spring Boot 2.7.x applications continue to work without modification
-- **Seamless Upgrade**: Spring Boot 3.x applications work with the same code and configuration
-- **Production Ready**: Fully tested and verified for production use with Spring Boot 3.5.7
-- **Future Proof**: Dual registration system supports current and future Spring Boot versions
+- **Breaking Change**: This version is NOT compatible with Spring Boot 2.x
+- **API Compatibility**: Application code using this library remains unchanged
+- **Configuration**: All configuration properties remain the same
+- **Production Ready**: Fully tested and verified for production use with Spring Boot 3.x
 
 ## [1.0.0] - 2026-01-29
 
@@ -129,6 +135,7 @@ Note: This release is on hold, pending resolution of Spring Boot 3 compatibility
   - `@ConditionalOnClass` - Only activates when required classes present
   - `@ConditionalOnMissingBean` - Respects custom implementations
   - Runs after `MailSenderAutoConfiguration` for proper dependency order
+  - Compatible with Spring Boot 2.7.x
 - **Configuration Properties**
   - `spring.mail.enabled` - Custom property to control email sending (default: false)
   - All standard Spring Boot mail properties supported
@@ -157,13 +164,6 @@ Note: This release is on hold, pending resolution of Spring Boot 3 compatibility
   - Advanced usage patterns (async, templates, error handling)
   - API reference with property tables
   - Best practices and troubleshooting guide
-- **AUTO-CONFIGURATION.md**
-  - Detailed auto-configuration guide
-  - Before/after comparison
-  - Technical implementation details
-  - Migration guide from manual configuration
-  - FAQ section
-  - Benefits and usage examples
 
 #### Dependencies
 - **Core Dependencies**
@@ -260,8 +260,8 @@ Note: This release is on hold, pending resolution of Spring Boot 3 compatibility
   - The module now auto-configures automatically
 
 ### Known Limitations
-- Auto-configuration designed for Spring Boot 2.7.x
-  - For Spring Boot 3.x, the `spring.factories` location needs updating
+- Spring Boot 2.7.x support (uses javax.* namespace)
+- Requires Java 11 or higher
 - Requires `spring-boot-starter-mail` on classpath
 - Email sending is disabled by default (`spring.mail.enabled=false`)
   - Must be explicitly enabled via configuration
@@ -279,23 +279,23 @@ Note: This release is on hold, pending resolution of Spring Boot 3 compatibility
 ### Links
 - [GitHub Repository](https://github.com/javaquery/JLite)
 - [Documentation](README.md)
-- [Auto-Configuration Guide](AUTO-CONFIGURATION.md)
 
 ---
 
 ## Version History
 
 ### Release Schedule
-- **1.0.0** - January 29, 2026 - Initial stable release with auto-configuration
+- **1.0.1** - January 31, 2026 - Spring Boot 3.x support with Jakarta EE migration
+- **1.0.0** - January 29, 2026 - Initial stable release with Spring Boot 2.x support
 
 ### Compatibility Matrix
 
-| Module Version | Spring Boot | Java | Status |
-|----------------|-------------|------|--------|
-| 1.0.0 | 2.7.x | 11+ | ✅ Stable |
+| Module Version | Spring Boot | Java | Jakarta/Javax | Status |
+|----------------|-------------|------|---------------|--------|
+| **1.0.1** | 3.0.x - 3.5.x | 17+ | jakarta.* | ✅ Current |
+| 1.0.0 | 2.7.x | 11+ | javax.* | ⚠️ Legacy |
 
 ### Future Roadmap
-- Spring Boot 3.x support
 - Template engine integration (Thymeleaf, Freemarker)
 - Email queue support
 - Retry mechanism for failed sends
@@ -310,4 +310,3 @@ Note: This release is on hold, pending resolution of Spring Boot 3 compatibility
 
 *For detailed usage examples and API documentation, see [README.md](README.md)*
 
-*For auto-configuration details, see [AUTO-CONFIGURATION.md](AUTO-CONFIGURATION.md)*

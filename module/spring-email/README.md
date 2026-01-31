@@ -2,7 +2,9 @@
 
 A lightweight and easy-to-use Spring Boot email module that simplifies sending emails with support for HTML content, attachments, multiple recipients, and more. Built on top of Spring Boot's mail starter.
 
-> **✨ Spring Boot 2.7.x & 3.x Compatible** | **☕ Java 11+ (Spring Boot 2) / Java 17+ (Spring Boot 3)**
+> **✨ Spring Boot 3.x+ Required** | **☕ Java 17+** | **📦 Jakarta EE Compatible**
+
+> **⚠️ Breaking Change in v1.0.1**: This version requires Spring Boot 3.x or above due to Jakarta EE migration. For Spring Boot 2.x support, use version 1.0.0.
 
 ## Features
 
@@ -42,6 +44,35 @@ dependencies {
 ```
 
 > **✨ Auto-Configuration**: This module uses Spring Boot auto-configuration. Simply add the dependency and the `MailService` bean will be automatically available for injection - no manual configuration or component scanning required!
+
+## Compatibility & Migration
+
+### Version Compatibility Matrix
+
+| Library Version | Spring Boot | Java | Jakarta/Javax | Status |
+|----------------|-------------|------|---------------|--------|
+| **1.0.1** | 3.0.x - 3.5.x | 17+ | jakarta.* | ✅ Current |
+| 1.0.0 | 2.7.x | 11+ | javax.* | ⚠️ Legacy |
+
+### Migration from Spring Boot 2.x to 3.x
+
+#### If You're Using Spring Boot 2.x
+You have two options:
+1. **Stay on version 1.0.0** - Continue using `com.javaquery:spring-email:1.0.0`
+2. **Upgrade to Spring Boot 3.x** - Upgrade your application and use version 1.0.1
+
+#### Upgrade Steps (to version 1.0.1)
+1. Upgrade your application to Spring Boot 3.0.x or higher
+2. Upgrade to Java 17 or higher
+3. Update dependency version to 1.0.1
+4. **No code changes required** - The API remains identical
+
+#### What Changed in 1.0.1
+- ✅ Uses `jakarta.mail.*` instead of `javax.mail.*`
+- ✅ Compatible with Spring Boot 3.x (3.0.x through 3.5.x)
+- ✅ Requires Java 17+
+- ✅ Same API - no code changes in your application
+- ❌ Not compatible with Spring Boot 2.x
 
 ## Configuration
 
@@ -578,9 +609,11 @@ Default implementation of `MailService` that:
 
 ## Requirements
 
-- Java 11 or higher
-- Spring Boot 2.x or 3.x
-- Spring Boot Mail Starter
+- **Java 17 or higher** (required by Spring Boot 3.x)
+- **Spring Boot 3.0.x or higher** (3.0.x, 3.1.x, 3.2.x, 3.3.x, 3.4.x, 3.5.x)
+- **Spring Boot Mail Starter** (with Jakarta Mail API)
+
+> **Note**: For Spring Boot 2.x support, use version 1.0.0 of this library.
 
 ## License
 
@@ -601,6 +634,8 @@ JavaQuery
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: December 2025
+**Version**: 1.0.1  
+**Last Updated**: January 31, 2026  
+**Spring Boot**: 3.x+ Required  
+**Java**: 17+ Required
 

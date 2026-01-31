@@ -12,6 +12,6 @@ dependencies {
     api project(':core:util')
 
     testImplementation "org.springframework.boot:spring-boot-starter-mail"
-    testImplementation "com.icegreen:greenmail:1.6.15"
-    testImplementation "com.icegreen:greenmail-junit5:1.6.15"
+    testImplementation "com.icegreen:greenmail:${greenmailVersion}"
+    testImplementation "com.icegreen:greenmail-junit5:${greenmailVersion}"
 }

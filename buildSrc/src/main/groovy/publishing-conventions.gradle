@@ -124,20 +124,15 @@ signing {
             def keyRingPath = secretKeyRingFile.toString()
             // Create File object and check existence
             def keyRingFile = new File(keyRingPath)
-            logger.lifecycle("Checking for secret key ring file at: {}", keyRingFile.absolutePath)
+            logger.debug("Checking for secret key ring file at: {}", keyRingFile.absolutePath)
 
             if (keyRingFile.exists()) {
                 // Gradle will automatically use signing.keyId, signing.password, signing.secretKeyRingFile properties
                 signingConfigured = true
                 logger.lifecycle("✓ Using file-based signing with key ring: {}", keyRingFile.absolutePath)
             } else {
-                logger.warn("✗ Secret key ring file not found at: {}", keyRingFile.absolutePath)
-                logger.warn("  Please verify the path in gradle.properties")
+                logger.debug("Secret key ring file not found at: {}", keyRingFile.absolutePath)
             }
-        } else {
-            if (!secretKeyRingFile) logger.warn("  signing.secretKeyRingFile is not set")
-            if (!keyId) logger.warn("  signing.keyId is not set")
-            if (!password) logger.warn("  signing.password is not set")
         }
 
         // Only try GPG if no other signing method is configured
@@ -151,8 +146,8 @@ signing {
                     logger.info("Using GPG agent for signing")
                 }
             } catch (Exception e) {
-                // GPG not available
-                logger.warn("GPG not available: {}", e.message)
+                // GPG not available - only log at debug level as it's not needed for tests
+                logger.debug("GPG not available: {}", e.message)
             }
         }
     }

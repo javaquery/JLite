@@ -3,7 +3,7 @@ package com.javaquery.spring.mx;
 import com.javaquery.util.Is;
 import com.javaquery.util.Strings;
 import com.javaquery.util.collection.Arrays;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
