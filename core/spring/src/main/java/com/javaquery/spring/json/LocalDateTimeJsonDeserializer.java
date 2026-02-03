@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.jackson.JsonComponent;
 
 /**
@@ -17,6 +18,10 @@ import org.springframework.boot.jackson.JsonComponent;
  * @since 1.0.0
  */
 @JsonComponent
+@ConditionalOnProperty(
+        name = "javaquery.jackson.deserializer.localdatetime.enabled",
+        havingValue = "true",
+        matchIfMissing = true)
 public class LocalDateTimeJsonDeserializer extends JsonDeserializer<LocalDateTime> {
 
     @Override

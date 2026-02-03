@@ -5,6 +5,33 @@ All notable changes to the core:spring module will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2026-02-03
+
+### Added
+
+#### Configurable JSON Deserializers
+- **@ConditionalOnProperty Support** - Added configuration properties to enable/disable custom JSON deserializers
+  - `LocalDateTimeJsonDeserializer` can now be controlled via `javaquery.jackson.deserializer.localdatetime.enabled` property
+  - `StringJsonDeserializer` can now be controlled via `javaquery.jackson.deserializer.string-trim.enabled` property
+  - Both deserializers are **enabled by default** (`matchIfMissing = true`)
+  - Allows fine-grained control over which deserializers are active in your application
+
+### Fixed
+
+#### JSON Deserializers Auto-Registration
+- **@JsonComponent Auto-Registration** - Fixed auto-registration of custom JSON deserializers
+  - Added `@ComponentScan` to `SpringUtilAutoConfiguration` to scan `com.javaquery.spring.json` package
+  - `StringJsonDeserializer` now automatically registered with all ObjectMapper beans
+  - `LocalDateTimeJsonDeserializer` now automatically registered with all ObjectMapper beans
+  - Zero configuration required - deserializers work out of the box
+  - Added comprehensive test coverage (`JsonDeserializerTest`)
+
+### Notes
+- **Backward Compatible**: Existing applications continue to work without changes - deserializers remain enabled by default
+- **Works Out of the Box**: Simply adding the dependency enables custom deserializers
+- **Configurable**: Can now disable individual deserializers if needed via application properties
+- **Spring Boot Best Practices**: Follows standard Spring Boot auto-configuration patterns
+
 ## [1.0.2] - 2026-01-30
 
 ### Added

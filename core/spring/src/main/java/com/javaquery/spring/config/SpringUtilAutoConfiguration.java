@@ -7,20 +7,37 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
  * Auto-configuration for Spring utilities.
  * This configuration will automatically be picked up by Spring Boot when the module is on the classpath.
+ * Runs after JacksonAutoConfiguration to use Spring Boot's configured ObjectMapper when available.
  *
  * @author vicky.thakor
  * @since 1.0.1
  */
 @Configuration
-@AutoConfiguration
+@AutoConfiguration(after = JacksonAutoConfiguration.class)
 @ConditionalOnClass(ObjectMapper.class)
+@ComponentScan(basePackages = "com.javaquery.spring.json")
 public class SpringUtilAutoConfiguration {
+
+    /**
+     * Creates a default ObjectMapper bean if one doesn't already exist.
+     * In Spring Boot applications, this will not be created as JacksonAutoConfiguration provides one.
+     * In plain Spring applications, this ensures there's always a primary ObjectMapper available.
+     *
+     * @return default ObjectMapper instance
+     */
+    @Bean
+    @ConditionalOnMissingBean(ObjectMapper.class)
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
 
     /**
      * Creates a snake_case ObjectMapper bean if one doesn't already exist.

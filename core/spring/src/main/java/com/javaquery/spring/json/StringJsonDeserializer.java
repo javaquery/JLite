@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import java.io.IOException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.jackson.JsonComponent;
 
 /**
@@ -12,6 +13,10 @@ import org.springframework.boot.jackson.JsonComponent;
  * @since 1.0.0
  */
 @JsonComponent
+@ConditionalOnProperty(
+        name = "javaquery.jackson.deserializer.string-trim.enabled",
+        havingValue = "true",
+        matchIfMissing = true)
 public class StringJsonDeserializer extends JsonDeserializer<String> {
 
     @Override

@@ -146,8 +146,13 @@ public abstract class AbstractService<T, ID> implements IAbstractService<T, ID> 
             throw new UnsupportedOperationException("Repository does not support Specifications.");
         }
         var page = specificationExecutor.findAll(specification, pageable);
-        return new PageData<>(
-                page.getTotalElements(), page.getTotalPages(), page.getNumber(), page.getSize(), page.getContent());
+        return PageData.<T>builder()
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .currentPage(page.getNumber())
+                .pageSize(page.getSize())
+                .data(page.getContent())
+                .build();
     }
 
     /**
@@ -171,8 +176,13 @@ public abstract class AbstractService<T, ID> implements IAbstractService<T, ID> 
      */
     public PageData<T> findAll(Pageable pageable) {
         var page = repository.findAll(pageable);
-        return new PageData<>(
-                page.getTotalElements(), page.getTotalPages(), page.getNumber(), page.getSize(), page.getContent());
+        return PageData.<T>builder()
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .currentPage(page.getNumber())
+                .pageSize(page.getSize())
+                .data(page.getContent())
+                .build();
     }
 
     /**

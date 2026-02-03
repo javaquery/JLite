@@ -20,7 +20,7 @@ A collection of utility classes and abstractions for Spring Boot projects, provi
 
 ```gradle
 dependencies {
-    implementation 'com.javaquery:spring:1.0.2'
+    implementation 'com.javaquery:spring:1.0.3'
 }
 ```
 
@@ -30,7 +30,7 @@ dependencies {
 <dependency>
     <groupId>com.javaquery</groupId>
     <artifactId>spring</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
 </dependency>
 ```
 
@@ -206,6 +206,30 @@ public class Customer {
 // Result: name = "John Doe", email = "john@example.com"
 ```
 
+#### Configuration
+
+Both deserializers are **enabled by default** but can be controlled via application properties:
+
+```properties
+# Disable LocalDateTimeJsonDeserializer (default: true)
+javaquery.jackson.deserializer.localdatetime.enabled=false
+
+# Disable StringJsonDeserializer (default: true)
+javaquery.jackson.deserializer.string-trim.enabled=false
+```
+
+Or in YAML:
+
+```yaml
+javaquery:
+  jackson:
+    deserializer:
+      localdatetime:
+        enabled: false  # Disable LocalDateTime custom deserializer
+      string-trim:
+        enabled: false  # Disable String trimming deserializer
+```
+
 ## Advanced Usage
 
 ### Custom Service Methods
@@ -339,8 +363,10 @@ Immutable wrapper for paginated results.
 
 | Module Version | Spring Boot | Java | Status |
 |----------------|-------------|------|--------|
-| 1.0.2 | 3.0.x - 3.5.x | 17+ | ✅ Verified |
-| 1.0.2 | 2.7.x | 11+ | ✅ Maintained |
+| 1.0.3 | 3.0.x - 3.5.x | 17+ | ✅ Verified |
+| 1.0.3 | 2.7.x | 11+ | ✅ Maintained |
+| 1.0.2 | 3.0.x - 3.5.x | 17+ | ✅ Still Works |
+| 1.0.2 | 2.7.x | 11+ | ✅ Still Works |
 | 1.0.1 | 2.7.x | 11+ | ✅ Still Works |
 | 1.0.0 | 2.7.x | 11+ | ✅ Still Works |
 
@@ -366,5 +392,5 @@ Contributions are welcome! Please ensure all tests pass before submitting pull r
 
 ## Version
 
-Current version: **1.0.1**
+Current version: **1.0.3**
 

@@ -1,6 +1,5 @@
 package com.javaquery.spring;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javaquery.spring.config.SpringUtilAutoConfiguration;
 import com.javaquery.spring.repository.CustomerAttributeRepository;
 import com.javaquery.spring.repository.CustomerRepository;
@@ -44,10 +43,5 @@ public class TestConfiguration {
             CustomerAttributeRepository customerAttributeRepository,
             ApplicationEventPublisher applicationEventPublisher) {
         return new CustomerAttributeServiceImpl(customerAttributeRepository, applicationEventPublisher);
-    }
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper();
     }
 }
