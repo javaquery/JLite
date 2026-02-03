@@ -1,0 +1,16 @@
+plugins {
+    id 'java-conventions'
+    id 'spring-conventions'
+    id 'publishing-conventions'
+}
+
+version = '1.0.0'
+description = 'Spring Boot integration with Liquibase for multi-tenant applications'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly 'org.liquibase:liquibase-core'
+}
