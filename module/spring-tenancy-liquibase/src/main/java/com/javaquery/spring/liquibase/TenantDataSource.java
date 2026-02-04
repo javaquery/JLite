@@ -49,6 +49,11 @@ public interface TenantDataSource {
      */
     String getDialect();
 
+    /**
+     * Constructs the JDBC connection URL based on the tenant's database details.
+     * This method supports MySQL, PostgreSQL, SQL Server, and Oracle based on the driver string.
+     * @return the constructed connection URL as a String
+     */
     default String connectionURL() {
         if (getDriver() == null) {
             return null;

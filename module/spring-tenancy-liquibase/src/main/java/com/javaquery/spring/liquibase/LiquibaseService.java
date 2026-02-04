@@ -11,31 +11,42 @@ import javax.sql.DataSource;
 import liquibase.exception.LiquibaseException;
 import liquibase.integration.spring.SpringLiquibase;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.stereotype.Service;
 
 /**
  * Provides Liquibase service to initialize database schemas for multiple tenants.
  * @author vicky.thakor
  * @since 1.0.0
  */
-@Service
 @Slf4j
-@DependsOn("liquibase")
 public class LiquibaseService {
 
-    @Autowired
-    private LiquibaseProperties liquibaseProperties;
+    private final LiquibaseProperties liquibaseProperties;
+    private final SpringLiquibase springLiquibase;
+    private final LiquibaseDataSource liquibaseDataSource;
 
-    @Autowired
-    @Qualifier("liquibase")
-    private SpringLiquibase springLiquibase;
+    /**
+     * Constructor for LiquibaseService.
+     *
+     * @param liquibaseProperties the Liquibase configuration properties
+     * @param springLiquibase the SpringLiquibase bean
+     * @param liquibaseDataSource the tenant data source provider
+     */
+    public LiquibaseService(
+            LiquibaseProperties liquibaseProperties,
+            SpringLiquibase springLiquibase,
+            LiquibaseDataSource liquibaseDataSource) {
+        this.liquibaseProperties = liquibaseProperties;
+        this.springLiquibase = springLiquibase;
+        this.liquibaseDataSource = liquibaseDataSource;
+    }
 
-    @Autowired
-    private LiquibaseDataSource liquibaseDataSource;
-
+    /**
+     * Initializes Liquibase for all tenant data sources on application startup.
+     * This method will run Liquibase against each tenant's data source if the
+     * 'liquibase.startup.run' property is set to true.
+     *
+     * @throws LiquibaseException if Liquibase execution fails for any tenant
+     */
     @PostConstruct
     public void initialize() throws LiquibaseException {
         log.info("Initializing Liquibase Service with properties: {}", liquibaseProperties);
@@ -71,6 +82,7 @@ public class LiquibaseService {
      * Manually initialize schema for a specific tenant.
      *
      * @param tenantDataSource The tenant-specific data source configuration.
+     * @throws LiquibaseException if Liquibase execution fails for the tenant
      */
     public void initSchemaForTenant(TenantDataSource tenantDataSource) throws LiquibaseException {
         try (HikariDataSource dataSource = hikariDataSource(tenantDataSource)) {
@@ -115,6 +127,7 @@ public class LiquibaseService {
         tenantLiquibase.setContexts(springLiquibase.getContexts());
         tenantLiquibase.setDefaultSchema(springLiquibase.getDefaultSchema());
         tenantLiquibase.setDropFirst(springLiquibase.isDropFirst());
+        tenantLiquibase.setResourceLoader(springLiquibase.getResourceLoader());
         tenantLiquibase.setShouldRun(true);
         return tenantLiquibase;
     }
@@ -151,6 +164,8 @@ public class LiquibaseService {
             // Connection validation
             config.setConnectionTestQuery("SELECT 1");
             config.setValidationTimeout(liquibaseProperties.getValidationTimeout());
+
+            return new HikariDataSource(config);
         }
         return null;
     }

@@ -8,5 +8,9 @@ import java.util.List;
  * @since 1.0.0
  */
 public interface LiquibaseDataSource {
+    /**
+     * Retrieves a list of all tenant data sources.
+     * @return List of TenantDataSource objects representing each tenant's data source information.
+     */
     List<TenantDataSource> getAllTenants();
 }
