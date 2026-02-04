@@ -43,6 +43,8 @@ dependencies {
 ```
 
 > **✨ Auto-Configuration**: This module uses Spring Boot auto-configuration. Simply add the dependency and the `LiquibaseService` bean will be automatically available for injection - no manual configuration or component scanning required!
+> 
+> **🚀 Automatic Initialization**: When `initialize-on-startup: true` is set, Liquibase will run automatically on application startup without requiring any explicit autowiring or bean injection.
 
 ## Configuration
 
@@ -171,7 +173,7 @@ public class MyLiquibaseDataSource implements LiquibaseDataSource {
             
             @Override
             public String getDialect() {
-                return tenant.getDbDialect(); // "MySQL", "PostgreSQL", "SQLServer", or "Oracle"
+                return tenant.getDbDialect(); // e.g., "org.hibernate.dialect.MySQLDialect"
             }
         };
     }
@@ -216,7 +218,7 @@ public class TenantProvisioningService {
      * Initialize schema for a single tenant
      */
     public void provisionNewTenant(TenantDataSource tenantDataSource) throws LiquibaseException {
-        liquibaseService.initSchemaForTenant(tenantDataSource);
+        liquibaseService.runLiquibaseForTenant(tenantDataSource);
         // Schema is now ready for the tenant
     }
     
@@ -255,7 +257,7 @@ public class TenantManagementController {
             
             // 2. Initialize Liquibase schema for the new tenant
             TenantDataSource tenantDataSource = tenant.toTenantDataSource();
-            liquibaseService.initSchemaForTenant(tenantDataSource);
+            liquibaseService.runLiquibaseForTenant(tenantDataSource);
             
             return ResponseEntity.ok("Tenant created and provisioned successfully");
         } catch (LiquibaseException e) {
@@ -314,23 +316,32 @@ The module automatically generates connection URLs for the following databases:
 
 | Database | Dialect Value | JDBC Driver |
 |----------|---------------|-------------|
-| MySQL | `MySQL` | `com.mysql.cj.jdbc.Driver` |
-| PostgreSQL | `PostgreSQL` | `org.postgresql.Driver` |
-| SQL Server | `SQLServer` | `com.microsoft.sqlserver.jdbc.SQLServerDriver` |
-| Oracle | `Oracle` | `oracle.jdbc.OracleDriver` |
+| MySQL | `org.hibernate.dialect.MySQLDialect` | `com.mysql.cj.jdbc.Driver` |
+| PostgreSQL | `org.hibernate.dialect.PostgreSQLDialect` | `org.postgresql.Driver` |
+| SQL Server | `org.hibernate.dialect.SQLServerDialect` | `com.microsoft.sqlserver.jdbc.SQLServerDriver` |
+| Oracle | `org.hibernate.dialect.OracleDialect` | `oracle.jdbc.OracleDriver` |
 
 ## Auto-Configuration Details
 
 This module uses Spring Boot's auto-configuration mechanism:
 
-- **`LiquibaseAutoConfiguration`**: Automatically configures the Liquibase service when the module is on the classpath
+- **`SpringLiquibaseAutoConfiguration`**: Automatically configures the Liquibase service when the module is on the classpath
+- **`LiquibaseInitializer`**: CommandLineRunner implementation that automatically triggers initialization on startup (when enabled)
 - **Conditional Beans**: Beans are only created when Liquibase and DataSource classes are available
 - **Property Binding**: Automatically binds `spring.datasource.liquibase.*` properties to `LiquibaseProperties`
 - **Customizable**: All beans can be overridden by defining your own beans with the same name
+- **No Explicit Autowiring Required**: The `LiquibaseInitializer` ensures automatic execution without needing to inject `LiquibaseService` anywhere
 
 The auto-configuration is registered in:
 - `META-INF/spring.factories` (Spring Boot 2.x compatibility)
 - `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` (Spring Boot 2.7+/3.x)
+
+### How It Works
+
+1. **Bean Creation**: `SpringLiquibaseAutoConfiguration` creates `LiquibaseService` and `LiquibaseInitializer` beans
+2. **Automatic Execution**: `LiquibaseInitializer` (a `CommandLineRunner`) automatically triggers `LiquibaseService.initialize()` after application context is fully loaded
+3. **Conditional Execution**: Initialization only runs if `initialize-on-startup: true` is configured
+4. **Zero Configuration**: No need to autowire `LiquibaseService` just to trigger initialization - it happens automatically
 
 ## Requirements
 
@@ -346,20 +357,23 @@ The auto-configuration is registered in:
 2. **Leak Detection**: Enable `leak-detection-threshold` in development to catch connection leaks early
 3. **Startup Initialization**: Use `initialize-on-startup: false` and initialize on-demand for better control
 4. **Error Handling**: Always wrap `LiquibaseService` calls in try-catch blocks to handle `LiquibaseException`
-5. **Tenant Validation**: Validate tenant configurations before passing to `initSchemaForTenant()`
+5. **Tenant Validation**: Validate tenant configurations before passing to `runLiquibaseForTenant()`
 
 ## Troubleshooting
 
 ### Common Issues
 
 **Issue**: Migrations not running on startup
-- **Solution**: Ensure `initialize-on-startup: true` is set and `LiquibaseDataSource` bean is properly registered
+- **Solution**: Ensure `initialize-on-startup: true` is set and `LiquibaseDataSource` bean is properly registered. The `LiquibaseInitializer` will automatically trigger initialization without requiring explicit autowiring.
 
 **Issue**: Connection timeouts
 - **Solution**: Increase `connection-timeout` or check database connectivity
 
 **Issue**: Bean not found
 - **Solution**: Ensure `org.liquibase:liquibase-core` is in your dependencies
+
+**Issue**: Want to disable automatic initialization
+- **Solution**: Set `initialize-on-startup: false` (default) and use `LiquibaseService` manually via injection when needed
 
 ## License
 

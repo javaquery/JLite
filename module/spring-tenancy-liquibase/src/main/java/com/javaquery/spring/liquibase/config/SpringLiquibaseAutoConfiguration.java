@@ -1,6 +1,7 @@
 package com.javaquery.spring.liquibase.config;
 
 import com.javaquery.spring.liquibase.LiquibaseDataSource;
+import com.javaquery.spring.liquibase.LiquibaseInitializer;
 import com.javaquery.spring.liquibase.LiquibaseProperties;
 import com.javaquery.spring.liquibase.LiquibaseService;
 import liquibase.integration.spring.SpringLiquibase;
@@ -65,5 +66,19 @@ public class SpringLiquibaseAutoConfiguration {
             SpringLiquibase springLiquibase,
             LiquibaseDataSource liquibaseDataSource) {
         return new LiquibaseService(liquibaseProperties, springLiquibase, liquibaseDataSource);
+    }
+
+    /**
+     * Creates a LiquibaseInitializer bean that triggers Liquibase initialization on application startup.
+     * This bean implements CommandLineRunner to ensure automatic execution without requiring
+     * explicit autowiring of LiquibaseService.
+     *
+     * @param liquibaseService the LiquibaseService bean
+     * @return LiquibaseInitializer instance
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public LiquibaseInitializer liquibaseInitializer(LiquibaseService liquibaseService) {
+        return new LiquibaseInitializer(liquibaseService);
     }
 }

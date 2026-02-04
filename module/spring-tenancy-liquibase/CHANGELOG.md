@@ -19,9 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Automatic bean registration and dependency injection
   - Conditional loading based on required dependencies
 - **Flexible Initialization** - Multiple initialization strategies
-  - Automatic initialization on application startup
+  - Automatic initialization on application startup via `LiquibaseInitializer` (CommandLineRunner)
   - Manual initialization for on-demand tenant provisioning
   - Configurable via Spring Boot properties
+  - No explicit autowiring required - initialization happens automatically when `initialize-on-startup: true`
+  - Better separation of concerns: `LiquibaseService` for logic, `LiquibaseInitializer` for auto-execution
 
 #### Connection Management
 - **HikariCP Integration** - Optimized connection pooling for each tenant
@@ -55,7 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Core Classes
 - **LiquibaseService** - Main service for tenant schema management
-  - `initSchemaForTenant()` - Initialize or update a specific tenant's schema
+  - `runLiquibaseForTenant()` - Initialize or update a specific tenant's schema
   - `initSchemaForAllTenants()` - Batch initialization for all tenants
   - Automatic Liquibase changelog execution
   - HikariCP connection pooling per tenant

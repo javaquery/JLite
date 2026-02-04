@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import liquibase.exception.LiquibaseException;
 import liquibase.integration.spring.SpringLiquibase;
@@ -14,8 +13,21 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Provides Liquibase service to initialize database schemas for multiple tenants.
+ * <p>
+ * This service is automatically configured by Spring Boot's auto-configuration and can be used
+ * in two ways:
+ * <ul>
+ *   <li><b>Automatic Initialization:</b> Set {@code spring.datasource.liquibase.initialize-on-startup=true}
+ *       in your application properties. The {@link LiquibaseInitializer} will automatically trigger
+ *       initialization on application startup without requiring explicit autowiring.</li>
+ *   <li><b>Manual Initialization:</b> Inject this service into your components and call
+ *       {@link #runLiquibaseForTenant(TenantDataSource)} or {@link #initialize()} methods as needed
+ *       for on-demand tenant provisioning.</li>
+ * </ul>
+ *
  * @author vicky.thakor
  * @since 1.0.0
+ * @see LiquibaseInitializer
  */
 @Slf4j
 public class LiquibaseService {
@@ -43,13 +55,16 @@ public class LiquibaseService {
     /**
      * Initializes Liquibase for all tenant data sources on application startup.
      * This method will run Liquibase against each tenant's data source if the
-     * 'liquibase.startup.run' property is set to true.
+     * 'spring.datasource.liquibase.initialize-on-startup' property is set to true.
+     * <p>
+     * <b>Note:</b> This method is automatically called by {@link LiquibaseInitializer} during
+     * application startup when automatic initialization is enabled. You don't need to call it
+     * manually unless you're implementing custom initialization logic.
      *
      * @throws LiquibaseException if Liquibase execution fails for any tenant
+     * @see LiquibaseInitializer
      */
-    @PostConstruct
     public void initialize() throws LiquibaseException {
-        log.info("Initializing Liquibase Service with properties: {}", liquibaseProperties);
         if (liquibaseProperties.isInitializeOnStartup()) {
             int successCount = 0;
             int failureCount = 0;
@@ -79,12 +94,12 @@ public class LiquibaseService {
     }
 
     /**
-     * Manually initialize schema for a specific tenant.
+     * Manually trigger liquibase execution for a specific tenant data source.
      *
      * @param tenantDataSource The tenant-specific data source configuration.
      * @throws LiquibaseException if Liquibase execution fails for the tenant
      */
-    public void initSchemaForTenant(TenantDataSource tenantDataSource) throws LiquibaseException {
+    public void runLiquibaseForTenant(TenantDataSource tenantDataSource) throws LiquibaseException {
         try (HikariDataSource dataSource = hikariDataSource(tenantDataSource)) {
             runLiquibaseForDataSource(dataSource);
             log.info("Liquibase schema has been initialized.");
